@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "Polar_MainActivity"
         private const val SHARED_PREFS_KEY = "polar_device_id"
+        private const val SHARED_PREFS_IP_KEY = "polar_server_ip"
         private const val PERMISSION_REQUEST_CODE = 1
     }
 
@@ -37,19 +38,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private var deviceId: String? = null
+    private var deviceIp: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         sharedPreferences = getPreferences(MODE_PRIVATE)
         deviceId = sharedPreferences.getString(SHARED_PREFS_KEY, "")
+        deviceIp = sharedPreferences.getString(SHARED_PREFS_IP_KEY, "")
 
         val setIdButton: Button = findViewById(R.id.buttonSetID)
+        val setIpButton: Button = findViewById(R.id.buttonSetIP)
         val ecgConnectButton: Button = findViewById(R.id.buttonConnectEcg)
         val hrConnectButton: Button = findViewById(R.id.buttonConnectHr)
         checkBT()
 
         setIdButton.setOnClickListener { onClickChangeID(it) }
+        setIpButton.setOnClickListener { onClickChangeIP(it) }
         ecgConnectButton.setOnClickListener { onClickConnectEcg(it) }
         hrConnectButton.setOnClickListener { onClickConnectHr(it) }
     }
@@ -58,11 +63,16 @@ class MainActivity : AppCompatActivity() {
         checkBT()
         if (deviceId == null || deviceId == "") {
             deviceId = sharedPreferences.getString(SHARED_PREFS_KEY, "")
-            showDialog(view)
-        } else {
-            showToast(getString(R.string.connecting) + " " + deviceId)
+            showIDDialog(view)
+        }else if(deviceIp == null || deviceIp == ""){
+            deviceIp = sharedPreferences.getString(SHARED_PREFS_IP_KEY, "")
+            showIPDialog(view)
+        }
+        else {
+            showToast(getString(R.string.connecting) + " " + deviceId + " " + deviceIp)
             val intent = Intent(this, ECGActivity::class.java)
             intent.putExtra("id", deviceId)
+            intent.putExtra("ip", deviceIp)
             startActivity(intent)
         }
     }
@@ -71,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         checkBT()
         if (deviceId == null || deviceId == "") {
             deviceId = sharedPreferences.getString(SHARED_PREFS_KEY, "")
-            showDialog(view)
+            showIDDialog(view)
         } else {
             showToast(getString(R.string.connecting) + " " + deviceId)
             val intent = Intent(this, HRActivity::class.java)
@@ -81,10 +91,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClickChangeID(view: View) {
-        showDialog(view)
+        showIDDialog(view)
     }
 
-    private fun showDialog(view: View) {
+    private fun onClickChangeIP(view: View) {
+        showIPDialog(view)
+    }
+
+    private fun showIDDialog(view: View) {
         val dialog = AlertDialog.Builder(this, R.style.PolarTheme)
         dialog.setTitle("Enter your Polar device's ID")
         val viewInflated = LayoutInflater.from(applicationContext).inflate(R.layout.device_id_dialog_layout, view.rootView as ViewGroup, false)
@@ -96,6 +110,24 @@ class MainActivity : AppCompatActivity() {
             deviceId = input.text.toString().uppercase()
             val editor = sharedPreferences.edit()
             editor.putString(SHARED_PREFS_KEY, deviceId)
+            editor.apply()
+        }
+        dialog.setNegativeButton("Cancel") { dialogInterface: DialogInterface, _: Int -> dialogInterface.cancel() }
+        dialog.show()
+    }
+
+    private fun showIPDialog(view: View) {
+        val dialog = AlertDialog.Builder(this, R.style.PolarTheme)
+        dialog.setTitle("Enter your server IP")
+        val viewInflated = LayoutInflater.from(applicationContext).inflate(R.layout.serwer_ip_dialog_layout, view.rootView as ViewGroup, false)
+        val input = viewInflated.findViewById<EditText>(R.id.input)
+        if (deviceIp?.isNotEmpty() == true) input.setText(deviceIp)
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        dialog.setView(viewInflated)
+        dialog.setPositiveButton("OK") { _: DialogInterface?, _: Int ->
+            deviceIp = input.text.toString().uppercase()
+            val editor = sharedPreferences.edit()
+            editor.putString(SHARED_PREFS_IP_KEY, deviceIp)
             editor.apply()
         }
         dialog.setNegativeButton("Cancel") { dialogInterface: DialogInterface, _: Int -> dialogInterface.cancel() }

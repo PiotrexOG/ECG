@@ -10,5 +10,7 @@
     <string name="connecting">Connecting to device</string>
     <string name="connected">Connected!</string>
     <string name="device_id">device_id</string>
+    <string name="device_ip">device_ip</string>
     <string name="set_id_button">Change device ID</string>
+    <string name="set_ip_button">Change device IP</string>
 </resources>

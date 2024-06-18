@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.StepMode
 import com.androidplot.xy.XYPlot
@@ -18,7 +19,19 @@ import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarSensorSetting
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import java.io.BufferedReader
+import java.io.DataOutputStream
+import java.io.IOException
+import java.net.Socket
+import java.nio.ByteBuffer
 import java.util.*
+import java.util.concurrent.Executors
+
+import java.io.File
+import java.io.FileWriter
+import java.io.BufferedWriter
+import java.io.FileReader
+
 
 class ECGActivity : AppCompatActivity(), PlotterListener {
     companion object {
@@ -35,13 +48,16 @@ class ECGActivity : AppCompatActivity(), PlotterListener {
     private lateinit var ecgPlotter: EcgPlotter
     private var ecgDisposable: Disposable? = null
     private var hrDisposable: Disposable? = null
+    private val SERVER_PORT = 12345
 
     private lateinit var deviceId: String
+    private lateinit var serverIP: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ecg)
         deviceId = intent.getStringExtra("id") ?: throw Exception("ECGActivity couldn't be created, no deviceId given")
+        serverIP = intent.getStringExtra("ip") ?: throw Exception("ECGActivity couldn't be created, no serverIp given")
         textViewHR = findViewById(R.id.hr)
         textViewRR = findViewById(R.id.rr)
         textViewDeviceId = findViewById(R.id.deviceId)
@@ -142,10 +158,103 @@ class ECGActivity : AppCompatActivity(), PlotterListener {
         ecgDisposable?.let {
             if (!it.isDisposed) it.dispose()
         }
+        closeSocketIfNeeded()
         api.shutDown()
     }
 
+    private var socket: Socket? = null
+    private var outputStream: DataOutputStream? = null
+    private fun openSocketIfNeeded() {
+        if (socket == null || outputStream == null || socket!!.isClosed) {
+            try {
+                socket = Socket(serverIP, SERVER_PORT)
+                outputStream = DataOutputStream(socket!!.getOutputStream())
+            } catch (e: IOException) {
+                Log.e(TAG, "Error opening socket: $e")
+            }
+        }
+    }
+
+    private fun closeSocket() {
+        try {
+            socket?.close()
+        } catch (e: IOException) {
+            Log.e(TAG, "Error closing socket: $e")
+        } finally {
+            socket = null
+        }
+    }
+
+    private val executor = Executors.newSingleThreadExecutor()
+
+//    private fun sendDataToServer(samples: List<PolarEcgData.PolarEcgDataSample>) {
+//        executor.submit {
+//            try {
+//                openSocketIfNeeded()
+//
+//                val buffer = ByteBuffer.allocate(samples.size * (4 + 8))
+//                for (obj in samples) {
+//                    buffer.putFloat(obj.voltage.toFloat())
+//                    buffer.putLong(obj.timeStamp)
+//                }
+//                val bytes = buffer.array()
+//
+//                outputStream?.write(bytes)
+//                outputStream?.flush()
+//            } catch (e: IOException) {
+//                Log.e(TAG, "Error sending data: $e")
+//            }
+//        }
+//    }
+
+    private fun sendDataToServer(samples: List<PolarEcgData.PolarEcgDataSample>) {
+        executor.submit {
+            try {
+                openSocketIfNeeded()
+
+                val buffer = ByteBuffer.allocate(samples.size * (4 + 8))  // Allocate enough space for float and long
+                val file = File(filesDir, "ecg_data1.csv")
+                if (!file.exists()) {
+                    file.createNewFile()
+                }
+                val fileWriter = FileWriter(file, true)
+                val bufferedWriter = BufferedWriter(fileWriter)
+
+                for (obj in samples) {
+                    buffer.putFloat(obj.voltage.toFloat())
+                    buffer.putLong(obj.timeStamp)
+                    try {
+                        bufferedWriter.write("${obj.timeStamp},${obj.voltage}\n")
+                    } catch (e: IOException) {
+                        Log.e(TAG, "Error writing to file: $e")
+                    }
+                }
+
+                val bytes = buffer.array()
+                outputStream?.write(bytes)
+                outputStream?.flush()
+                bufferedWriter.close()
+
+            } catch (e: IOException) {
+                Log.e(TAG, "Error sending data: $e")
+            }
+        }
+    }
+
+
+
+    // Wywołanie tej funkcji na końcu, aby upewnić się, że gniazdo zostanie zamknięte.
+    private fun closeSocketIfNeeded() {
+        if (socket != null && !socket!!.isClosed) {
+            closeSocket()
+        }
+    }
+
+
     fun streamECG() {
+
+
+
         val isDisposed = ecgDisposable?.isDisposed ?: true
         if (isDisposed) {
             ecgDisposable = api.requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.ECG)
@@ -155,7 +264,15 @@ class ECGActivity : AppCompatActivity(), PlotterListener {
                 .subscribe(
                     { polarEcgData: PolarEcgData ->
                         Log.d(TAG, "ecg update")
+                        sendDataToServer(polarEcgData.samples)
+                        Log.d(TAG, polarEcgData.samples.size.toString())
+                        var siema = false
                         for (data in polarEcgData.samples) {
+                            if (!siema) {
+                                Log.d(TAG, "pierwsza wartosc to: ${data.voltage}")
+                                Log.d(TAG, "pierwszy timestamp to: ${data.timeStamp}")
+                            }
+                            siema = true
                             ecgPlotter.sendSingleSample((data.voltage.toFloat() / 1000.0).toFloat())
                         }
                     },
@@ -174,6 +291,7 @@ class ECGActivity : AppCompatActivity(), PlotterListener {
         }
     }
 
+
     fun streamHR() {
         val isDisposed = hrDisposable?.isDisposed ?: true
         if (isDisposed) {
@@ -181,6 +299,9 @@ class ECGActivity : AppCompatActivity(), PlotterListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { hrData: PolarHrData ->
+
+
+
                         for (sample in hrData.samples) {
                             Log.d(TAG, "HR " + sample.hr)
                             if (sample.rrsMs.isNotEmpty()) {
@@ -208,4 +329,5 @@ class ECGActivity : AppCompatActivity(), PlotterListener {
     override fun update() {
         runOnUiThread { plot.redraw() }
     }
+
 }
