@@ -23,6 +23,9 @@ data class PolarEcgDataSample(
 
 class MainActivity : AppCompatActivity() {
 
+    private val ipAddress = "10.0.2.2" //local machine address / host machine of emulator
+    private val port = 12345
+
     companion object {
         private const val TAG = "ECGActivity"
         private const val SAMPLE_SIZE = 73
@@ -65,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     private fun openSocketIfNeeded() {
         if (socket == null || outputStream == null || socket!!.isClosed) {
             try {
-                socket = Socket("192.168.1.132", 12345) // Server IP address
+                socket = Socket(ipAddress, port) // Server IP address
                 outputStream = DataOutputStream(socket!!.getOutputStream())
             } catch (e: IOException) {
                 Log.e(TAG, "Error opening socket: $e")
