@@ -5,23 +5,97 @@ from collections import deque
 import numpy as np
 import threading
 import queue
+import datetime
+
+import numpy as np
+from scipy.signal import lfilter, find_peaks
+
+class PanTompkins:
+    def __init__(self, fs):
+        self.fs = fs  # Sampling frequency (e.g., 130 Hz)
+    
+    def bandpass_filter(self, signal):
+        # Simple bandpass filter between 5-15 Hz for QRS detection
+        b = np.array([1, -2, 1])
+        a = np.array([1, -1.8, 0.81])
+        filtered_signal = lfilter(b, a, signal)
+        return filtered_signal
+
+    def derivative(self, signal):
+        # Derivative emphasizes slope of QRS complex
+        b = np.array([1, 2, 0, -2, -1]) * (self.fs / 8.0)
+        derivative_signal = lfilter(b, 1, signal)
+        return derivative_signal
+
+    def squaring(self, signal):
+        # Square each point in the signal
+        squared_signal = signal ** 2
+        return squared_signal
+
+    def moving_average(self, signal):
+        # Moving average window size (approx 150ms window)
+        window_size = int(0.15 * self.fs)
+        ma_signal = np.convolve(signal, np.ones(window_size) / window_size, mode='same')
+        return ma_signal
+
+    def detect_r_peaks(self, ecg_signal):
+        # Apply the Pan-Tompkins algorithm step by step
+        filtered_signal = self.bandpass_filter(ecg_signal)
+        derivative_signal = self.derivative(filtered_signal)
+        squared_signal = self.squaring(derivative_signal)
+        ma_signal = self.moving_average(squared_signal)
+
+        # Detect peaks in the moving average signal
+        peaks, _ = find_peaks(ma_signal, distance=int(0.6 * self.fs))  # Peaks with minimum distance of 600 ms
+        return peaks
 
 
 class EcgPlotter:
-    def __init__(self, title):
+    def __init__(self, title, sampling_frequency):
         self.SECONDS_TO_PLOT = 5
         self.plot_data = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Assuming 130 Hz max frequency
+        self.r_peaks = []  # List to store R-peaks timestamps
         self.fig, self.ax = plt.subplots()
         self.line, = self.ax.plot([], [])
         plt.title(title)
-        plt.xlabel('Time (s)')
+        plt.xlabel('Time (ms)')
         plt.ylabel('mV')
         self.timer = self.fig.canvas.new_timer(interval=100)
         self.timer.add_callback(self.update_plot)
         self.timer.start()
 
+        # Initialize the Pan-Tompkins algorithm
+        self.pan_tompkins = PanTompkins(sampling_frequency)
+
     def send_single_sample(self, timestamp, mV):
         self.plot_data.append((timestamp, mV))
+        if len(self.plot_data) >= 130:  # Process when we have enough data
+            self.detect_r_peak()
+
+    def detect_r_peak(self):
+        timestamps, ecg_values = zip(*self.plot_data)
+        ecg_array = np.array(ecg_values)
+
+        # Use Pan-Tompkins to detect R-peaks
+        r_peak_indices = self.pan_tompkins.detect_r_peaks(ecg_array)
+
+        for peak_index in r_peak_indices:
+            peak_timestamp = timestamps[peak_index]
+            if len(self.r_peaks) == 0 or (peak_timestamp - self.r_peaks[-1]) > 300:
+                self.r_peaks.append(peak_timestamp)
+                print(f"R-peak detected at {peak_timestamp} ms")
+
+                # Calculate R-R intervals and HRV
+                self.calculate_rr_intervals()
+
+    def calculate_rr_intervals(self):
+        if len(self.r_peaks) > 1:
+            rr_intervals = np.diff(self.r_peaks)  # Calculate differences between consecutive R-peaks
+            print(f"R-R Intervals: {rr_intervals}")
+
+            # Calculate basic HRV metrics like SDNN (Standard deviation of RR intervals)
+            sdnn = np.std(rr_intervals)
+            print(f"SDNN: {sdnn} ms")
 
     def update_plot(self):
         if len(self.plot_data) > 0:
@@ -34,10 +108,9 @@ class EcgPlotter:
             self.fig.canvas.draw_idle()  # Update the plot safely for threading
 
 
-# Define the host and port to listen on
-HOST = '127.0.0.1'  # Listen on all network interfaces
-PORT = 12345  # Choose a port number
-ecg_plotter = EcgPlotter("ECG")
+HOST = '127.0.0.1' 
+PORT = 12345
+ecg_plotter = EcgPlotter("ECG", 130)
 data_queue = queue.Queue()
 
 
@@ -67,9 +140,10 @@ def process_packet(raw_data):
         long_value = struct.unpack('!q', raw_data[offset + 4:offset + 12])[0]  # Wyciągnięcie long
         if siema == 0:
             print("First value:" + "%f" % float_value)
+            # date = datetime.datetime.fromtimestamp((long_value / 1e9))
             print("First value timestamp:" + str(long_value))
         siema = 1
-        data_queue.put((long_value, float_value))  # Dodanie wartości do kolejki
+        data_queue.put((long_value/1e6, float_value))  # Dodanie wartości do kolejki
 
 
 def plot_data():
