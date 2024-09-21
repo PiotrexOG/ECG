@@ -31,11 +31,11 @@ class EcgPlotter:
             self.line.set_data(x - x[0], values)  # Normalize time to start from 0
             self.ax.relim()
             self.ax.autoscale_view()
-            self.fig.canvas.draw_idle()  # Zaktualizuj wykres w sposób bezpieczny dla wątków
+            self.fig.canvas.draw_idle()  # Update the plot safely for threading
 
 
 # Define the host and port to listen on
-HOST = '192.168.1.132'  # Listen on all network interfaces
+HOST = '127.0.0.1'  # Listen on all network interfaces
 PORT = 12345  # Choose a port number
 ecg_plotter = EcgPlotter("ECG")
 data_queue = queue.Queue()
@@ -47,7 +47,7 @@ def handle_client_connection(client_socket):
             raw_data = receive_packet(client_socket)
             process_packet(raw_data)
     except (ConnectionResetError, ValueError):
-        print("Klient rozłączony.")
+        print("Client disconnected.")
     finally:
         client_socket.close()
 
@@ -66,8 +66,8 @@ def process_packet(raw_data):
         float_value = struct.unpack('!f', raw_data[offset:offset + 4])[0]  # Wyciągnięcie floata
         long_value = struct.unpack('!q', raw_data[offset + 4:offset + 12])[0]  # Wyciągnięcie long
         if siema == 0:
-            print("pierwsza wartosc to:" + "%f" % float_value)
-            print("pierwszy timestamp to:" + "%d" % long_value)
+            print("First value:" + "%f" % float_value)
+            print("First value timestamp:" + str(long_value))
         siema = 1
         data_queue.put((long_value, float_value))  # Dodanie wartości do kolejki
 
@@ -88,7 +88,7 @@ def start_server():
 
         # Start listening for incoming connections
         server_socket.listen(1)
-        print("Server listening on port", PORT)
+        print("Server listening on port", HOST, PORT)
 
         plot_thread = threading.Thread(target=plot_data)
         plot_thread.daemon = True
