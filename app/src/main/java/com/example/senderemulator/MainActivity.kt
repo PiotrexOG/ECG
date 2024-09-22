@@ -17,23 +17,25 @@ private var socket: Socket? = null
 private var outputStream: DataOutputStream? = null
 
 data class PolarEcgDataSample(
-    val timeStamp: Long,
+    var timeStamp: Long,
     val voltage: Int
 )
 
 class MainActivity : AppCompatActivity() {
 
-    private val ipAddress = "10.0.2.2" //local machine address / host machine of emulator
-    private val port = 12345
-
     companion object {
         private const val TAG = "ECGActivity"
         private const val SAMPLE_SIZE = 73
+        private const val IP_ADDRESS = "10.0.2.2" //local machine address / host machine of emulator
+        private const val PORT = 12345
+        private const val LOOP_DATA = true
     }
 
     private val samplesList = mutableListOf<PolarEcgDataSample>()
     private var currentIndex = 0
     private val timer = Timer()
+
+    private var offset:Long = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,11 +50,13 @@ class MainActivity : AppCompatActivity() {
     private fun scheduleNextPacket(initialDelay: Long) {
         timer.schedule(object : TimerTask() {
             override fun run() {
+                val firstToLastDiff = samplesList.last().timeStamp - samplesList.first().timeStamp
+
                 if (currentIndex + SAMPLE_SIZE <= samplesList.size) {
                     val samples = samplesList.subList(currentIndex, currentIndex + SAMPLE_SIZE)
                     sendDataToServer(samples)
                     Log.d(TAG, samples[0].voltage.toString())
-                    Log.d(TAG, samples[0].timeStamp.toString())
+                    Log.d(TAG, (samples[0].timeStamp).toString())
 
                     // Calculate delay based on timestamps in nanoseconds, convert to milliseconds
                     val delayNs = samples.last().timeStamp - samples.first().timeStamp
@@ -61,6 +65,16 @@ class MainActivity : AppCompatActivity() {
                     currentIndex += SAMPLE_SIZE
                     scheduleNextPacket(delayMs)
                 }
+                else{
+                    if(LOOP_DATA) {
+                        currentIndex = 0
+                        for (sample in samplesList) {
+                            sample.timeStamp += firstToLastDiff
+                        }
+                        offset += firstToLastDiff
+                        scheduleNextPacket(0)
+                    }
+                }
             }
         }, initialDelay)
     }
@@ -68,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     private fun openSocketIfNeeded() {
         if (socket == null || outputStream == null || socket!!.isClosed) {
             try {
-                socket = Socket(ipAddress, port) // Server IP address
+                socket = Socket(IP_ADDRESS, PORT) // Server IP address
                 outputStream = DataOutputStream(socket!!.getOutputStream())
             } catch (e: IOException) {
                 Log.e(TAG, "Error opening socket: $e")
