@@ -5,7 +5,6 @@ from collections import deque
 import numpy as np
 import threading
 import queue
-import datetime
 
 import numpy as np
 from scipy.signal import lfilter, find_peaks
@@ -55,17 +54,28 @@ class EcgPlotter:
         self.SECONDS_TO_PLOT = 5
         self.plot_data = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Assuming 130 Hz max frequency
         self.r_peaks = []  # List to store R-peaks timestamps
-        self.fig, self.ax = plt.subplots()
-        self.line, = self.ax.plot([], [])
-        plt.title(title)
-        plt.xlabel('Time (ms)')
-        plt.ylabel('mV')
+        
+        # Create subplots: one for ECG, one for moving average signal
+        self.fig, (self.ax_ecg, self.ax_ma) = plt.subplots(2, 1, sharex=True)
+        
+        # ECG plot
+        self.line_ecg, = self.ax_ecg.plot([], [])
+        self.ax_ecg.set_title(title + " - ECG Signal")
+        self.ax_ecg.set_ylabel('mV')
+        
+        # Moving average plot
+        self.line_ma, = self.ax_ma.plot([], [], color='orange')
+        self.ax_ma.set_title(title + " - Moving Average (ma_signal)")
+        self.ax_ma.set_xlabel('Time (ms)')
+        self.ax_ma.set_ylabel('Amplitude')
+        
         self.timer = self.fig.canvas.new_timer(interval=100)
         self.timer.add_callback(self.update_plot)
         self.timer.start()
 
         # Initialize the Pan-Tompkins algorithm
         self.pan_tompkins = PanTompkins(sampling_frequency)
+        self.ma_signal = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Store moving average signal for plotting
 
     def send_single_sample(self, timestamp, mV):
         self.plot_data.append((timestamp, mV))
@@ -80,13 +90,14 @@ class EcgPlotter:
         r_peak_indices = self.pan_tompkins.detect_r_peaks(ecg_array)
 
         for peak_index in r_peak_indices:
-            peak_timestamp = timestamps[peak_index]
+            peak_timestamp = timestamps[peak_index]  # Get corresponding timestamp for the peak
             if len(self.r_peaks) == 0 or (peak_timestamp - self.r_peaks[-1]) > 300:
                 self.r_peaks.append(peak_timestamp)
                 print(f"R-peak detected at {peak_timestamp} ms")
 
                 # Calculate R-R intervals and HRV
                 self.calculate_rr_intervals()
+
 
     def calculate_rr_intervals(self):
         if len(self.r_peaks) > 1:
@@ -99,13 +110,43 @@ class EcgPlotter:
 
     def update_plot(self):
         if len(self.plot_data) > 0:
-            timestamps, values = zip(*self.plot_data)
-            # Convert timestamps from ms to seconds
+            timestamps, ecg_values = zip(*self.plot_data)
             x = np.array(timestamps)
-            self.line.set_data(x - x[0], values)  # Normalize time to start from 0
-            self.ax.relim()
-            self.ax.autoscale_view()
+
+            # Normalize x-axis for ECG plot
+            x_normalized = x - x[0]
+
+            # Update ECG plot
+            self.line_ecg.set_data(x_normalized, ecg_values)  # Use normalized time
+            self.ax_ecg.relim()
+            self.ax_ecg.autoscale_view()  
+
+            # Mark R-peaks on the ECG plot
+            if len(self.r_peaks) > 0:
+                # Clear previous R-peak markers
+                for line in self.ax_ecg.lines[1:]:
+                    line.remove()  # Remove previous R-peak markers (keeps only the first line for the ECG)
+
+                for r_peak_time in self.r_peaks:
+                    # Find the corresponding x value for each R-peak
+                    r_peak_normalized = r_peak_time - x[0]  # Normalize based on the plot's start time
+                    self.ax_ecg.axvline(x=r_peak_normalized, color='red', linestyle='--', label="R-peak")
+
+            # Update Moving Average plot if data exists
+            if len(self.ma_signal) > 0:
+                # Ensure ma_x and ma_signal have the same length
+                ma_signal_length = min(len(x), len(self.ma_signal))  # Use minimum length
+                ma_x = x_normalized[:ma_signal_length]  # Slice normalized x to match the length of ma_signal
+                ma_y = list(self.ma_signal)[:ma_signal_length]  # Slice ma_signal to match ma_x
+
+                self.line_ma.set_data(ma_x, ma_y)  # Use normalized time for the MA plot
+                self.ax_ma.relim()
+                self.ax_ma.autoscale_view()
+
             self.fig.canvas.draw_idle()  # Update the plot safely for threading
+
+
+
 
 
 HOST = '127.0.0.1' 
@@ -143,7 +184,7 @@ def process_packet(raw_data):
             # date = datetime.datetime.fromtimestamp((long_value / 1e9))
             print("First value timestamp:" + str(long_value))
         siema = 1
-        data_queue.put((long_value/1e6, float_value))  # Dodanie wartości do kolejki
+        data_queue.put((long_value/1e6, -float_value))  # Dodanie wartości do kolejki
 
 
 def plot_data():
