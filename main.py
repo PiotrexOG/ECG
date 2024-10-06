@@ -13,7 +13,7 @@ from scipy.signal import lfilter, find_peaks
 class PanTompkins:
     def __init__(self, fs):
         self.fs = fs  # Sampling frequency (e.g., 130 Hz)
-    
+
     def bandpass_filter(self, signal):
         # Simple bandpass filter between 5-15 Hz for QRS detection
         b = np.array([1, -2, 1])
@@ -57,6 +57,7 @@ class EcgPlotter:
         self.r_peaks = []  # List to store R-peaks timestamps
         self.fig, self.ax = plt.subplots()
         self.line, = self.ax.plot([], [])
+        self.scatter_r_peaks = None  # To store scatter points for R-peaks
         plt.title(title)
         plt.xlabel('Time (ms)')
         plt.ylabel('mV')
@@ -68,9 +69,14 @@ class EcgPlotter:
         self.pan_tompkins = PanTompkins(sampling_frequency)
 
     def send_single_sample(self, timestamp, mV):
+        #if timestamp < 599616068803.2223:
+        if timestamp < 599616073170.9828:
+            return
+
         self.plot_data.append((timestamp, mV))
         if len(self.plot_data) >= 130:  # Process when we have enough data
-            self.detect_r_peak()
+            #self.detect_r_peak()
+            self.detect_r_peak_simple()
 
     def detect_r_peak(self):
         timestamps, ecg_values = zip(*self.plot_data)
@@ -88,6 +94,41 @@ class EcgPlotter:
                 # Calculate R-R intervals and HRV
                 self.calculate_rr_intervals()
 
+    def detect_r_peak_simple(self):
+        timestamps, ecg_values = zip(*self.plot_data)
+        ecg_array = np.array(ecg_values)
+        window_size = int(0.8 * self.pan_tompkins.fs)  # Zakładamy okno cyklu serca ok. 800 ms
+
+        # Lista do przechowywania miejsc, gdzie będą pionowe linie rozdzielające cykle
+        cycle_separators = []
+
+        r_peaks_simple = []
+        for i in range(0, len(ecg_array), window_size):
+            segment = ecg_array[i:i + window_size]
+            if len(segment) > 0:
+                # Znajdź maksimum w tym segmencie (potencjalny R-peak)
+                peak_idx = np.argmax(segment)
+                peak_timestamp = timestamps[i + peak_idx]
+
+                # Sprawdź, czy R-peak nie jest zbyt blisko poprzedniego
+                if len(self.r_peaks) == 0 or (peak_timestamp - self.r_peaks[-1]) > 300:
+                    self.r_peaks.append(peak_timestamp)
+                    r_peaks_simple.append(peak_timestamp)
+                    print(f"R-peak (simple) detected at {peak_timestamp} ms")
+                    cycle_separators.append(peak_timestamp)
+
+                    # Obliczamy R-R interwały tylko wtedy, gdy wykryjemy nowy R-peak
+                    self.calculate_rr_intervals()
+
+        # Rysujemy linie oddzielające cykle serca
+        self.plot_cycle_separators(cycle_separators)
+
+    def plot_cycle_separators(self, cycle_separators):
+        # Dodaj linie na wykresie w miejscach cykli serca (skalujemy z nanosekund na milisekundy)
+        for separator in cycle_separators:
+            self.ax.axvline(x=separator / 1e6 - self.plot_data[0][0] / 1e6, color='green', linestyle='--')
+        self.fig.canvas.draw_idle()
+
     def calculate_rr_intervals(self):
         if len(self.r_peaks) > 1:
             rr_intervals = np.diff(self.r_peaks)  # Calculate differences between consecutive R-peaks
@@ -100,15 +141,37 @@ class EcgPlotter:
     def update_plot(self):
         if len(self.plot_data) > 0:
             timestamps, values = zip(*self.plot_data)
-            # Convert timestamps from ms to seconds
-            x = np.array(timestamps)
-            self.line.set_data(x - x[0], values)  # Normalize time to start from 0
+            # Konwertuj timestampy z nanosekund na milisekundy (lub sekundy)
+            timestamps_ms = np.array(timestamps) / 1e6  # Przykładowo na milisekundy
+            self.line.set_data(timestamps_ms - timestamps_ms[0], values)  # Normalize time to start from 0
             self.ax.relim()
             self.ax.autoscale_view()
+
+            if len(self.r_peaks) > 0:
+                # Filtruj R-peaki, aby wyświetlić tylko te w zakresie aktualnego wykresu
+                current_time_window_start = timestamps_ms[0]
+                current_time_window_end = timestamps_ms[-1]
+
+                # Filtruj tylko te R-peaki, które mieszczą się w aktualnym oknie czasu
+                filtered_r_peaks = [time for time in self.r_peaks if
+                                    current_time_window_start <= time <= current_time_window_end]
+
+                # Odpowiadające wartości EKG dla przefiltrowanych R-peaks
+                r_peak_values = [value for (time, value) in self.plot_data if time in filtered_r_peaks]
+                r_peak_times = [time / 1e6 - timestamps_ms[0] for time in
+                                filtered_r_peaks]  # Normalize time to start from 0
+
+                # Usunięcie starych kropek
+                if self.scatter_r_peaks is not None:
+                    self.scatter_r_peaks.remove()
+
+                # Rysowanie nowych kropek w miejscach R-peaków
+                self.scatter_r_peaks = self.ax.scatter(r_peak_times, r_peak_values, color='red', s=50, zorder=5)
+
             self.fig.canvas.draw_idle()  # Update the plot safely for threading
 
 
-HOST = '127.0.0.1' 
+HOST = '127.0.0.1'
 PORT = 12345
 ecg_plotter = EcgPlotter("ECG", 130)
 data_queue = queue.Queue()
@@ -143,7 +206,7 @@ def process_packet(raw_data):
             # date = datetime.datetime.fromtimestamp((long_value / 1e9))
             print("First value timestamp:" + str(long_value))
         siema = 1
-        data_queue.put((long_value/1e6, float_value))  # Dodanie wartości do kolejki
+        data_queue.put((long_value/1e6, -float_value))  # Dodanie wartości do kolejki
 
 
 def plot_data():
