@@ -42,11 +42,11 @@ def find_r_peaks(ecg_signal, frequency: float):
     window_size = int(0.150 * frequency)  # 150 ms window
     integrated_signal = moving_window_integration(squared_signal, window_size)
     
-    threshold = 0.4 * np.max(integrated_signal)
+    #threshold = 0.4 * np.max(integrated_signal)
+    threshold = np.mean(integrated_signal) + 0.5 * np.std(integrated_signal)  # Mean + 0.5*std
     
-    # Detect peaks in the integrated signal (600-700 ms min distance between peaks)
     peaks, _ = signal.find_peaks(
-        integrated_signal, height=threshold, distance=int(0.6 * frequency)
+        integrated_signal, height=threshold, distance=int(0.6 * frequency) # 600 ms
     )
     
     refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
