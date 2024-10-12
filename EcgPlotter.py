@@ -1,15 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import deque
+from EcgData import *
 
 
 class EcgPlotter:
-    def __init__(self, title, sampling_frequency):
+    def __init__(self, title: str, ecg_data: EcgData):
+        self.ecg_data = ecg_data
         self.SECONDS_TO_PLOT = 5
-        self.plot_data = deque(maxlen=sampling_frequency * self.SECONDS_TO_PLOT)
-        self.r_peaks = []  # List to store R-peaks timestamps
+        self.plot_data = deque(maxlen=ecg_data.frequency * self.SECONDS_TO_PLOT)
+        # self.r_peaks = []  # List to store R-peaks timestamps
 
-        # Create subplots: one for ECG, one for moving average signal
         self.fig, (self.ax_ecg) = plt.subplots()
 
         # ECG plot
@@ -30,12 +31,12 @@ class EcgPlotter:
         )
         self.ax_ecg.set_title("ECG Waveform")
         self.ax_ecg.set_xlabel("Time (s)")
+        
+        self.ax_r_peaks = self.ax_ecg.scatter([], [], color="red", label="R-peaks", marker='x', s=100)
 
-        self.timer = self.fig.canvas.new_timer(interval=100)
+        self.timer = self.fig.canvas.new_timer(interval=500)
         self.timer.add_callback(self.update_plot)
         self.timer.start()
-
-        # self.ani = FuncAnimation(self.fig, self.update_plot, interval=100)
 
     def send_single_sample(self, timestamp, voltage):
         self.plot_data.append((timestamp, voltage))
@@ -50,6 +51,16 @@ class EcgPlotter:
             self.line_ecg.set_data(x_normalized, ecg_values)  # Use normalized time
             self.ax_ecg.relim()  # Recalculate limits
             self.ax_ecg.autoscale_view()  # Auto scale the view
+            
+            r_peaks = self.ecg_data.r_peaks
+            if r_peaks.any():  # Check if any R-peaks were found
+                r_peak_times, r_peak_values = zip(*r_peaks)
+                # Normalize the R-peak timestamps
+                r_peak_times_normalized = np.array(r_peak_times) - x[0]
+                # Update scatter plot with R-peaks
+                self.ax_r_peaks.set_offsets(np.array([r_peak_times_normalized, r_peak_values]).T)
+            else:
+                self.ax_r_peaks.set_offsets([])  # Clear R-peaks if none found
+        self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()
-        # return self.line_ecg,  # Return the updated line object for FuncAnimation
