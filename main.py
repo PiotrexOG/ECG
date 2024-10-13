@@ -50,10 +50,44 @@ class PanTompkins:
         return peaks
 
 
+class EcgRPeakDetector:
+    def __init__(self):
+        self.r_peaks = []  # Lista do przechowywania timestampów i wartości R-peaków
+        self.threshold = 700  # Próg dla wartości sygnału (w mV)
+        self.last_peak_time = -1  # Czas ostatniego wykrytego załamka R (inicjalnie brak)
+
+    def detect_r_peaks(self, timestamps, ecg_values):
+        # Przechodzimy po parach timestamp-value
+        for index, (timestamp, value) in enumerate(zip(timestamps, ecg_values)):
+            # Sprawdzamy, czy dane są nowsze od ostatnio wykrytego R-peaku
+            if timestamp > self.last_peak_time:
+                # Sprawdź, czy wartość sygnału przekracza próg
+                if value > self.threshold:
+                    # Jeżeli to pierwsza wartość, ustaw ją jako początkową
+                    if index > 2:
+                        # Oblicz pochodną (różnica wartości / różnica czasów)
+                        derivative = (value - ecg_values[index-1])
+                        prev_derivate = ecg_values[index-1] - ecg_values[index-2]
+                        # Sprawdź, czy pochodna zmienia znak lub jest równa zero (szczyt załamka R)
+                        if derivative <= 0 and prev_derivate >= 0:
+                            # Zidentyfikowano szczyt, zapisujemy ten punkt jako załamek R
+                            self.r_peaks.append(
+                                (timestamps[index-1], ecg_values[index-1]))  # Dodaj timestamp i wartość załamka R
+                            self.last_peak_time = timestamps[index-1]  # Zaktualizuj czas ostatniego załamka R
+
+                            # Po wykryciu załamka przechodzimy do kolejnej iteracji
+
+
+
+    def get_r_peaks(self):
+        return self.r_peaks
+
 class EcgPlotter:
     def __init__(self, title, sampling_frequency):
         self.SECONDS_TO_PLOT = 5
-        self.plot_data = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Assuming 130 Hz max frequency
+        #self.plot_data = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Assuming 130 Hz max frequency
+        self.plot_data = []
+        self.detector = EcgRPeakDetector()  # Tworzenie instancji klasy wykrywającej R-peaks
         self.r_peaks = []  # List to store R-peaks timestamps
         self.fig, self.ax = plt.subplots()
         self.line, = self.ax.plot([], [])
@@ -70,13 +104,15 @@ class EcgPlotter:
 
     def send_single_sample(self, timestamp, mV):
         #if timestamp < 599616068803.2223:
-        if timestamp < 599616073170.9828:
+        if timestamp < 599616073201739904:
             return
 
         self.plot_data.append((timestamp, mV))
-        if len(self.plot_data) >= 130:  # Process when we have enough data
+        timestamps, ecg_values = zip(*self.plot_data)
+        self.detector.detect_r_peaks(timestamps, ecg_values)  # Wykrywanie R-peaks
+        #if len(self.plot_data) >= 130:  # Process when we have enough data
             #self.detect_r_peak()
-            self.detect_r_peak_simple()
+            #self.detect_r_peak_simple()
 
     def detect_r_peak(self):
         timestamps, ecg_values = zip(*self.plot_data)
@@ -123,6 +159,32 @@ class EcgPlotter:
         # Rysujemy linie oddzielające cykle serca
         self.plot_cycle_separators(cycle_separators)
 
+    def detect_r_peaks_own(self, timestamp, value):
+        # Sprawdź, czy wartość sygnału przekracza próg
+        if value > self.threshold:
+            # Jeżeli to pierwsza wartość, ustaw ją jako początkową
+            if self.previous_value is not None and self.previous_time is not None:
+                # Oblicz pochodną (różnica wartości / różnica czasów)
+                derivative = (value - self.previous_value) / (timestamp - self.previous_time)
+
+                # Sprawdź, czy pochodna zmienia znak lub jest równa zero (szczyt załamka R)
+                if derivative <= 0:
+                    # Zidentyfikowano potencjalny szczyt - wybierz maksymalną wartość z kandydatów
+                    if len(self.candidate_peaks) > 0:
+                        max_peak = max(self.candidate_peaks, key=lambda x: x[1])  # Znajdź maksimum
+                        self.r_peaks.append(max_peak)  # Dodaj timestamp i wartość załamka R
+                        self.candidate_peaks.clear()  # Wyczyść kandydatów po detekcji
+
+            # Zapisz obecnego kandydata na załamek R
+            self.candidate_peaks.append((timestamp, value))
+
+        # Aktualizuj poprzednie wartości
+        self.previous_value = value
+        self.previous_time = timestamp
+
+    def get_r_peaks(self):
+        return self.r_peaks
+
     def plot_cycle_separators(self, cycle_separators):
         # Dodaj linie na wykresie w miejscach cykli serca (skalujemy z nanosekund na milisekundy)
         for separator in cycle_separators:
@@ -142,33 +204,28 @@ class EcgPlotter:
         if len(self.plot_data) > 0:
             timestamps, values = zip(*self.plot_data)
             # Konwertuj timestampy z nanosekund na milisekundy (lub sekundy)
-            timestamps_ms = np.array(timestamps) / 1e6  # Przykładowo na milisekundy
-            self.line.set_data(timestamps_ms - timestamps_ms[0], values)  # Normalize time to start from 0
+
+            # Rysowanie sygnału EKG
+            timestamps_ms = np.array(timestamps) / 1e6  # Konwersja na milisekundy
+            self.line.set_data(timestamps_ms - timestamps_ms[0], values)
+
+            # Rysowanie R-peaks
+            if self.scatter_r_peaks:
+                self.scatter_r_peaks.remove()  # Usuwanie poprzedniego scattera
+            self.r_peaks = self.detector.get_r_peaks()
+            if len(self.r_peaks) > 0:
+                r_peak_times, r_peak_values = zip(*self.r_peaks)
+                r_peak_times_ms = np.array(r_peak_times) / 1e6  # Konwersja na milisekundy
+                self.scatter_r_peaks = self.ax.scatter(
+                    r_peak_times_ms - timestamps_ms[0], r_peak_values, color='red'
+                )
+
+            # Aktualizacja osi i wykresu
             self.ax.relim()
             self.ax.autoscale_view()
+            self.fig.canvas.draw_idle()  # Bezpieczna aktualizacja wykresu
 
-            if len(self.r_peaks) > 0:
-                # Filtruj R-peaki, aby wyświetlić tylko te w zakresie aktualnego wykresu
-                current_time_window_start = timestamps_ms[0]
-                current_time_window_end = timestamps_ms[-1]
 
-                # Filtruj tylko te R-peaki, które mieszczą się w aktualnym oknie czasu
-                filtered_r_peaks = [time for time in self.r_peaks if
-                                    current_time_window_start <= time <= current_time_window_end]
-
-                # Odpowiadające wartości EKG dla przefiltrowanych R-peaks
-                r_peak_values = [value for (time, value) in self.plot_data if time in filtered_r_peaks]
-                r_peak_times = [time / 1e6 - timestamps_ms[0] for time in
-                                filtered_r_peaks]  # Normalize time to start from 0
-
-                # Usunięcie starych kropek
-                if self.scatter_r_peaks is not None:
-                    self.scatter_r_peaks.remove()
-
-                # Rysowanie nowych kropek w miejscach R-peaków
-                self.scatter_r_peaks = self.ax.scatter(r_peak_times, r_peak_values, color='red', s=50, zorder=5)
-
-            self.fig.canvas.draw_idle()  # Update the plot safely for threading
 
 
 HOST = '127.0.0.1'
@@ -201,12 +258,12 @@ def process_packet(raw_data):
         offset = i * (4 + 8)
         float_value = struct.unpack('!f', raw_data[offset:offset + 4])[0]  # Wyciągnięcie floata
         long_value = struct.unpack('!q', raw_data[offset + 4:offset + 12])[0]  # Wyciągnięcie long
-        if siema == 0:
-            print("First value:" + "%f" % float_value)
+       # if siema == 0:
+           # print("First value:" + "%f" % float_value)
             # date = datetime.datetime.fromtimestamp((long_value / 1e9))
-            print("First value timestamp:" + str(long_value))
+           # print("First value timestamp:" + str(long_value))
         siema = 1
-        data_queue.put((long_value/1e6, -float_value))  # Dodanie wartości do kolejki
+        data_queue.put((long_value, -float_value))  # Dodanie wartości do kolejki
 
 
 def plot_data():
