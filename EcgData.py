@@ -23,6 +23,12 @@ class EcgData:
     def sdnn(self):
         self.__refresh_if_dirty()
         return self.__sdnn
+    
+    
+    @property
+    def rmssd(self):
+        self.__refresh_if_dirty()
+        return self.__rmssd
 
 
 
@@ -76,7 +82,7 @@ class EcgData:
         self.__calc_mean_rr()
         self.__calc_sdnn()
         self.__calc_rmssd()
-        self.__calc_pnn50()
+        #self.__calc_pnn50()
         return
 
     def __find_r_peaks(self):
