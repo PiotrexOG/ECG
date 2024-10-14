@@ -16,12 +16,12 @@ SAMPLING_RATE = 130  # HZ
 VERBOSE = False
 PRINT_PACKETS = False
 
-REC_VALUES_COUNT = int(130/2)  # 73
+REC_VALUES_COUNT = int(130 / 2)  # 73
 VALUE_SIZE = 4 + 8
 
-data = EcgData()
+data = EcgData(SAMPLING_RATE)
 
-ecg_plotter = EcgPlotter("ECG", SAMPLING_RATE)
+ecg_plotter = EcgPlotter("ECG", data)
 data_queue = queue.Queue()
 
 
@@ -37,12 +37,14 @@ def receive_packet(client_socket):
     while len(buffer) < REC_VALUES_COUNT * VALUE_SIZE:
         chunk = client_socket.recv(REC_VALUES_COUNT * VALUE_SIZE - len(buffer))
         if not chunk:
-           raise ValueError("Error while receiving data...")
+            raise ValueError("Error while receiving data...")
         buffer += chunk
     return buffer
 
 
 def process_packet(raw_data):
+    timestamps = []
+    values = []
     for i in range(REC_VALUES_COUNT):
         offset = i * (4 + 8)
         float_value = struct.unpack("!f", raw_data[offset : offset + 4])[
@@ -51,11 +53,16 @@ def process_packet(raw_data):
         long_value = struct.unpack("!q", raw_data[offset + 4 : offset + 12])[
             0
         ]  # Wyciągnięcie long
+        timestamps.append(long_value/ 1e9)
+        values.append(-float_value)
+        
         if PRINT_PACKETS:
             print("First value:" + "%f" % float_value)
             print("First value timestamp:" + str(long_value))
-        data.pushRawData(long_value / 1e9, -float_value)
-        data_queue.put(data.rawData[-1])
+        # data.push_raw_data(long_value / 1e9, -float_value)
+        #data_queue.put(data.raw_data[-1])
+        data_queue.put((long_value/ 1e9, -float_value))
+    data.push_raw_data(timestamps, values)
 
 
 def plot_data():
