@@ -9,6 +9,7 @@ class EcgPlotter:
         self.ecg_data = ecg_data
         self.SECONDS_TO_PLOT = 5
         self.plot_data = deque(maxlen=ecg_data.frequency * self.SECONDS_TO_PLOT)
+        # self.plot_data = [] # uncomment if you want ypur plot to not be trimmed to last few seconds
         # self.r_peaks = []  # List to store R-peaks timestamps
 
         self.fig, (self.ax_ecg) = plt.subplots()
@@ -55,7 +56,8 @@ class EcgPlotter:
             self.ax_ecg.relim()  # Recalculate limits
             self.ax_ecg.autoscale_view()  # Auto scale the view
 
-            r_peaks = self.ecg_data.r_peaks
+            #r_peaks = self.ecg_data.r_peaks
+            r_peaks = self.ecg_data.r_peaks_piotr
             if r_peaks.any():  # Check if any R-peaks were found
                 r_peak_times, r_peak_values = zip(*r_peaks)
                 # Normalize the R-peak timestamps
@@ -65,7 +67,7 @@ class EcgPlotter:
                     np.array([r_peak_times_normalized, r_peak_values]).T
                 )
             else:
-                self.ax_r_peaks.set_offsets([])  # Clear R-peaks if none found
+                self.ax_r_peaks.set_offsets(np.empty((0, 2)))
         self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()

@@ -10,6 +10,11 @@ class EcgData:
         return self.__r_peaks
 
     @property
+    def r_peaks_piotr(self):
+        self.__refresh_if_dirty()
+        return self.__r_peaks_piotr
+
+    @property
     def rr_intervals(self):
         self.__refresh_if_dirty()
         return self.__rr_intervals
@@ -41,6 +46,7 @@ class EcgData:
         self.frequency = frequency
         self.raw_data = np.empty((0, 2))
         self.__r_peaks = np.empty(0)
+        self.__r_peaks_piotr = np.empty(0)
         self.__rr_intervals = np.empty(0)
         self.__mean_rr = -1
         self.__sdnn = -1
@@ -78,6 +84,7 @@ class EcgData:
 
     def __refresh_data(self):
         self.__find_r_peaks()
+        self.__find_r_peaks_piotr()
         self.__calc_rr_intervals()
         self.__calc_mean_rr()
         self.__calc_sdnn()
@@ -88,6 +95,10 @@ class EcgData:
     def __find_r_peaks(self):
         self.__r_peaks = PanTompkins.find_r_peaks(self.raw_data, self.frequency)
         return self.__r_peaks
+
+    def __find_r_peaks_piotr(self):
+        self.__r_peaks_piotr = PanTompkins.find_r_peaks_piotr(self.raw_data)
+        return self.__r_peaks_piotr
 
     def __calc_rr_intervals(self):
         if len(self.__r_peaks) < 2:
