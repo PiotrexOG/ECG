@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 from EcgData import *
 
+from config import *
 
 class EcgPlotter:
     def __init__(self, title: str, ecg_data: EcgData):
@@ -69,6 +70,6 @@ class EcgPlotter:
                 )
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
-        self.ecg_data.print_data()
+        if PRINT_ECG_DATA: self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()

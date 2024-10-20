@@ -5,3 +5,4 @@ VALUES_IN_PACKET_COUNT = int(SAMPLING_RATE / 2)
 CSV_PATH = "data/ecg_data1.csv"
 
 RUN_TEST_DATA = True
+PRINT_ECG_DATA = False

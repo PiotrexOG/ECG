@@ -96,8 +96,7 @@ def start_server():
 
 
 if __name__ == "__main__":
-    if RUN_TEST_DATA:
-        run_emulator_thread()
+    if RUN_TEST_DATA: run_emulator_thread()
     
     server_thread = threading.Thread(target=start_server)
     server_thread.daemon = True
