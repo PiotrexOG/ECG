@@ -41,25 +41,41 @@ def receive_packet(client_socket):
 
 
 def process_packet(raw_data):
-    timestamps = []
-    values = []
-    for i in range(VALUES_IN_PACKET_COUNT):
-        offset = i * (4 + 8)
-        float_value = struct.unpack("!f", raw_data[offset : offset + 4])[
-            0
-        ]  # Wyciągnięcie floata
-        long_value = struct.unpack("!q", raw_data[offset + 4 : offset + 12])[
-            0
-        ]  # Wyciągnięcie long
-        timestamps.append(long_value / 1e9)
-        values.append(-float_value)
+    timestamps = [
+        struct.unpack("!q", raw_data[i * 12 + 4 : i * 12 + 12])[0] / 1e9
+        for i in range(VALUES_IN_PACKET_COUNT)
+    ]
+    if NEGATE_INCOMING_DATA:
+        values = [
+            -struct.unpack("!f", raw_data[i * 12 : i * 12 + 4])[0]
+            for i in range(VALUES_IN_PACKET_COUNT)
+        ]
+    else:
+        values = [
+            struct.unpack("!f", raw_data[i * 12 : i * 12 + 4])[0]
+            for i in range(VALUES_IN_PACKET_COUNT)
+        ]
+        
+    """
+    # for i in range(VALUES_IN_PACKET_COUNT):
+    #     offset = i * (4 + 8)
+    #     float_value = struct.unpack("!f", raw_data[offset : offset + 4])[
+    #         0
+    #     ]  # Wyciągnięcie floata
+    #     long_value = struct.unpack("!q", raw_data[offset + 4 : offset + 12])[
+    #         0
+    #     ]  # Wyciągnięcie long
+    #     timestamps.append(long_value / 1e9)
+    #     values.append(-float_value)
 
-        if PRINT_PACKETS:
-            print("First value:" + "%f" % float_value)
-            print("First value timestamp:" + str(long_value))
-        # data.push_raw_data(long_value / 1e9, -float_value)
-        # data_queue.put(data.raw_data[-1])
-        data_queue.put((long_value / 1e9, -float_value))
+    #     if PRINT_PACKETS:
+    #         print("First value:" + "%f" % float_value)
+    #         print("First value timestamp:" + str(long_value))
+    #     # data.push_raw_data(long_value / 1e9, -float_value)
+    #     # data_queue.put(data.raw_data[-1])
+    #     data_queue.put((long_value / 1e9, -float_value))
+    """
+
     data.push_raw_data(timestamps, values)
 
 
@@ -95,8 +111,9 @@ def start_server():
 
 
 if __name__ == "__main__":
-    if RUN_TEST_DATA: run_emulator_thread()
-    
+    if RUN_TEST_DATA:
+        run_emulator_thread()
+
     server_thread = threading.Thread(target=start_server)
     server_thread.daemon = True
     server_thread.start()
