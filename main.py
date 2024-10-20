@@ -1,190 +1,67 @@
 import socket
 import struct
 import matplotlib.pyplot as plt
-from collections import deque
-import numpy as np
 import threading
 import queue
-
-import numpy as np
 from scipy.signal import lfilter, find_peaks
+from EcgData import *
+from EcgPlotter import *
+from config import *
+from dataSenderEmulator import run_emulator_thread
 
-class PanTompkins:
-    def __init__(self, fs):
-        self.fs = fs  # Sampling frequency (e.g., 130 Hz)
-    
-    def bandpass_filter(self, signal):
-        # Simple bandpass filter between 5-15 Hz for QRS detection
-        b = np.array([1, -2, 1])
-        a = np.array([1, -1.8, 0.81])
-        filtered_signal = lfilter(b, a, signal)
-        return filtered_signal
+# HOST = "127.0.0.1"
+# PORT = 12345
+# SAMPLING_RATE = 130  # HZ
+VERBOSE = False
+PRINT_PACKETS = False
 
-    def derivative(self, signal):
-        # Derivative emphasizes slope of QRS complex
-        b = np.array([1, 2, 0, -2, -1]) * (self.fs / 8.0)
-        derivative_signal = lfilter(b, 1, signal)
-        return derivative_signal
+# REC_VALUES_COUNT = int(130 / 2)  # 73
+VALUE_SIZE = 4 + 8
 
-    def squaring(self, signal):
-        # Square each point in the signal
-        squared_signal = signal ** 2
-        return squared_signal
+data = EcgData(SAMPLING_RATE)
 
-    def moving_average(self, signal):
-        # Moving average window size (approx 150ms window)
-        window_size = int(0.15 * self.fs)
-        ma_signal = np.convolve(signal, np.ones(window_size) / window_size, mode='same')
-        return ma_signal
-
-    def detect_r_peaks(self, ecg_signal):
-        # Apply the Pan-Tompkins algorithm step by step
-        filtered_signal = self.bandpass_filter(ecg_signal)
-        derivative_signal = self.derivative(filtered_signal)
-        squared_signal = self.squaring(derivative_signal)
-        ma_signal = self.moving_average(squared_signal)
-
-        # Detect peaks in the moving average signal
-        peaks, _ = find_peaks(ma_signal, distance=int(0.6 * self.fs))  # Peaks with minimum distance of 600 ms
-        return peaks
-
-
-class EcgPlotter:
-    def __init__(self, title, sampling_frequency):
-        self.SECONDS_TO_PLOT = 5
-        self.plot_data = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Assuming 130 Hz max frequency
-        self.r_peaks = []  # List to store R-peaks timestamps
-        
-        # Create subplots: one for ECG, one for moving average signal
-        self.fig, (self.ax_ecg, self.ax_ma) = plt.subplots(2, 1, sharex=True)
-        
-        # ECG plot
-        self.line_ecg, = self.ax_ecg.plot([], [])
-        self.ax_ecg.set_title(title + " - ECG Signal")
-        self.ax_ecg.set_ylabel('mV')
-        
-        # Moving average plot
-        self.line_ma, = self.ax_ma.plot([], [], color='orange')
-        self.ax_ma.set_title(title + " - Moving Average (ma_signal)")
-        self.ax_ma.set_xlabel('Time (ms)')
-        self.ax_ma.set_ylabel('Amplitude')
-        
-        self.timer = self.fig.canvas.new_timer(interval=100)
-        self.timer.add_callback(self.update_plot)
-        self.timer.start()
-
-        # Initialize the Pan-Tompkins algorithm
-        self.pan_tompkins = PanTompkins(sampling_frequency)
-        self.ma_signal = deque(maxlen=130 * self.SECONDS_TO_PLOT)  # Store moving average signal for plotting
-
-    def send_single_sample(self, timestamp, mV):
-        self.plot_data.append((timestamp, mV))
-        if len(self.plot_data) >= 130:  # Process when we have enough data
-            self.detect_r_peak()
-
-    def detect_r_peak(self):
-        timestamps, ecg_values = zip(*self.plot_data)
-        ecg_array = np.array(ecg_values)
-
-        # Use Pan-Tompkins to detect R-peaks
-        r_peak_indices = self.pan_tompkins.detect_r_peaks(ecg_array)
-
-        for peak_index in r_peak_indices:
-            peak_timestamp = timestamps[peak_index]  # Get corresponding timestamp for the peak
-            if len(self.r_peaks) == 0 or (peak_timestamp - self.r_peaks[-1]) > 300:
-                self.r_peaks.append(peak_timestamp)
-                print(f"R-peak detected at {peak_timestamp} ms")
-
-                # Calculate R-R intervals and HRV
-                self.calculate_rr_intervals()
-
-
-    def calculate_rr_intervals(self):
-        if len(self.r_peaks) > 1:
-            rr_intervals = np.diff(self.r_peaks)  # Calculate differences between consecutive R-peaks
-            print(f"R-R Intervals: {rr_intervals}")
-
-            # Calculate basic HRV metrics like SDNN (Standard deviation of RR intervals)
-            sdnn = np.std(rr_intervals)
-            print(f"SDNN: {sdnn} ms")
-
-    def update_plot(self):
-        if len(self.plot_data) > 0:
-            timestamps, ecg_values = zip(*self.plot_data)
-            x = np.array(timestamps)
-
-            # Normalize x-axis for ECG plot
-            x_normalized = x - x[0]
-
-            # Update ECG plot
-            self.line_ecg.set_data(x_normalized, ecg_values)  # Use normalized time
-            self.ax_ecg.relim()
-            self.ax_ecg.autoscale_view()  
-
-            # Mark R-peaks on the ECG plot
-            if len(self.r_peaks) > 0:
-                # Clear previous R-peak markers
-                for line in self.ax_ecg.lines[1:]:
-                    line.remove()  # Remove previous R-peak markers (keeps only the first line for the ECG)
-
-                for r_peak_time in self.r_peaks:
-                    # Find the corresponding x value for each R-peak
-                    r_peak_normalized = r_peak_time - x[0]  # Normalize based on the plot's start time
-                    self.ax_ecg.axvline(x=r_peak_normalized, color='red', linestyle='--', label="R-peak")
-
-            # Update Moving Average plot if data exists
-            if len(self.ma_signal) > 0:
-                # Ensure ma_x and ma_signal have the same length
-                ma_signal_length = min(len(x), len(self.ma_signal))  # Use minimum length
-                ma_x = x_normalized[:ma_signal_length]  # Slice normalized x to match the length of ma_signal
-                ma_y = list(self.ma_signal)[:ma_signal_length]  # Slice ma_signal to match ma_x
-
-                self.line_ma.set_data(ma_x, ma_y)  # Use normalized time for the MA plot
-                self.ax_ma.relim()
-                self.ax_ma.autoscale_view()
-
-            self.fig.canvas.draw_idle()  # Update the plot safely for threading
-
-
-
-
-
-HOST = '127.0.0.1' 
-PORT = 12345
-ecg_plotter = EcgPlotter("ECG", 130)
+ecg_plotter = EcgPlotter("ECG", data)
 data_queue = queue.Queue()
 
 
 def handle_client_connection(client_socket):
-    try:
-        while True:
-            raw_data = receive_packet(client_socket)
-            process_packet(raw_data)
-    except (ConnectionResetError, ValueError):
-        print("Client disconnected.")
-    finally:
-        client_socket.close()
+    # try:
+    while True:
+        raw_data = receive_packet(client_socket)
+        process_packet(raw_data)
 
 
 def receive_packet(client_socket):
-    raw_data = client_socket.recv(73 * (4 + 8))
-    if len(raw_data) < 73 * (4 + 8):
-        raise ValueError("Brak danych lub błąd połączenia.")
-    return raw_data
+    buffer = b""
+    while len(buffer) < VALUES_IN_PACKET_COUNT * VALUE_SIZE:
+        chunk = client_socket.recv(VALUES_IN_PACKET_COUNT * VALUE_SIZE - len(buffer))
+        if not chunk:
+            raise ValueError("Error while receiving data...")
+        buffer += chunk
+    return buffer
 
 
 def process_packet(raw_data):
-    siema = 0
-    for i in range(73):
+    timestamps = []
+    values = []
+    for i in range(VALUES_IN_PACKET_COUNT):
         offset = i * (4 + 8)
-        float_value = struct.unpack('!f', raw_data[offset:offset + 4])[0]  # Wyciągnięcie floata
-        long_value = struct.unpack('!q', raw_data[offset + 4:offset + 12])[0]  # Wyciągnięcie long
-        if siema == 0:
+        float_value = struct.unpack("!f", raw_data[offset : offset + 4])[
+            0
+        ]  # Wyciągnięcie floata
+        long_value = struct.unpack("!q", raw_data[offset + 4 : offset + 12])[
+            0
+        ]  # Wyciągnięcie long
+        timestamps.append(long_value / 1e9)
+        values.append(-float_value)
+
+        if PRINT_PACKETS:
             print("First value:" + "%f" % float_value)
-            # date = datetime.datetime.fromtimestamp((long_value / 1e9))
             print("First value timestamp:" + str(long_value))
-        siema = 1
-        data_queue.put((long_value/1e6, -float_value))  # Dodanie wartości do kolejki
+        # data.push_raw_data(long_value / 1e9, -float_value)
+        # data_queue.put(data.raw_data[-1])
+        data_queue.put((long_value / 1e9, -float_value))
+    data.push_raw_data(timestamps, values)
 
 
 def plot_data():
@@ -198,11 +75,9 @@ def plot_data():
 
 def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        # Bind the socket to the address and port
         server_socket.bind((HOST, PORT))
 
-        # Start listening for incoming connections
-        server_socket.listen(1)
+        server_socket.listen(1)  # accept only one client
         print("Server listening on port", HOST, PORT)
 
         plot_thread = threading.Thread(target=plot_data)
@@ -210,19 +85,21 @@ def start_server():
         plot_thread.start()
 
         while True:
-            # Accept incoming connections
-            client_socket, _ = server_socket.accept()
-            print("Client connected.")
+            client_socket, client_address = server_socket.accept()
+            print(f"Client connected: {client_address}")
 
-            # Handle the client connection
-            client_thread = threading.Thread(target=handle_client_connection, args=(client_socket,))
+            client_thread = threading.Thread(
+                target=handle_client_connection, args=(client_socket,)
+            )
             client_thread.daemon = True
             client_thread.start()
 
 
 if __name__ == "__main__":
+    run_emulator_thread()
+    
     server_thread = threading.Thread(target=start_server)
     server_thread.daemon = True
     server_thread.start()
 
-    plt.show()  # Upewnij się, że główny wątek pozostaje w pętli wyświetlania wykresu
+    plt.show()
