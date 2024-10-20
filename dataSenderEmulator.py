@@ -26,9 +26,8 @@ def send_loop(data):
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((HOST, PORT))
                 index = 0
-                first_timestamp = data[0][0]
+                first_timestamp = data[0][0] if NORMALIZED_TEST_DATA_TIME else 0
                 offset = 0
-                sleep_offset = 0
                 while True:
                     byte_buffer = b""
                     first_ts_in_iteration = data[index][0] + offset
@@ -46,7 +45,6 @@ def send_loop(data):
                                 + data[-1][0]
                                 - data[-2][0]
                             )
-                            sleep_offset = offset
 
                     sock.sendall(byte_buffer)
                     
