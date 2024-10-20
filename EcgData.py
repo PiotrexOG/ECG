@@ -56,9 +56,13 @@ class EcgData:
         return
 
     def print_data(self):
-        print(f"Mean RR: {self.mean_rr*1e3 if self.mean_rr is not None else self.mean_rr}ms")
-        print(f"SDNN: {self.sdnn}")
-        print(f"RMSSD: {self.rmssd}")
+        mean_rr = round(self.mean_rr*1e3, 2) if self.mean_rr is not None else None
+        sdnn = round(self.sdnn, 2) if self.sdnn is not None else None
+        rmssd = round(self.rmssd, 2) if self.rmssd is not None else None    
+        print("ECG DATA---------------")
+        if(mean_rr is not None): print(f"Mean RR: {mean_rr} ms")
+        if(sdnn is not None): print(f"SDNN: {sdnn}")
+        if(rmssd is not None): print(f"RMSSD: {rmssd}")
         return
 
     def push_raw_data(self, x, y):
