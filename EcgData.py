@@ -1,6 +1,6 @@
 import numpy as np
 import PanTompkins
-
+import NAME_THIS_MODULE_YOURSELF_PIOTER
 
 class EcgData:
 
@@ -97,7 +97,7 @@ class EcgData:
         return self.__r_peaks
 
     def __find_r_peaks_piotr(self):
-        self.__r_peaks_piotr = PanTompkins.find_r_peaks_piotr(self.raw_data)
+        self.__r_peaks_piotr = NAME_THIS_MODULE_YOURSELF_PIOTER.find_r_peaks_piotr(self.raw_data)
         return self.__r_peaks_piotr
 
     def __calc_rr_intervals(self):
