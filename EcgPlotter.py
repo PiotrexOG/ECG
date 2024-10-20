@@ -12,7 +12,8 @@ class EcgPlotter:
         # self.plot_data = [] # uncomment if you want ypur plot to not be trimmed to last few seconds
         # self.r_peaks = []  # List to store R-peaks timestamps
 
-        self.fig, (self.ax_ecg) = plt.subplots()
+        self.fig, (self.ax_ecg) = plt.subplots(figsize=(16, 8))
+        plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)
 
         # ECG plot
         (self.line_ecg,) = self.ax_ecg.plot([], [], color="green")
@@ -56,8 +57,8 @@ class EcgPlotter:
             self.ax_ecg.relim()  # Recalculate limits
             self.ax_ecg.autoscale_view()  # Auto scale the view
 
-            #r_peaks = self.ecg_data.r_peaks
-            r_peaks = self.ecg_data.r_peaks_piotr
+            r_peaks = self.ecg_data.r_peaks
+            # r_peaks = self.ecg_data.r_peaks_piotr
             if r_peaks.any():  # Check if any R-peaks were found
                 r_peak_times, r_peak_values = zip(*r_peaks)
                 # Normalize the R-peak timestamps
