@@ -3,7 +3,6 @@ import struct
 import matplotlib.pyplot as plt
 import threading
 import queue
-from scipy.signal import lfilter, find_peaks
 from EcgData import *
 from EcgPlotter import *
 from config import *
@@ -64,13 +63,13 @@ def process_packet(raw_data):
     data.push_raw_data(timestamps, values)
 
 
-def plot_data():
-    while True:
-        try:
-            timestamp, mV = data_queue.get(timeout=1)
-            ecg_plotter.send_single_sample(timestamp, mV)
-        except queue.Empty:
-            continue
+# def plot_data():
+#     while True:
+#         try:
+#             timestamp, mV = data_queue.get(timeout=1)
+#             # ecg_plotter.send_single_sample(timestamp, mV)
+#         except queue.Empty:
+#             continue
 
 
 def start_server():
@@ -80,9 +79,9 @@ def start_server():
         server_socket.listen(1)  # accept only one client
         print("Server listening on port", HOST, PORT)
 
-        plot_thread = threading.Thread(target=plot_data)
-        plot_thread.daemon = True
-        plot_thread.start()
+        # plot_thread = threading.Thread(target=plot_data)
+        # plot_thread.daemon = True
+        # plot_thread.start()
 
         while True:
             client_socket, client_address = server_socket.accept()

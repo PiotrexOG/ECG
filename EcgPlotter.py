@@ -5,13 +5,21 @@ from EcgData import *
 
 from config import *
 
+
 class EcgPlotter:
+    @property
+    def _is_plot_up_to_date(self) -> bool:
+        if (
+            0 == len(self._plot_data)
+            or self.ecg_data.raw_data[-1][0] > self._plot_data[-1][0]
+        ):
+            return False
+        return True
+
     def __init__(self, title: str, ecg_data: EcgData):
         self.ecg_data = ecg_data
         self.SECONDS_TO_PLOT = 5
-        self.plot_data = deque(maxlen=ecg_data.frequency * self.SECONDS_TO_PLOT)
-        # self.plot_data = [] # uncomment if you want ypur plot to not be trimmed to last few seconds
-        # self.r_peaks = []  # List to store R-peaks timestamps
+        self._plot_data = deque(maxlen=ecg_data.frequency * self.SECONDS_TO_PLOT)
 
         self.fig, (self.ax_ecg) = plt.subplots(figsize=(16, 8))
         plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)
@@ -44,12 +52,38 @@ class EcgPlotter:
 
         self.timer.start()
 
-    def send_single_sample(self, timestamp, voltage):
-        self.plot_data.append((timestamp, voltage))
+    # def send_single_sample(self, timestamp, voltage):
+    #     self._plot_data.append((timestamp, voltage))
 
-    def update_plot(self):
-        if len(self.plot_data) > 0:
-            timestamps, ecg_values = zip(*self.plot_data)
+    def _update_plot_data(self) -> None:
+        if 0 == len(self.ecg_data.raw_data) or self._is_plot_up_to_date:
+            return
+        else:
+            plot_data_count = len(self._plot_data)
+            ecg_data_count = len(self.ecg_data.raw_data)
+
+            if 0 == plot_data_count:
+                number_of_rows = (
+                    plot_data_count
+                    if len(self.ecg_data.raw_data) >= plot_data_count
+                    else ecg_data_count
+                )
+                for row in self.ecg_data.raw_data[-number_of_rows:]:
+                    self._plot_data.append(row)
+                return
+            else:
+                last_index = np.where(
+                    np.all(self.ecg_data.raw_data == self._plot_data[-1], axis=1)
+                )[0][0]
+
+                for row in self.ecg_data.raw_data[last_index + 1:]:
+                    self._plot_data.append(row)
+                return
+
+    def update_plot(self) -> None:
+        self._update_plot_data()
+        if len(self._plot_data) > 0:
+            timestamps, ecg_values = zip(*self._plot_data)
             x = np.array(timestamps)
             x_normalized = x - x[0]  # Normalize time to start from 0
 
@@ -70,6 +104,7 @@ class EcgPlotter:
                 )
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
-        if PRINT_ECG_DATA: self.ecg_data.print_data()
+        if PRINT_ECG_DATA:
+            self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()
