@@ -28,32 +28,40 @@ def send_loop(data):
                 index = 0
                 first_timestamp = data[0][0]
                 offset = 0
-                while True: 
-                    byte_buffer = b''
-                    first_ts_in_iteration = data[index][0]
+                sleep_offset = 0
+                while True:
+                    byte_buffer = b""
+                    first_ts_in_iteration = data[index][0] + offset
                     for i in range(VALUES_IN_PACKET_COUNT):
                         timestamp = data[index][0] - first_timestamp + offset
                         value = data[index][1]
-                        byte_buffer += struct.pack('!f', value)
-                        byte_buffer += struct.pack('!q', timestamp)
+                        byte_buffer += struct.pack("!f", value)
+                        byte_buffer += struct.pack("!q", timestamp)
 
                         index = index + 1
-                        if index > len(data):
+                        if index == len(data):
                             index = 0
-                            offset = offset + data[-1] - first_timestamp
-                    
+                            offset += (
+                                (data[-1][0] - first_timestamp)
+                                + data[-1][0]
+                                - data[-2][0]
+                            )
+                            sleep_offset = offset
+
                     sock.sendall(byte_buffer)
                     
-                    time.sleep((data[index][0]-first_ts_in_iteration)/1e9)   
+                    sleep_time = (data[index][0] + offset - first_ts_in_iteration) / 1e9
+                    time.sleep(sleep_time)
         except Exception as ex:
             print(f"Exception was thrown: {ex}")
 
+
 def emulator_thread_entry():
     csv_data = read_csv(CSV_PATH)
-    send_loop(csv_data)  
+    send_loop(csv_data)
+
 
 def run_emulator_thread():
     thread = threading.Thread(target=emulator_thread_entry)
     thread.daemon = True
     thread.start()
-    
