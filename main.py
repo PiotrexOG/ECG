@@ -8,14 +8,10 @@ from EcgPlotter import *
 from config import *
 from dataSenderEmulator import run_emulator_thread
 
-# HOST = "127.0.0.1"
-# PORT = 12345
-# SAMPLING_RATE = 130  # HZ
 VERBOSE = False
 PRINT_PACKETS = False
 
-# REC_VALUES_COUNT = int(130 / 2)  # 73
-VALUE_SIZE = 4 + 8
+
 
 data = EcgData(SAMPLING_RATE)
 
@@ -32,8 +28,8 @@ def handle_client_connection(client_socket):
 
 def receive_packet(client_socket):
     buffer = b""
-    while len(buffer) < VALUES_IN_PACKET_COUNT * VALUE_SIZE:
-        chunk = client_socket.recv(VALUES_IN_PACKET_COUNT * VALUE_SIZE - len(buffer))
+    while len(buffer) < VALUES_IN_PACKET_COUNT * SINGLE_ENTRY_SIZE:
+        chunk = client_socket.recv(VALUES_IN_PACKET_COUNT * SINGLE_ENTRY_SIZE - len(buffer))
         if not chunk:
             raise ValueError("Error while receiving data...")
         buffer += chunk
@@ -42,17 +38,17 @@ def receive_packet(client_socket):
 
 def process_packet(raw_data):
     timestamps = [
-        struct.unpack("!q", raw_data[i * 12 + 4 : i * 12 + 12])[0] / 1e9
+        struct.unpack("!q", raw_data[i * SINGLE_ENTRY_SIZE + VALUE_SIZE : i * SINGLE_ENTRY_SIZE + SINGLE_ENTRY_SIZE])[0] / 1e9
         for i in range(VALUES_IN_PACKET_COUNT)
     ]
     if NEGATE_INCOMING_DATA:
         values = [
-            -struct.unpack("!f", raw_data[i * 12 : i * 12 + 4])[0]
+            -struct.unpack("!f", raw_data[i * SINGLE_ENTRY_SIZE : i * SINGLE_ENTRY_SIZE + VALUE_SIZE])[0]
             for i in range(VALUES_IN_PACKET_COUNT)
         ]
     else:
         values = [
-            struct.unpack("!f", raw_data[i * 12 : i * 12 + 4])[0]
+            struct.unpack("!f", raw_data[i * SINGLE_ENTRY_SIZE : i * SINGLE_ENTRY_SIZE + VALUE_SIZE])[0]
             for i in range(VALUES_IN_PACKET_COUNT)
         ]
         
@@ -78,7 +74,7 @@ def process_packet(raw_data):
 
     data.push_raw_data(timestamps, values)
 
-
+"""
 # def plot_data():
 #     while True:
 #         try:
@@ -86,7 +82,7 @@ def process_packet(raw_data):
 #             # ecg_plotter.send_single_sample(timestamp, mV)
 #         except queue.Empty:
 #             continue
-
+"""
 
 def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
