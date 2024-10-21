@@ -2,6 +2,7 @@ import numpy as np
 import PanTompkins
 import NAME_THIS_MODULE_YOURSELF_PIOTER
 
+
 class EcgData:
 
     @property
@@ -28,18 +29,15 @@ class EcgData:
     def sdnn(self):
         self.__refresh_if_dirty()
         return self.__sdnn
-    
-    
+
     @property
     def rmssd(self):
         self.__refresh_if_dirty()
         return self.__rmssd
 
-
-
     @property
     def pnn50(self):
-        self.__refresh_if_dirty
+        self.__refresh_if_dirty()
         return self.__pnn50
 
     def __init__(self, frequency):
@@ -56,13 +54,19 @@ class EcgData:
         return
 
     def print_data(self):
-        mean_rr = round(self.mean_rr*1e3, 2) if self.mean_rr is not None else None
+        mean_rr = round(self.mean_rr * 1e3, 2) if self.mean_rr is not None else None
         sdnn = round(self.sdnn, 2) if self.sdnn is not None else None
-        rmssd = round(self.rmssd, 2) if self.rmssd is not None else None    
+        rmssd = round(self.rmssd, 2) if self.rmssd is not None else None
+        pnn50 = round(self.pnn50, 2) if self.rmssd is not None else None
         print("ECG DATA---------------")
-        if(mean_rr is not None): print(f"Mean RR: {mean_rr} ms")
-        if(sdnn is not None): print(f"SDNN: {sdnn}")
-        if(rmssd is not None): print(f"RMSSD: {rmssd}")
+        if mean_rr is not None:
+            print(f"Mean RR: {mean_rr} ms")
+        if sdnn is not None:
+            print(f"SDNN: {sdnn}")
+        if rmssd is not None:
+            print(f"RMSSD: {rmssd}")
+        if pnn50 is not None:
+            print(f"PNN50: {pnn50}%")
         return
 
     def push_raw_data(self, x, y):
@@ -93,7 +97,7 @@ class EcgData:
         self.__calc_mean_rr()
         self.__calc_sdnn()
         self.__calc_rmssd()
-        #self.__calc_pnn50()
+        self.__calc_pnn50()
         return
 
     def __find_r_peaks(self):
@@ -101,7 +105,9 @@ class EcgData:
         return self.__r_peaks
 
     def __find_r_peaks_piotr(self):
-        self.__r_peaks_piotr = NAME_THIS_MODULE_YOURSELF_PIOTER.find_r_peaks_piotr(self.raw_data)
+        self.__r_peaks_piotr = NAME_THIS_MODULE_YOURSELF_PIOTER.find_r_peaks_piotr(
+            self.raw_data
+        )
         return self.__r_peaks_piotr
 
     def __calc_rr_intervals(self):
@@ -132,6 +138,21 @@ class EcgData:
         )
         return self.__rmssd
 
+    def __calc_pnn50(self):
+        if len(self.__rr_intervals) < 2:
+            self.__pnn50 = None
+            return self.__pnn50
 
+        diff_rr_intervals = np.diff(self.__rr_intervals)
+
+        nn50_count = np.sum(np.abs(diff_rr_intervals) > 0.050)  # 50 ms
+
+        self.__pnn50 = (
+            (nn50_count / len(diff_rr_intervals)) * 100
+            if len(diff_rr_intervals) > 0
+            else None
+        )
+
+        return self.__pnn50
 
     pass
