@@ -1,6 +1,8 @@
 import numpy as np
 import PanTompkins
 import NAME_THIS_MODULE_YOURSELF_PIOTER
+from config import *
+from dataSenderEmulator import read_csv
 
 
 class EcgData:
@@ -52,6 +54,17 @@ class EcgData:
         self.__pnn50 = -1
         self.__is_dirty = False
         return
+
+    def load_csv_data(self, path):
+        csv_data = np.array(read_csv(path))
+        if NORMALIZED_TEST_DATA_TIME:
+            csv_data[:, 0] -= csv_data[0, 0]
+        if NEGATE_INCOMING_DATA:
+            csv_data[:, 1] *= -1
+        csv_data[:, 0] /= TIME_SCALE_FACTOR
+        self.raw_data = csv_data
+        # self.__is_dirty = True
+        self.__refresh_data()
 
     def print_data(self):
         mean_rr = round(self.mean_rr * 1e3, 2) if self.mean_rr is not None else None
