@@ -5,6 +5,7 @@ import threading
 import queue
 from EcgData import *
 from EcgPlotter import *
+from HRPlotter import HRPlotter
 from config import *
 from dataSenderEmulator import run_emulator_thread
 
