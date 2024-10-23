@@ -5,6 +5,7 @@ import threading
 import queue
 from EcgData import *
 from EcgPlotter import *
+from HRPlotter import HRPlotter
 from config import *
 from dataSenderEmulator import run_emulator_thread
 
@@ -16,6 +17,7 @@ PRINT_PACKETS = False
 data = EcgData(SAMPLING_RATE)
 
 ecg_plotter = EcgPlotter("ECG", data)
+hr_plotter = HRPlotter("ECG", data)
 data_queue = queue.Queue()
 
 

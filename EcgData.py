@@ -59,7 +59,10 @@ class EcgData:
         mean_rr = round(self.mean_rr*1e3, 2) if self.mean_rr is not None else None
         sdnn = round(self.sdnn, 2) if self.sdnn is not None else None
         rmssd = round(self.rmssd, 2) if self.rmssd is not None else None    
-        print("ECG DATA---------------")
+        print("ECG PEAKS---------------")
+        print(self.r_peaks)
+        print("ECG INTERVALS---------------")
+        print(self.rr_intervals)
         if(mean_rr is not None): print(f"Mean RR: {mean_rr} ms")
         if(sdnn is not None): print(f"SDNN: {sdnn}")
         if(rmssd is not None): print(f"RMSSD: {rmssd}")

@@ -105,6 +105,6 @@ class EcgPlotter:
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
         if PRINT_ECG_DATA:
-            self.ecg_data.print_data()
+            pass#self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()
