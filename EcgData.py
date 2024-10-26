@@ -104,7 +104,8 @@ class EcgData:
         return
 
     def __refresh_data(self):
-        self.__find_r_peaks()
+        # self.__find_r_peaks()
+        self.__find_new_r_peaks()
         self.__find_r_peaks_piotr()
         self.__calc_rr_intervals()
         self.__calc_mean_rr()
@@ -116,6 +117,41 @@ class EcgData:
     def __find_r_peaks(self):
         self.__r_peaks = PanTompkins.find_r_peaks(self.raw_data, self.frequency)
         return self.__r_peaks
+    
+    def __find_new_r_peaks(self):
+        if len(self.raw_data) < self.frequency * 2:
+            return
+        if len(self.__r_peaks) == 0:
+            self.__find_r_peaks()
+            return
+        
+        index = -1
+        for i in range(len(self.raw_data)-1, -1, -1):
+            if self.raw_data[i][0] < self.__r_peaks[-1][0]:
+                index = i
+                break
+        #offset = int(self.__mean_rr/2*self.frequency)
+        # new_peaks = PanTompkins.find_r_peaks(self.raw_data[-(index+offset):], self.frequency)
+        new_peaks = PanTompkins.find_r_peaks(self.raw_data[-index:], self.frequency)
+        
+        start_index = -1
+        for i in range(len(new_peaks)):
+            if self.__r_peaks[-1][0] < new_peaks[i][0]:
+                start_index = i
+                break
+            
+        if -1 == start_index:
+            return
+        
+        
+        if self.raw_data[-1][0] - new_peaks[-1][0] > self.__mean_rr/2:
+            end_index = len(new_peaks-1)
+        else:
+            end_index = -1
+        
+        self.__r_peaks = np.vstack((self.__r_peaks, new_peaks[start_index:end_index]))
+
+
 
     def __find_r_peaks_piotr(self):
         self.__r_peaks_piotr = NAME_THIS_MODULE_YOURSELF_PIOTER.find_r_peaks_piotr(
@@ -129,6 +165,14 @@ class EcgData:
 
         self.__rr_intervals = np.diff([peak[0] for peak in self.__r_peaks])
         return self.__rr_intervals
+    
+    # @staticmethod
+    # def calc_rr_intervals(r_peaks: np.ndarray)->np.ndarray:
+    #     if len(r_peaks) < 2:
+    #         return np.empty(0)
+
+    #     rr_intervals = np.diff([peak[0] for peak in r_peaks])
+    #     return rr_intervals
 
     def __calc_mean_rr(self):
         self.__mean_rr = (
