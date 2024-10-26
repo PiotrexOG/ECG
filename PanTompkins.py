@@ -39,14 +39,14 @@ def find_r_peaks(ecg_signal, frequency: float):
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
     
-    window_size = int(0.150 * frequency)  # 150 ms window
+    window_size = int(0.050 * frequency)  # 50 ms window
     integrated_signal = moving_window_integration(squared_signal, window_size)
     
     #threshold = 0.4 * np.max(integrated_signal)
-    threshold = np.mean(integrated_signal) + 0.5 * np.std(integrated_signal)  # Mean + 0.5*std
+    threshold = np.mean(integrated_signal) + 0.6 * np.std(integrated_signal)  # Mean + 0.6*std
     
     peaks, _ = signal.find_peaks(
-        integrated_signal, height=threshold, distance=int(0.6 * frequency) # 600 ms
+        integrated_signal, height=threshold, distance=int(0.4 * frequency) # 400 ms
     )
     
     refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)

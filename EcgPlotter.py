@@ -18,8 +18,7 @@ class EcgPlotter:
 
     def __init__(self, title: str, ecg_data: EcgData):
         self.ecg_data = ecg_data
-        self.SECONDS_TO_PLOT = 5
-        self._plot_data = deque(maxlen=ecg_data.frequency * self.SECONDS_TO_PLOT)
+        self._plot_data = deque(maxlen=ecg_data.frequency * SECONDS_TO_PLOT)
 
         self.fig, (self.ax_ecg) = plt.subplots(figsize=(16, 8))
         plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)

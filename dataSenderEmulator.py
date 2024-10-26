@@ -2,9 +2,7 @@ import csv
 import struct
 import time
 import threading
-
 import socket
-
 
 from config import *
 
@@ -15,7 +13,7 @@ def read_csv(path: str):
     with open(path, mode="r") as file:
         csv_reader = csv.reader(file)
         for row in csv_reader:
-            data.append((int(row[0]), int(row[1])))
+            data.append((int(row[0]), float(row[1])))
 
     return data
 
@@ -39,6 +37,8 @@ def send_loop(data):
 
                         index = index + 1
                         if index == len(data):
+                            if not LOOP_DATA:
+                                return
                             index = 0
                             offset += (
                                 (data[-1][0] - first_timestamp)
@@ -47,8 +47,8 @@ def send_loop(data):
                             )
 
                     sock.sendall(byte_buffer)
-                    
-                    sleep_time = (data[index][0] + offset - first_ts_in_iteration) / 1e9
+
+                    sleep_time = (data[index][0] + offset - first_ts_in_iteration) / TIME_SCALE_FACTOR
                     time.sleep(sleep_time)
         except Exception as ex:
             print(f"Exception was thrown: {ex}")

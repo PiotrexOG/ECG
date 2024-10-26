@@ -12,13 +12,6 @@ VERBOSE = False
 PRINT_PACKETS = False
 
 
-
-data = EcgData(SAMPLING_RATE)
-
-ecg_plotter = EcgPlotter("ECG", data)
-data_queue = queue.Queue()
-
-
 def handle_client_connection(client_socket):
     # try:
     while True:
@@ -29,7 +22,9 @@ def handle_client_connection(client_socket):
 def receive_packet(client_socket):
     buffer = b""
     while len(buffer) < VALUES_IN_PACKET_COUNT * SINGLE_ENTRY_SIZE:
-        chunk = client_socket.recv(VALUES_IN_PACKET_COUNT * SINGLE_ENTRY_SIZE - len(buffer))
+        chunk = client_socket.recv(
+            VALUES_IN_PACKET_COUNT * SINGLE_ENTRY_SIZE - len(buffer)
+        )
         if not chunk:
             raise ValueError("Error while receiving data...")
         buffer += chunk
@@ -38,51 +33,36 @@ def receive_packet(client_socket):
 
 def process_packet(raw_data):
     timestamps = [
-        struct.unpack("!q", raw_data[i * SINGLE_ENTRY_SIZE + VALUE_SIZE : i * SINGLE_ENTRY_SIZE + SINGLE_ENTRY_SIZE])[0] / 1e9
+        struct.unpack(
+            "!q",
+            raw_data[
+                i * SINGLE_ENTRY_SIZE
+                + VALUE_SIZE : i * SINGLE_ENTRY_SIZE
+                + SINGLE_ENTRY_SIZE
+            ],
+        )[0]
+        / TIME_SCALE_FACTOR
         for i in range(VALUES_IN_PACKET_COUNT)
     ]
     if NEGATE_INCOMING_DATA:
         values = [
-            -struct.unpack("!f", raw_data[i * SINGLE_ENTRY_SIZE : i * SINGLE_ENTRY_SIZE + VALUE_SIZE])[0]
+            -struct.unpack(
+                "!f",
+                raw_data[i * SINGLE_ENTRY_SIZE : i * SINGLE_ENTRY_SIZE + VALUE_SIZE],
+            )[0]
             for i in range(VALUES_IN_PACKET_COUNT)
         ]
     else:
         values = [
-            struct.unpack("!f", raw_data[i * SINGLE_ENTRY_SIZE : i * SINGLE_ENTRY_SIZE + VALUE_SIZE])[0]
+            struct.unpack(
+                "!f",
+                raw_data[i * SINGLE_ENTRY_SIZE : i * SINGLE_ENTRY_SIZE + VALUE_SIZE],
+            )[0]
             for i in range(VALUES_IN_PACKET_COUNT)
         ]
-        
-    """
-    # for i in range(VALUES_IN_PACKET_COUNT):
-    #     offset = i * (4 + 8)
-    #     float_value = struct.unpack("!f", raw_data[offset : offset + 4])[
-    #         0
-    #     ]  # Wyciągnięcie floata
-    #     long_value = struct.unpack("!q", raw_data[offset + 4 : offset + 12])[
-    #         0
-    #     ]  # Wyciągnięcie long
-    #     timestamps.append(long_value / 1e9)
-    #     values.append(-float_value)
-
-    #     if PRINT_PACKETS:
-    #         print("First value:" + "%f" % float_value)
-    #         print("First value timestamp:" + str(long_value))
-    #     # data.push_raw_data(long_value / 1e9, -float_value)
-    #     # data_queue.put(data.raw_data[-1])
-    #     data_queue.put((long_value / 1e9, -float_value))
-    """
 
     data.push_raw_data(timestamps, values)
 
-"""
-# def plot_data():
-#     while True:
-#         try:
-#             timestamp, mV = data_queue.get(timeout=1)
-#             # ecg_plotter.send_single_sample(timestamp, mV)
-#         except queue.Empty:
-#             continue
-"""
 
 def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
@@ -106,12 +86,37 @@ def start_server():
             client_thread.start()
 
 
-if __name__ == "__main__":
-    if RUN_TEST_DATA:
-        run_emulator_thread()
-
+def run_server():
     server_thread = threading.Thread(target=start_server)
     server_thread.daemon = True
     server_thread.start()
+
+
+def run_normal_mode():
+    run_server()
+
+
+def run_simulation():
+    run_emulator_thread()
+    run_normal_mode()
+
+
+def run_load_CSV(data):
+    data.load_csv_data(CSV_PATH)
+
+
+if __name__ == "__main__":
+    data = EcgData(SAMPLING_RATE)
+    ecg_plotter = EcgPlotter("ECG", data)
+
+    match APP_MODE:
+        case AppModeEnum.NORMAL:
+            run_normal_mode()
+
+        case AppModeEnum.SIMULATION:
+            run_simulation()
+
+        case AppModeEnum.LOAD_CSV:
+            run_load_CSV(data)
 
     plt.show()
