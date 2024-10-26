@@ -18,7 +18,7 @@ class EcgPlotter:
 
     def __init__(self, title: str, ecg_data: EcgData):
         self.ecg_data = ecg_data
-        self.SECONDS_TO_PLOT = 5
+        self.SECONDS_TO_PLOT = 50
         self._plot_data = deque(maxlen=ecg_data.frequency * self.SECONDS_TO_PLOT)
 
         self.fig, (self.ax_ecg) = plt.subplots(figsize=(16, 8))
@@ -46,6 +46,10 @@ class EcgPlotter:
         self.ax_r_peaks = self.ax_ecg.scatter(
             [], [], color="red", label="R-peaks", marker="x", s=100
         )
+
+        # Add dynamic text on the side of the plot
+        self.text_box = self.fig.text(0.87, 0.5, '', fontsize=14, color='white',
+                                      bbox=dict(facecolor='black', alpha=0.5))
 
         self.timer = self.fig.canvas.new_timer(interval=500)
         self.timer.add_callback(self.update_plot)
@@ -104,7 +108,19 @@ class EcgPlotter:
                 )
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
+
+            # Update dynamic text (e.g., current voltage)
+            current_voltage = ecg_values[-1]  # Get latest voltage value
+            current_time = timestamps[-1]  # Get latest timestamp
+            if self.ecg_data.rr_intervals.any():
+                current_interval = self.ecg_data.rr_intervals[-1]
+                current_hr = 60 / current_interval
+                current_r_peak = self.ecg_data.r_peaks[-1][1]
+                self.text_box.set_text(
+                    f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV\nHR: {current_hr:.2f}")
+            # self.text_box.set_text(f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV")
+
         if PRINT_ECG_DATA:
-            pass#self.ecg_data.print_data()
+            self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()

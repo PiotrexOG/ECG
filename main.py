@@ -17,7 +17,7 @@ PRINT_PACKETS = False
 data = EcgData(SAMPLING_RATE)
 
 ecg_plotter = EcgPlotter("ECG", data)
-hr_plotter = HRPlotter("ECG", data)
+#hr_plotter = HRPlotter("ECG", data)
 data_queue = queue.Queue()
 
 
