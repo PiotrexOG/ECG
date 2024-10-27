@@ -11,6 +11,26 @@ def bandpass_filter(sig, frequency, lowcut: float = 5, highcut: float = 18):
     return filtered_signal
 
 
+def filter_ecg_with_timestamps(ecg_signal, frequency: float):
+    # Extract timestamps and ECG values from the input
+    timestamps = ecg_signal[:, 0]
+    ecg_values = ecg_signal[:, 1]
+
+    # Apply bandpass filter to the ECG values
+    filtered_signal = bandpass_filter(ecg_values, frequency, lowcut=0.5, highcut=40)
+    #filtered_signal = ecg_values
+    diff_signal = derivative_filter(filtered_signal)
+    squared_signal = square(diff_signal)
+
+    #window_size = int(0.050 * frequency)  # 50 ms window
+    #integrated_signal = moving_window_integration(filtered_signal, window_size)
+
+    # Combine timestamps with filtered signal values
+    filtered_signal_with_timestamps = np.column_stack((timestamps, filtered_signal))
+
+    return filtered_signal_with_timestamps
+
+
 def derivative_filter(sig):
     return np.diff(sig, prepend=0)
 

@@ -9,11 +9,11 @@ class HRPlotter:
 
     def __init__(self, title: str, ecg_data: EcgData):
         self.ecg_data = ecg_data
-        self.PEAKS_TO_PLOT = 30
+        self.PEAKS_TO_PLOT = 160
         self._hr_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for HR data
         self._r_peaks_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for R-peak data
 
-        self.fig, (self.ax_rr, self.ax_hr) = plt.subplots(2, 1, figsize=(5, 6))
+        self.fig, (self.ax_rr, self.ax_hr, self.ax_rr_fil) = plt.subplots(3, 1, figsize=(5, 6))
         plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)
 
         # R-peak plot as a continuous line using deque data

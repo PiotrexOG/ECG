@@ -11,7 +11,7 @@ class EcgPlotter:
     def _is_plot_up_to_date(self) -> bool:
         if (
             0 == len(self._plot_data)
-            or self.ecg_data.raw_data[-1][0] > self._plot_data[-1][0]
+            or self.ecg_data.filtered_data[-1][0] > self._plot_data[-1][0]
         ):
             return False
         return True
@@ -61,19 +61,19 @@ class EcgPlotter:
 
     def _update_plot_data(self) -> None:
         #self._plot_data = self.ecg_data.filtered_data
-        if 0 == len(self.ecg_data.raw_data) or self._is_plot_up_to_date:
+        if 0 == len(self.ecg_data.filtered_data) or self._is_plot_up_to_date:
             return
         else:
             plot_data_count = len(self._plot_data)
-            ecg_data_count = len(self.ecg_data.raw_data)
+            ecg_data_count = len(self.ecg_data.filtered_data)
 
             if 0 == plot_data_count:
                 number_of_rows = (
                     plot_data_count
-                    if len(self.ecg_data.raw_data) >= plot_data_count
+                    if len(self.ecg_data.filtered_data) >= plot_data_count
                     else ecg_data_count
                 )
-                for row in self.ecg_data.raw_data[-number_of_rows:]:
+                for row in self.ecg_data.filtered_data[-number_of_rows:]:
                     self._plot_data.append(row)
                 return
             else:
@@ -82,13 +82,13 @@ class EcgPlotter:
 
                 # Szukanie indeksu z tym samym timestampem w ecg_data.filtered_data
                 last_index = np.where(
-                    np.array([row[0] == target_timestamp for row in self.ecg_data.raw_data])
+                    np.array([row[0] == target_timestamp for row in self.ecg_data.filtered_data])
                 )[0][0]
 
                 # last_index = np.where(
                 #     np.all(self.ecg_data.raw_data == self._plot_data[-1], axis=1)
                 # )[0][0]
-                for row in self.ecg_data.raw_data[last_index + 1:]:
+                for row in self.ecg_data.filtered_data[last_index + 1:]:
                     self._plot_data.append(row)
                 return
 
