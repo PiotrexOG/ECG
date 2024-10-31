@@ -8,6 +8,8 @@ from EcgPlotter import *
 from config import *
 from dataSenderEmulator import run_emulator_thread
 from nnHelpers import *
+from PanTompkinsFinder import PanTompkinsFinder
+from CnnFinder import CnnFinder
 
 
 import tensorflow as tf
@@ -69,6 +71,7 @@ def process_packet(raw_data):
         ]
 
     data.push_raw_data(timestamps, values)
+    # data1.raw_data = data.raw_data
 
 
 def start_server():
@@ -109,13 +112,17 @@ def run_simulation():
 
 
 def run_load_CSV(data):
-    data.load_csv_data(CSV_PATH)
-
+    data.load_csv_data_with_timestamps(CSV_PATH)
 
 
 if __name__ == "__main__":
-    data = EcgData(SAMPLING_RATE)
-    # ecg_plotter = EcgPlotter("ECG", data)
+    # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    data = EcgData(SAMPLING_RATE, CnnFinder("models/model.keras", WINDOW_SIZE))
+    # data1 = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    # data1 = EcgData(SAMPLING_RATE, CnnFinder("models/proszePieknie.keras", WINDOW_SIZE))
+    ecg_plotter = EcgPlotter("ECG", data)
+    # ecg_plotter2 = EcgPlotter("PanTomkins", data1)
+    # data.load_data_from_mitbih("data\\mit-bih\\100")
 
     match APP_MODE:
         case AppModeEnum.NORMAL:
@@ -127,12 +134,12 @@ if __name__ == "__main__":
         case AppModeEnum.LOAD_CSV:
             run_load_CSV(data)
 
-    plt.show()
-    epochs = 150
 
-    print(f"data length: {len(data.raw_data)}")
-    X_train, y_train, R_p_w = data.extract_windows(256)
-    #train(X_train, y_train, R_p_w, 256, epochs)
-    test("", epochs, 256, data)
+    plt.show()
+
+    # print(f"data length: {len(data.raw_data)}")
+    # X_train, y_train, R_p_w = data.extract_windows(256)
+    # train(X_train, y_train, R_p_w, 256, epochs)
+    # test("", epochs, 256, data)
 
     model_name = "sig2sig_unet"

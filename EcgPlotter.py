@@ -39,11 +39,15 @@ class EcgPlotter:
         self.ax_ecg.tick_params(
             axis="y",
         )
-        self.ax_ecg.set_title("ECG Waveform")
         self.ax_ecg.set_xlabel("Time (s)")
 
         self.ax_r_peaks = self.ax_ecg.scatter(
             [], [], color="red", label="R-peaks", marker="x", s=100
+        )
+        
+        self.stats_text = self.ax_ecg.text(
+            0.01, 0.01, "", transform=self.ax_ecg.transAxes, color="white", fontsize=12,
+            verticalalignment="bottom", bbox=dict(facecolor="black", alpha=0.5)
         )
 
         self.timer = self.fig.canvas.new_timer(interval=500)
@@ -80,6 +84,7 @@ class EcgPlotter:
                 return
 
     def update_plot(self) -> None:
+        self.ecg_data.refresh_if_dirty()
         self._update_plot_data()
         if len(self._plot_data) > 0:
             timestamps, ecg_values = zip(*self._plot_data)
@@ -104,6 +109,8 @@ class EcgPlotter:
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
         if PRINT_ECG_DATA:
-            self.ecg_data.print_data()
+            self.stats_text.set_text(self.ecg_data.print_data_string())
+            # self.ecg_data.print_data()
+            
 
         self.fig.canvas.draw_idle()

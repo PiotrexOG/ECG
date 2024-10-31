@@ -34,8 +34,20 @@ def refine_peak_positions(ecg_signal, detected_peaks, search_window=10):
     
     return np.array(refined_peaks)
 
-def find_r_peaks(ecg_signal, frequency: float):
+def find_r_peaks_values(ecg_signal, frequency: float):
     peaks = find_r_peaks_ind(ecg_signal, frequency)
+    
+    peak_values = ecg_signal[peaks, 1]
+    # peak_timestamps = ecg_signal[peaks, 0]
+    
+    # peaks_with_timestamps = np.column_stack((peak_timestamps, peak_values))
+    
+    # return peaks_with_timestamps
+    return peak_values
+
+
+def find_r_peaks_values_with_timestamps(ecg_signal, frequency: float):
+    peaks = find_r_peaks_ind(ecg_signal[:, 1], frequency)
     
     peak_values = ecg_signal[peaks, 1]
     peak_timestamps = ecg_signal[peaks, 0]
@@ -45,7 +57,8 @@ def find_r_peaks(ecg_signal, frequency: float):
     return peaks_with_timestamps
 
 def find_r_peaks_ind(ecg_signal, frequency: float):
-    filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency)
+    # filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency)
+    filtered_signal = bandpass_filter(ecg_signal, frequency)
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
     
@@ -59,7 +72,8 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
         integrated_signal, height=threshold, distance=int(0.4 * frequency) # 400 ms
     )
     
-    refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
+    # refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
+    refined_peaks = refine_peak_positions(ecg_signal, peaks)
     
     return refined_peaks
 

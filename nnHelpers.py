@@ -8,7 +8,6 @@ from wfdb import processing
 from tqdm import tqdm
 
 
-
 def calculate_stats(r_ref, r_ans, thr_, fs):
     # Threshold region to consider correct detection. in samples
     # thr_ = 0.15 #(150/4 ms)
@@ -89,8 +88,17 @@ def verifier(ecg, R_peaks, R_probs, ver_wind=60):
     wind = 30
     check_ind = np.squeeze(np.array(np.where(R_probs < 0.95)))
 
-    if R_peaks[check_ind[-1]] == R_peaks[-1]:
-        check_ind = check_ind[:-1]
+    try:
+        if len(check_ind) < 2:
+            return R_peaks, R_probs
+    except:
+        return R_peaks, R_probs
+
+    try:
+        if R_peaks[check_ind[-1]] == R_peaks[-1]:
+            check_ind = check_ind[:-1]
+    except:
+        pass
 
     for ind in check_ind:
 
@@ -100,61 +108,54 @@ def verifier(ecg, R_peaks, R_probs, ver_wind=60):
 
         # 60 for chinese data
         if diff < ver_wind:
+            two_probs = [R_probs[two_ind[0]], R_probs[two_ind[1]]]
+            two_peaks = [R_peaks[two_ind[0]], R_peaks[two_ind[1]]]
 
-            try:
+            beat1 = ecg[two_peaks[0] - wind : two_peaks[0] + wind]
+            beat2 = ecg[two_peaks[1] - wind : two_peaks[1] + wind]
 
-                two_probs = [R_probs[two_ind[0]], R_probs[two_ind[1]]]
-                two_peaks = [R_peaks[two_ind[0]], R_peaks[two_ind[1]]]
+            for i in range(two_ind[0] - 1, two_ind[0] - 1 - 30, -1):
+                for thr_p in [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
+                    if R_probs[i] > thr_p:
+                        # print(i)
+                        prv_beat = ecg[R_peaks[i] - wind : R_peaks[i] + wind]
+                        break
 
-                beat1 = ecg[two_peaks[0] - wind : two_peaks[0] + wind]
-                beat2 = ecg[two_peaks[1] - wind : two_peaks[1] + wind]
+            for i in range(two_ind[1] + 1, two_ind[1] + 1 + 30):
 
-                for i in range(two_ind[0] - 1, two_ind[0] - 1 - 30, -1):
-                    for thr_p in [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
-                        if R_probs[i] > thr_p:
-                            # print(i)
-                            prv_beat = ecg[R_peaks[i] - wind : R_peaks[i] + wind]
-                            break
+                for thr_p in [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
+                    if i == len(R_probs):
+                        nxt_beat = ecg[R_peaks[i - 1] - wind : R_peaks[i - 1] + wind]
+                        break
 
-                for i in range(two_ind[1] + 1, two_ind[1] + 1 + 30):
+                    if R_probs[i] > thr_p:
+                        # print(i)
+                        nxt_beat = ecg[R_peaks[i] - wind : R_peaks[i] + wind]
+                        break
 
-                    for thr_p in [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
-                        if i == len(R_probs):
-                            nxt_beat = ecg[
-                                R_peaks[i - 1] - wind : R_peaks[i - 1] + wind
-                            ]
-                            break
+                else:
+                    # Continue if the inner loop wasn't broken.
+                    continue
+                # Inner loop was broken, break the outer.
+                break
 
-                        if R_probs[i] > thr_p:
-                            # print(i)
-                            nxt_beat = ecg[R_peaks[i] - wind : R_peaks[i] + wind]
-                            break
+            if len(nxt_beat) != 60:
+                nxt_beat = prv_beat
+            if len(prv_beat) != 60:
+                prv_beat = nxt_beat
+            if len(beat1) != 60:
+                beat1 = beat2
+            if len(beat2) != 60:
+                beat2 = beat1
 
-                    else:
-                        # Continue if the inner loop wasn't broken.
-                        continue
-                    # Inner loop was broken, break the outer.
-                    break
+            X1 = np.corrcoef(np.squeeze(beat1), np.squeeze(prv_beat))[0, 1]
+            X2 = np.corrcoef(np.squeeze(beat1), np.squeeze(nxt_beat))[0, 1]
 
-                if len(nxt_beat) != 60:
-                    nxt_beat = prv_beat
-                if len(prv_beat) != 60:
-                    prv_beat = nxt_beat
-                if len(beat1) != 60:
-                    beat1 = beat2
-                if len(beat2) != 60:
-                    beat2 = beat1
+            Y1 = np.corrcoef(np.squeeze(beat2), np.squeeze(prv_beat))[0, 1]
+            Y2 = np.corrcoef(np.squeeze(beat2), np.squeeze(nxt_beat))[0, 1]
 
-                X1 = np.corrcoef(np.squeeze(beat1), np.squeeze(prv_beat))[0, 1]
-                X2 = np.corrcoef(np.squeeze(beat1), np.squeeze(nxt_beat))[0, 1]
-
-                Y1 = np.corrcoef(np.squeeze(beat2), np.squeeze(prv_beat))[0, 1]
-                Y2 = np.corrcoef(np.squeeze(beat2), np.squeeze(nxt_beat))[0, 1]
-
-                si = np.argmin([X1 * X2, Y1 * Y2])
-                del_indx.append(two_ind[si])
-            except:
-                pass
+            si = np.argmin([X1 * X2, Y1 * Y2])
+            del_indx.append(two_ind[si])
 
     R_peaks_ver = np.delete(R_peaks, del_indx)
 
@@ -283,7 +284,8 @@ def filter_predictions(signal, preds, threshold):
     filtered_peaks = []
     filtered_probs = []
 
-    for peak_id in tqdm(np.unique(correct_up)):
+    # for peak_id in tqdm(np.unique(correct_up)):
+    for peak_id in np.unique(correct_up):
         # Select indices and take probabilities from the locations
         # that contain at leas 5 points
         points_in_peak = np.where(correct_up == peak_id)[0]
@@ -291,19 +293,19 @@ def filter_predictions(signal, preds, threshold):
             filtered_probs.append(above_thresh[points_in_peak].mean())
             filtered_peaks.append(peak_id)
 
-    print(len(filtered_peaks))
+    # print(len(filtered_peaks))
     filtered_peaks = np.asarray(filtered_peaks)
     filtered_probs = np.asarray(filtered_probs)
 
     return filtered_peaks, filtered_probs
 
 
-def train(X_train, y_train, R_p_w, input_size, epochs):
+def train(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
     start = time.process_time()
 
     model = sig2sig_unet(input_size)
-
-    model_path = "models/proszePieknie.keras"
+    
+    model_path = "models\\" + model_file_name + ".keras"
 
     if not os.path.exists("models/"):
         os.makedirs("models/")
