@@ -117,8 +117,8 @@ def run_load_CSV(data):
 
 
 if __name__ == "__main__":
-    # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    data = EcgData(SAMPLING_RATE, CnnFinder("models/model.keras", WINDOW_SIZE))
+    data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    # data = EcgData(SAMPLING_RATE, CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
     # data1 = EcgData(SAMPLING_RATE, PanTompkinsFinder())
     # data1 = EcgData(SAMPLING_RATE, CnnFinder("models/proszePieknie.keras", WINDOW_SIZE))
     ecg_plotter = EcgPlotter("ECG", data)
