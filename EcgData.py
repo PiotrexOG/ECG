@@ -22,7 +22,7 @@ class EcgData:
     def raw_data(self, raw_data):
         self.__lock.acquire()
         self.__raw_data = raw_data
-        self.__is_dirty = True
+        self.__set_dirty()
         self.__lock.release()
         self.refresh_if_dirty()
 
@@ -93,13 +93,18 @@ class EcgData:
     def load_data_from_mitbih(self, path, record_num=0):
         record = wfdb.rdrecord(path)
         annotation = wfdb.rdann(path, "atr")
-        ecg_signal = record.p_signal
+        ecg_signal = record.p_signal[:, record_num]
         sample_rate = record.fs
         channel_names = record.sig_name
         r_peak_locations = annotation.sample
+        
+        
+        timestamps = np.array([i/sample_rate for i in range(len(ecg_signal))])
+        
 
         self.frequency = sample_rate
         self.__loaded_r_peaks_ind = r_peak_locations
+        self.raw_data = np.column_stack((timestamps, ecg_signal))
 
     def print_data(self):
         print("ECG DATA---------------")
@@ -146,7 +151,7 @@ class EcgData:
             return
 
         self.__refresh_data()
-        self._is_dirty = False
+        self.__is_dirty = False
         return
 
     def __refresh_data(self):

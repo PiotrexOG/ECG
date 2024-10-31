@@ -113,6 +113,7 @@ def run_simulation():
 
 def run_load_CSV(data):
     data.load_csv_data_with_timestamps(CSV_PATH)
+    # data.load_data_from_mitbih("data\\mit-bih\\100")
 
 
 if __name__ == "__main__":
