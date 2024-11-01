@@ -44,10 +44,28 @@ class EcgPlotter:
         self.ax_r_peaks = self.ax_ecg.scatter(
             [], [], color="red", label="R-peaks", marker="x", s=100
         )
-        
+
+        self.ax_p = self.ax_ecg.scatter(
+            [], [], color="yellow", label="P", marker="x", s=100
+        )
+
+        self.ax_q = self.ax_ecg.scatter(
+            [], [], color="blue", label="Q", marker="x", s=100
+        )
+
+        self.ax_test = self.ax_ecg.scatter(
+            [], [], color="white", label="test", marker="x", s=100
+        )
+
         self.stats_text = self.ax_ecg.text(
-            0.01, 0.01, "", transform=self.ax_ecg.transAxes, color="white", fontsize=12,
-            verticalalignment="bottom", bbox=dict(facecolor="black", alpha=0.5)
+            0.01,
+            0.01,
+            "",
+            transform=self.ax_ecg.transAxes,
+            color="white",
+            fontsize=12,
+            verticalalignment="bottom",
+            bbox=dict(facecolor="black", alpha=0.5),
         )
 
         self.timer = self.fig.canvas.new_timer(interval=500)
@@ -79,7 +97,7 @@ class EcgPlotter:
                     np.all(self.ecg_data.raw_data == self._plot_data[-1], axis=1)
                 )[0][0]
 
-                for row in self.ecg_data.raw_data[last_index + 1:]:
+                for row in self.ecg_data.raw_data[last_index + 1 :]:
                     self._plot_data.append(row)
                 return
 
@@ -97,6 +115,31 @@ class EcgPlotter:
             self.ax_ecg.autoscale_view()  # Auto scale the view
 
             r_peaks = self.ecg_data.r_peaks
+            for i in range(len(r_peaks) - 1, -1, -1):
+                if r_peaks[i, 0] < self._plot_data[0][0]:
+                    r_peaks = r_peaks[i + 1 :, :]
+                    break
+            p = self.ecg_data.raw_data[self.ecg_data.p, :]
+            for i in range(len(p) - 1, -1, -1):
+                if p[i, 0] < self._plot_data[0][0]:
+                    p = p[i + 1 :, :]
+                    break
+
+            q = self.ecg_data.raw_data[self.ecg_data.q, :]
+            for i in range(len(q) - 1, -1, -1):
+                if q[i, 0] < self._plot_data[0][0]:
+                    q = q[i + 1 :, :]
+                    break
+
+            test = self.ecg_data.raw_data[self.ecg_data.test, :]
+            for i in range(len(test) - 1, -1, -1):
+                if test[i, 0] < self._plot_data[0][0]:
+                    test = test[i + 1 :, :]
+                    break
+
+            rows_to_delete = np.concatenate((q, p))
+            test = np.array([row for row in test if not any((row == x).all() for x in rows_to_delete)])
+
             # r_peaks = self.ecg_data.r_peaks_piotr
             if r_peaks.any():  # Check if any R-peaks were found
                 r_peak_times, r_peak_values = zip(*r_peaks)
@@ -106,11 +149,26 @@ class EcgPlotter:
                 self.ax_r_peaks.set_offsets(
                     np.array([r_peak_times_normalized, r_peak_values]).T
                 )
+
+                p_times, p_values = zip(*p)
+                p_times_normalized = np.array(p_times) - x[0]
+                self.ax_p.set_offsets(np.array([p_times_normalized, p_values]).T)
+
+                q_times, q_values = zip(*q)
+                q_times_normalized = np.array(q_times) - x[0]
+                self.ax_q.set_offsets(np.array([q_times_normalized, q_values]).T)
+
+                test_times, test_values = zip(*test)
+                test_times_normalized = np.array(test_times) - x[0]
+                self.ax_test.set_offsets(
+                    np.array([test_times_normalized, test_values]).T
+                )
+                # for i in range(len(test_times_normalized)):
+                #     self.ax_ecg.text(test_times_normalized[i]+0.1, test_value[i], 'P', fontsize=12, ha='left', color='blue')
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
         if PRINT_ECG_DATA:
             self.stats_text.set_text(self.ecg_data.print_data_string())
             # self.ecg_data.print_data()
-            
 
         self.fig.canvas.draw_idle()

@@ -105,6 +105,30 @@ class EcgData:
         self.frequency = sample_rate
         self.__loaded_r_peaks_ind = r_peak_locations
         self.raw_data = np.column_stack((timestamps, ecg_signal))
+        
+        
+    def load_data_from_qt(self, path, record_num = 0):
+        record = wfdb.rdrecord(path)
+        ecg_signal = record.p_signal[:, record_num]
+        #header = wfdb.rdann(path, "hea")
+        annotation_q1c = wfdb.rdann(path, "q1c")
+        annotation_qt1 = wfdb.rdann(path, "qt1")
+        annotation_pu = wfdb.rdann(path, "pu")
+        annotation_pu0 = wfdb.rdann(path, "pu0")
+        
+        self.test = annotation_pu.sample
+        
+        p_indexes = np.where(np.array(annotation_pu.symbol)=='p')[0]
+        self.p = annotation_pu.sample[p_indexes]
+        q_indexes = np.where(np.array(annotation_pu.symbol)=='N')[0]
+        self.q = annotation_pu.sample[q_indexes]
+        
+        sample_rate = record.fs
+        timestamps = np.array([i/sample_rate for i in range(len(ecg_signal))])
+        
+        
+        self.frequency = sample_rate
+        self.raw_data = np.column_stack((timestamps, ecg_signal))
 
     def print_data(self):
         print("ECG DATA---------------")
