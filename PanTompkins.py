@@ -22,11 +22,11 @@ def filter_ecg_with_timestamps(ecg_signal, frequency: float):
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
 
-    #window_size = int(0.050 * frequency)  # 50 ms window
-    #integrated_signal = moving_window_integration(filtered_signal, window_size)
+    window_size = int(0.050 * frequency)  # 50 ms window
+    integrated_signal = moving_window_integration(squared_signal, window_size)
 
     # Combine timestamps with filtered signal values
-    filtered_signal_with_timestamps = np.column_stack((timestamps, filtered_signal))
+    filtered_signal_with_timestamps = np.column_stack((timestamps, integrated_signal))
 
     return filtered_signal_with_timestamps
 
@@ -54,8 +54,8 @@ def refine_peak_positions(ecg_signal, detected_peaks, search_window=10):
     
     return np.array(refined_peaks)
 
-def find_r_peaks(ecg_signal, frequency: float):
-    filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency)
+def find_r_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float = 18):
+    filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency, lowcut, highcut)
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
     

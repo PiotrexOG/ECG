@@ -6,7 +6,7 @@ from EcgData import *
 from config import *
 
 
-class EcgPlotter:
+class EcgPlotterFILTERED:
     @property
     def _is_plot_up_to_date(self) -> bool:
         if (
@@ -107,7 +107,7 @@ class EcgPlotter:
             self.ax_ecg.relim()  # Recalculate limits
             self.ax_ecg.autoscale_view()  # Auto scale the view
 
-            r_peaks = self.ecg_data.r_peaks
+            r_peaks = self.ecg_data.r_peaks_filtered
             # r_peaks = self.ecg_data.r_peaks_piotr
             if r_peaks.any():  # Check if any R-peaks were found
                 r_peak_times, r_peak_values = zip(*r_peaks)
@@ -131,7 +131,7 @@ class EcgPlotter:
                     f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV\nHR: {current_hr:.2f}")
             # self.text_box.set_text(f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV")
 
-        if PRINT_ECG_DATA:
-            self.ecg_data.print_data()
+        #if PRINT_ECG_DATA:
+            #self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()

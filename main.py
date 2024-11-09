@@ -5,6 +5,7 @@ import threading
 import queue
 from EcgData import *
 from EcgPlotter import *
+from EcgPlotterFILTERED import *
 from HRPlotter import HRPlotter
 from config import *
 from dataSenderEmulator import run_emulator_thread
@@ -109,6 +110,7 @@ def run_load_CSV(data):
 if __name__ == "__main__":
     data = EcgData(SAMPLING_RATE)
     ecg_plotter = EcgPlotter("ECG", data)
+    ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
     hr_plotter = HRPlotter("HR", data)
 
     if APP_MODE == AppModeEnum.NORMAL:
