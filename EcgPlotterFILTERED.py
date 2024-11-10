@@ -95,8 +95,8 @@ class EcgPlotterFILTERED:
     def update_plot(self) -> None:
         # if np.count_nonzero(self.ecg_data.data_buffer) < 1000:
         #     return
-        self._update_plot_data()
-
+       # self._update_plot_data()
+        self._plot_data = self.ecg_data.filtered_data[:SECONDS_TO_PLOT*self.ecg_data.frequency]
         if len(self._plot_data) > 0:
             timestamps, ecg_values = zip(*self._plot_data)
             x = np.array(timestamps)

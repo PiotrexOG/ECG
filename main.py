@@ -109,8 +109,8 @@ def run_load_CSV(data):
 
 if __name__ == "__main__":
     data = EcgData(SAMPLING_RATE)
-    ecg_plotter = EcgPlotter("ECG", data)
-    ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
+    #ecg_plotter = EcgPlotter("ECG", data)
+    #ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
     hr_plotter = HRPlotter("HR", data)
 
     if APP_MODE == AppModeEnum.NORMAL:
@@ -120,6 +120,7 @@ if __name__ == "__main__":
         run_simulation()
 
     elif APP_MODE == AppModeEnum.LOAD_CSV:
+        pass
         run_load_CSV(data)
 
     plt.show()

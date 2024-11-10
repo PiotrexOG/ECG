@@ -9,12 +9,13 @@ class HRPlotter:
 
     def __init__(self, title: str, ecg_data: EcgData):
         self.ecg_data = ecg_data
-        self.PEAKS_TO_PLOT = 10
+        self.PEAKS_TO_PLOT = int(SECONDS_TO_PLOT/0.75)
         self._hr_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for HR data
         self._hr_fil_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for HR data
         self._r_peaks_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for R-peak data
+        self._r_peaks_fil_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for R-peak data
 
-        self.fig, (self.ax_rr, self.ax_hr, self.ax_hr_fil) = plt.subplots(3, 1, figsize=(5, 6))
+        self.fig, (self.ax_rr, self.ax_rr_fil, self.ax_hr, self.ax_hr_fil) = plt.subplots(4, 1, figsize=(5, 6))
         plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)
 
         # R-peak plot as a continuous line using deque data
@@ -35,8 +36,16 @@ class HRPlotter:
         self.ax_r_peaks = self.ax_rr.scatter(
             x, y, color="red", label="R-peaks", marker=".", s=100
         )
+
+
         # Line plot for R-peaks using deque data
         (self.line_r_peaks,) = self.ax_rr.plot(x, y, color="green", label="R-peaks")
+
+        # Heart rate plot
+        (self.line_r_peaks_fil,) = self.ax_rr_fil.plot([], [], color="blue")
+        self.ax_rr_fil.set_title("Heart Rate (HR)")
+        self.ax_rr_fil.set_ylabel("HR (bpm)")
+        self.ax_rr_fil.set_xlabel("Time (s)")
 
         # Heart rate plot
         (self.line_hr,) = self.ax_hr.plot([], [], color="blue")
@@ -49,6 +58,14 @@ class HRPlotter:
         self.ax_hr_fil.set_title("Heart Rate (HR)")
         self.ax_hr_fil.set_ylabel("HR (bpm)")
         self.ax_hr_fil.set_xlabel("Time (s)")
+
+        self.ax_hr_ups = self.ax_hr.scatter(
+            x, y, color="red", label="R-peaks", marker=".", s=100
+        )
+
+        self.ax_hr_downs = self.ax_hr.scatter(
+            x, y, color="green", label="R-peaks", marker=".", s=100
+        )
 
         self.text_box = self.fig.text(0.87, 0.5, '', fontsize=14, color='white',
                                       bbox=dict(facecolor='black', alpha=0.5))
@@ -113,9 +130,36 @@ class HRPlotter:
 
         if hrs:
             r_peak_times, r_peak_values = zip(*hrs)
+            x = np.array(r_peak_times)
             r_peak_times_normalized = np.array(r_peak_times) - r_peak_times[0]
 
+            ups = self.ecg_data.hr_ups
+
             self.line_hr.set_data(r_peak_times_normalized, r_peak_values)
+
+            if ups.any():  # Check if any R-peaks were found
+                t, v = zip(*ups)
+                # Normalize the R-peak timestamps
+                tn = np.array(t) - x[0]
+                # Update scatter plot with R-peaks
+                self.ax_hr_ups.set_offsets(
+                    np.array([tn, v]).T
+                )
+            else:
+                self.ax_hr_ups.set_offsets(np.empty((0, 2)))
+
+            downs = self.ecg_data.hr_downs
+
+            if downs.any():  # Check if any R-peaks were found
+                t, v = zip(*downs)
+                # Normalize the R-peak timestamps
+                tn = np.array(t) - x[0]
+                # Update scatter plot with R-peaks
+                self.ax_hr_downs.set_offsets(
+                    np.array([tn, v]).T
+                )
+            else:
+                self.ax_hr_downs.set_offsets(np.empty((0, 2)))
 
             self.ax_hr.relim()
             self.ax_hr.autoscale_view()

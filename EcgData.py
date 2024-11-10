@@ -1,6 +1,7 @@
 import numpy as np
 import PanTompkins
 import NAME_THIS_MODULE_YOURSELF_PIOTER
+from PanTompkins import derivative_filter
 from config import *
 from dataSenderEmulator import read_csv
 import scipy.signal as signal
@@ -12,6 +13,16 @@ class EcgData:
     def r_peaks(self):
         self.__refresh_if_dirty()
         return self.__r_peaks
+
+    @property
+    def hr_ups(self):
+        self.__refresh_if_dirty()
+        return self.__hr_ups
+
+    @property
+    def hr_downs(self):
+        self.__refresh_if_dirty()
+        return self.__hr_downs
 
     @property
     def hr(self):
@@ -59,6 +70,8 @@ class EcgData:
         self.raw_data = np.empty((0, 2))
         self.filtered_data = np.empty((0, 2))
         self.__r_peaks = np.empty(0)
+        self.__hr_ups = np.empty(0)
+        self.__hr_downs = np.empty(0)
         self.__r_peaks_filtered = np.empty(0)
         self.__r_peaks_piotr = np.empty(0)
         self.__rr_intervals = np.empty(0)
@@ -77,18 +90,18 @@ class EcgData:
         self.highcut = 18
         self.buffer_size = 4000
         self.data_buffer = np.zeros(self.buffer_size)  # Inicjalizacja bufora o stałej wielkości
-        self.b, self.a = self.create_bandpass_filter(self.lowcut, self.highcut)
+        self.b, self.a = self.create_bandpass_filter(self.lowcut, self.highcut,4)
         self.zi = signal.lfilter_zi(self.b, self.a)  # Stan filtra dla lfilter
 
-        self.lowcutHR = 0.85
-        self.highcutHR = 1.5
+        self.lowcutHR = 2
+        self.highcutHR = 30
         self.buffer_sizeHR = 100
         self.data_bufferHR = np.zeros(self.buffer_sizeHR)  # Inicjalizacja bufora o stałej wielkości
-        # self.bHR, self.aHR = self.create_bandpass_filter(self.lowcutHR, self.highcutHR)
-        # self.ziHR = signal.lfilter_zi(self.bHR, self.aHR)  # Stan filtra dla lfilter
+        self.bHR, self.aHR = self.create_bandpass_filter(self.lowcutHR, self.highcutHR,2)
+        self.ziHR = signal.lfilter_zi(self.bHR, self.aHR)  # Stan filtra dla lfilter
 
-        self.bHR, self.aHR = signal.butter(2, [0.1, 40], btype='bandpass', fs=100)  # Przykładowy filtr
-        self.ziHR = signal.lfilter_zi(self.bHR, self.aHR) * 0  # Inicjalizacja współczynników stanu filtra
+       # self.bHR, self.aHR = signal.butter(2, [0.1, 40], btype='bandpass', fs=100)  # Przykładowy filtr
+        # self.ziHR = signal.lfilter_zi(self.bHR, self.aHR) * 0  # Inicjalizacja współczynników stanu filtra
 
         return
 
@@ -110,6 +123,15 @@ class EcgData:
         filtered_signal, self.ziHR = signal.lfilter(self.bHR, self.aHR, self.data_bufferHR, zi=self.ziHR)
         return filtered_signal[-len(new_data):]  # Zwróć tylko najnowsze przefiltrowane wartości
 
+    def derivative_filter(self, sig):
+        return np.diff(sig, prepend=0)
+
+    def square1(self, sig):
+        return sig ** 2
+
+    def moving_window_integration(self, sig, window_size):
+        return np.convolve(sig, np.ones(window_size) / window_size, mode="same")
+
     def load_csv_data(self, path):
         csv_data = np.array(read_csv(path))
         if NORMALIZED_TEST_DATA_TIME:
@@ -121,10 +143,32 @@ class EcgData:
         filtered_signal = signal.filtfilt(self.b, self.a, csv_data[:, 1])
 
         # Zapisanie przefiltrowanych danych do raw_data
-        self.raw_data = np.column_stack((csv_data[:, 0], filtered_signal))
+        self.raw_data = np.column_stack((csv_data[:, 0], csv_data[:, 1]))
+        print(len(self.raw_data))
+
+
+
+
+        self.filtered_data = np.column_stack((csv_data[:, 0], filtered_signal))
+        print(len(self.filtered_data))
+
 
         # self.__is_dirty = True
         self.__refresh_data()
+        print(len(self.__hr))
+        #print(self.__hr[:,0])
+
+
+        filtered_hr = signal.filtfilt(self.bHR, self.aHR, self.__hr[:,1])
+        #diff_signal = self.derivative_filter(filtered_hr)
+        #squared_signal = self.square1(filtered_hr)
+
+        window_size = int(0.050 * 130)  # 50 ms window
+        #integrated_signal = self.moving_window_integration(filtered_hr, window_size)
+
+        self.hr_filtered = np.column_stack((self.__hr[:, 0], filtered_hr))
+
+
 
     def print_data(self):
         mean_rr = round(self.mean_rr * 1e3, 2) if self.mean_rr is not None else None
@@ -173,11 +217,11 @@ class EcgData:
         self.__set_dirty()
         return
 
-    def create_bandpass_filter(self, lowcut, highcut):
+    def create_bandpass_filter(self, lowcut, highcut, order):
         nyquist = 0.5 * self.frequency
         low = lowcut / nyquist
         high = highcut / nyquist
-        b, a = signal.butter(4, [low, high], btype="band")
+        b, a = signal.butter(order, [low, high], btype="band")
         return b, a
 
     def __set_dirty(self):
@@ -194,6 +238,7 @@ class EcgData:
 
     def __refresh_data(self):
         # self.__find_r_peaks()
+
         self.__find_new_r_peaks()
         self.__find_new_r_peaks_filtered()
         self.__find_r_peaks_piotr()
@@ -203,7 +248,17 @@ class EcgData:
         self.__calc_rmssd()
         self.__calc_pnn50()
         self.__calc_hr()
+        self.__find_hr_ups()
+        self.__find_hr_downs()
         return
+
+    def __find_hr_downs(self):
+        self.__hr_downs = self.find_hr_downs(self.__hr, self.frequency, self.lowcutHR, self.highcutHR)
+        return self.__hr_downs
+
+    def __find_hr_ups(self):
+        self.__hr_ups = self.find_hr_ups(self.__hr, self.frequency, self.lowcutHR, self.highcutHR)
+        return self.__hr_ups
 
     def __find_r_peaks(self):
         self.__r_peaks = self.find_r_peaks(self.raw_data, self.frequency)
@@ -216,6 +271,15 @@ class EcgData:
     @staticmethod
     def find_r_peaks(data: np.ndarray, frequency: int) -> np.ndarray:
         return PanTompkins.find_r_peaks(data, frequency)
+
+    @staticmethod
+    def find_hr_ups(data: np.ndarray, frequency: int, a: float, b: float) -> np.ndarray:
+        return PanTompkins.find_hr_peaks(data, frequency, a,b, 0.009)
+
+    @staticmethod
+    def find_hr_downs(data: np.ndarray, frequency: int, a: float, b: float) -> np.ndarray:
+
+        return PanTompkins.find_hr_peaks(data, frequency, a,b, 0.009, -1)
 
     def __find_new_r_peaks(self):
         if len(self.raw_data) < self.frequency * 2:
@@ -358,10 +422,10 @@ class EcgData:
         # Połącz znaczniki czasowe i wartości tętna w kolumny
         result = np.column_stack((timestamps, heart_rates))
 
-        if len(result) > 10:
-            result2 = PanTompkins.filter_ecg_with_timestamps(result, 100)
-            print(result2)
-            return result2
+        # if len(result) > 10:
+        #     result2 = PanTompkins.filter_ecg_with_timestamps(result, 100)
+        #     print(result2)
+        #     return result2
         return result
     def __calc_rmssd(self):
         self.__rmssd = self.calc_rmssd(self.__rr_intervals)
