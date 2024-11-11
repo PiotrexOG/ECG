@@ -79,9 +79,8 @@ def find_r_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float
     return peaks_with_timestamps
 
 
-def find_hr_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float = 18, size: float = 0.4, isUpright:int = 1):
+def find_hr_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float = 18, size: int = 7, isUpright:int = 1):
 
-    size = 0.05
     filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency, lowcut, highcut)
 
     filtered_signal = isUpright*filtered_signal
@@ -91,14 +90,14 @@ def find_hr_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: floa
 
 
     peaks, _ = signal.find_peaks(
-        filtered_signal, height=threshold, distance=int(size * frequency)  # 400 ms
+        filtered_signal, height=threshold, distance=int(size * 1.22)  # 400 ms
     )
 
 
     if isUpright == -1:
-        refined_peaks = refine_peak_positions(filtered_signal, peaks, search_window=5)
+        refined_peaks = refine_peak_positions(-ecg_signal[:, 1], peaks, search_window=size)
     else:
-        refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks, search_window=5)
+        refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks, search_window=size)
 
     peak_values = ecg_signal[refined_peaks, 1]
     peak_timestamps = ecg_signal[refined_peaks, 0]

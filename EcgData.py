@@ -29,6 +29,15 @@ class EcgData:
         self.__refresh_if_dirty()
         return self.__hr
 
+    @property
+    def inhalation_starts_moments(self):
+        self.__refresh_if_dirty()
+        return self.__inhalation_starts_moments
+
+    @property
+    def exhalation_starts_moments(self):
+        self.__refresh_if_dirty()
+        return self.__exhalation_starts_moments
 
     @property
     def r_peaks_filtered(self):
@@ -95,10 +104,16 @@ class EcgData:
 
         self.lowcutHR = 2
         self.highcutHR = 30
-        self.buffer_sizeHR = 100
+        self.buffer_sizeHR = 200
         self.data_bufferHR = np.zeros(self.buffer_sizeHR)  # Inicjalizacja bufora o stałej wielkości
-        self.bHR, self.aHR = self.create_bandpass_filter(self.lowcutHR, self.highcutHR,2)
+        self.bHR, self.aHR = self.create_bandpass_filter1(self.lowcutHR, self.highcutHR,4)
         self.ziHR = signal.lfilter_zi(self.bHR, self.aHR)  # Stan filtra dla lfilter
+
+        self.__inhalation_starts_moments = np.empty(0)
+        self.__exhalation_starts_moments = np.empty(0)
+
+        self.wdechy = []  # Lista par (początek wdechu, koniec wdechu)
+        self.wydechy = []  # Lista par (początek wydechu, koniec wydechu)
 
        # self.bHR, self.aHR = signal.butter(2, [0.1, 40], btype='bandpass', fs=100)  # Przykładowy filtr
         # self.ziHR = signal.lfilter_zi(self.bHR, self.aHR) * 0  # Inicjalizacja współczynników stanu filtra
@@ -113,15 +128,19 @@ class EcgData:
                                                   zi=self.zi * self.data_buffer[0])
         return filtered_signal[-len(new_data):], self.zi
 
-    def update_and_filter_hr(self, new_data):
+    def update_hr(self, new_data):
         # Aktualizacja bufora poprzez usunięcie najstarszych elementów, jeśli bufor osiągnął maksymalny rozmiar
         if len(self.data_bufferHR) >= self.buffer_sizeHR:
             self.data_bufferHR = np.roll(self.data_bufferHR, -1)
             self.data_bufferHR[-1] = new_data
 
+    def filter_hr(self):
         # Przefiltrowanie sygnału
-        filtered_signal, self.ziHR = signal.lfilter(self.bHR, self.aHR, self.data_bufferHR, zi=self.ziHR)
-        return filtered_signal[-len(new_data):]  # Zwróć tylko najnowsze przefiltrowane wartości
+        #filtered_signal, self.ziHR = signal.lfilter(self.bHR, self.aHR, self.data_bufferHR, zi=self.ziHR)
+        filtered_signal = signal.filtfilt(self.bHR, self.aHR, self.__hr[:, 1])
+        #return filtered_signal[-len(new_data):]  # Zwróć tylko najnowsze przefiltrowane wartości
+        peaks_with_timestamps = np.column_stack((self.__hr[:, 0], filtered_signal))
+        return peaks_with_timestamps # Zwróć tylko najnowsze przefiltrowane wartości
 
     def derivative_filter(self, sig):
         return np.diff(sig, prepend=0)
@@ -155,18 +174,9 @@ class EcgData:
 
         # self.__is_dirty = True
         self.__refresh_data()
-        print(len(self.__hr))
-        #print(self.__hr[:,0])
 
 
-        filtered_hr = signal.filtfilt(self.bHR, self.aHR, self.__hr[:,1])
-        #diff_signal = self.derivative_filter(filtered_hr)
-        #squared_signal = self.square1(filtered_hr)
-
-        window_size = int(0.050 * 130)  # 50 ms window
-        #integrated_signal = self.moving_window_integration(filtered_hr, window_size)
-
-        self.hr_filtered = np.column_stack((self.__hr[:, 0], filtered_hr))
+        #self.hr_filtered = self.filter_hr()
 
 
 
@@ -175,6 +185,8 @@ class EcgData:
         sdnn = round(self.sdnn, 2) if self.sdnn is not None else None
         rmssd = round(self.rmssd, 2) if self.rmssd is not None else None
         pnn50 = round(self.pnn50, 2) if self.rmssd is not None else None
+
+
         # print("ECG peaks---------------")
         # print (self.r_peaks)
         # print("ECG intervals---------------")
@@ -205,6 +217,7 @@ class EcgData:
         if isinstance(x, list) and isinstance(y, list):
             new_data = np.array(y)  # Przekształć wartości sygnału na tablicę
             filtered_data, self.zi = self.update_and_filter(new_data)  # Filtrowanie z zachowaniem stanu
+            filtered_data, self.zi = self.update_and_filter(new_data)  # Filtrowanie z zachowaniem stanu
             self.filtered_data = np.concatenate((self.filtered_data, np.column_stack((x, filtered_data))))
             self.raw_data = np.concatenate((self.raw_data, np.column_stack((x, y))))
         else:
@@ -218,6 +231,13 @@ class EcgData:
         return
 
     def create_bandpass_filter(self, lowcut, highcut, order):
+        nyquist = 0.5 * self.frequency
+        low = lowcut / nyquist
+        high = highcut / nyquist
+        b, a = signal.butter(order, [low, high], btype="band")
+        return b, a
+
+    def create_bandpass_filter1(self, lowcut, highcut, order):
         nyquist = 0.5 * self.frequency
         low = lowcut / nyquist
         high = highcut / nyquist
@@ -248,8 +268,54 @@ class EcgData:
         self.__calc_rmssd()
         self.__calc_pnn50()
         self.__calc_hr()
-        self.__find_hr_ups()
-        self.__find_hr_downs()
+        if(len(self.__hr) > 28):
+            self.hr_filtered = self.filter_hr()
+            self.__exhalation_starts_moments = self.__find_hr_ups()[:, 0] - self.__hr[0][0]
+            self.__inhalation_starts_moments = self.__find_hr_downs()[:, 0] - self.__hr[0][0]
+
+            # Zakładając posortowane listy minima (wdechy) i maksima (wydechy)
+            minima = self.__inhalation_starts_moments
+            maksima = self.__exhalation_starts_moments
+
+
+
+            i, j = 0, 0  # Indeksy do list minimów i maksimów
+
+            while i < len(minima) and j < len(maksima):
+                if minima[i] < maksima[j]:
+                    if not (i + 1 < len(minima) and minima[i + 1] < maksima[j]):
+                        czas = maksima[j] - minima[i]
+                        self.wdechy.append((minima[i], maksima[j], czas))
+                    i += 1
+                else:
+                    if not (j + 1 < len(maksima) and maksima[j + 1] < minima[i]):
+                        czas =  minima[i] - maksima[j]
+                        self.wydechy.append((maksima[j], minima[i], czas))
+                    j += 1
+
+            print("poczatki wdechu: ")
+            print(self.inhalation_starts_moments)
+            print("poczatki wydechu: ")
+            print(self.exhalation_starts_moments)
+
+            # Wyświetlenie wyników końcowych
+            print("\nLista wdechów (początek, koniec, czas trwania):")
+            for start, end, czas in self.wdechy:
+                print(f"Od {start} do {end}, czas trwania: {czas}")
+
+
+            print("\nLista wydechów (początek, koniec, czas trwania):")
+            for start, end, czas in self.wydechy:
+                print(f"Od {start} do {end}, czas trwania: {czas}")
+
+            # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
+            if self.wdechy:
+                srednia_wdechu = sum(czas for _, _, czas in self.wdechy) / len(self.wdechy)
+                print(f"\nŚredni czas trwania wdechu: {srednia_wdechu:.2f}")
+
+            if self.wydechy:
+                srednia_wydechu = sum(czas for _, _, czas in self.wydechy) / len(self.wydechy)
+                print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
         return
 
     def __find_hr_downs(self):
@@ -274,12 +340,12 @@ class EcgData:
 
     @staticmethod
     def find_hr_ups(data: np.ndarray, frequency: int, a: float, b: float) -> np.ndarray:
-        return PanTompkins.find_hr_peaks(data, frequency, a,b, 0.009)
+        return PanTompkins.find_hr_peaks(data, frequency, a,b, 5)
 
     @staticmethod
     def find_hr_downs(data: np.ndarray, frequency: int, a: float, b: float) -> np.ndarray:
 
-        return PanTompkins.find_hr_peaks(data, frequency, a,b, 0.009, -1)
+        return PanTompkins.find_hr_peaks(data, frequency, a,b, 5, -1)
 
     def __find_new_r_peaks(self):
         if len(self.raw_data) < self.frequency * 2:
@@ -315,6 +381,22 @@ class EcgData:
             end_index = -1
 
         nowe_peaki = new_peaks[start_index-1:end_index]
+
+        # if len(nowe_peaki) <= 1:
+        #     if len(self.__r_peaks) >= 2:
+        #         for i in range(len(self.__r_peaks) - 1):
+        #             x0 = self.__r_peaks[i][0]
+        #             x1 = self.__r_peaks[i+1][0]
+        #             x = x1 - x0
+        #             y = 60 / x
+        #
+        #             # Dodajemy nową wartość do bufora
+        #             new_data = np.array([y])  # Przekształć wartość sygnału na tablicę
+        #             filtered_data = self.update_and_filter_hr(new_data)  # Filtracja nowej wartości
+        #
+        #             # Dodaj przefiltrowany wynik do przechowywanej tablicy wyników
+        #             self.hr_filtered = np.append(self.hr_filtered, [[x1, filtered_data[0]]], axis=0)
+
         if len(nowe_peaki) > 1:
             x0 = nowe_peaki[0][0]
             x1 = nowe_peaki[1][0]
@@ -322,13 +404,16 @@ class EcgData:
             y = 60/x
 
             # Dodajemy nową wartość do bufora
-            new_data = np.array([y])  # Przekształć wartość sygnału na tablicę
-            filtered_data = self.update_and_filter_hr(new_data)  # Filtracja nowej wartości
+  #          new_data = np.array([y])  # Przekształć wartość sygnału na tablicę
+    #        self.update_hr(new_data)  # Filtracja nowej wartości
 
-            # Dodaj przefiltrowany wynik do przechowywanej tablicy wyników
-            self.hr_filtered = np.append(self.hr_filtered, [[x1, filtered_data[0]]], axis=0)
-
-
+    #        if (len(self.__hr) > 15):
+        #        filtered_data = self.filter_hr(new_data)  # Filtracja nowej wartości
+                # Dodaj przefiltrowany wynik do przechowywanej tablicy wyników
+                #self.hr_filtered = np.append(self.hr_filtered, [[x1, filtered_data[0]]], axis=0)
+      #          self.hr_filtered = filtered_data
+            # else:
+            #     self.hr_filtered = np.append(self.hr_filtered, [[x1, new_data[0]]], axis=0)
         self.__r_peaks = np.vstack((self.__r_peaks, new_peaks[start_index:end_index]))
 
     def __find_new_r_peaks_filtered(self):

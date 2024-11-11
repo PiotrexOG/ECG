@@ -133,10 +133,10 @@ class HRPlotter:
             x = np.array(r_peak_times)
             r_peak_times_normalized = np.array(r_peak_times) - r_peak_times[0]
 
-            ups = self.ecg_data.hr_ups
 
             self.line_hr.set_data(r_peak_times_normalized, r_peak_values)
 
+            ups = self.ecg_data.hr_ups
             if ups.any():  # Check if any R-peaks were found
                 t, v = zip(*ups)
                 # Normalize the R-peak timestamps
@@ -166,8 +166,12 @@ class HRPlotter:
 
         hrs_fil = self._hr_fil_plot_data
         if hrs_fil:
+            t, r = zip(*hrs)
             r_peak_times, r_peak_values = zip(*hrs_fil)
-            r_peak_times_normalized = np.array(r_peak_times) - r_peak_times[0]
+        #    x = t[16] - t[0]
+            r_peak_times_normalized = np.array(r_peak_times) - t[0]
+
+            # Dodanie początkowych pustych danych do czasu 14 sekund
 
             self.line_hr_fil.set_data(r_peak_times_normalized, r_peak_values)
 
@@ -188,7 +192,7 @@ class HRPlotter:
         #         f"Interval: {current_interval:.2f}s\nHR: {current_hr:.2f}"
         #     )
 
-        #if PRINT_ECG_DATA:
-            #self.ecg_data.print_data()
+        if PRINT_ECG_DATA:
+            self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()

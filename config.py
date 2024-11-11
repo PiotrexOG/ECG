@@ -7,7 +7,7 @@ VALUES_IN_PACKET_COUNT = int(SAMPLING_RATE / 2)  # send packet twice a second
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
-CSV_PATH = "data/arkusz_rsa7.csv"
+CSV_PATH = "data/arkusz_rsa5.csv"
 
 PRINT_ECG_DATA = True
 NEGATE_INCOMING_DATA = False
