@@ -1,0 +1,88 @@
+\chapter{Przetwarzanie sygna³ów EKG}
+Lorem ipsum
+\section{Identyfikacja szczytów R}
+Identyfikacja szczytów R by³a kluczowym etapem w przygotowaniu danych
+treningowych wykorzystywanych w pracy. Dane pochodz¹ce z dostêpnych baz, takich
+jak MIT-BIH, zawiera³y w wiêkszoœci przypadków oznaczone szczyty R, co znacznie
+u³atwia³o proces analizy. Jednak w przypadku samodzielnie zebranych danych przy
+u¿yciu urz¹dzenia Polar H10 konieczne by³o opracowanie skutecznej metody
+identyfikacji szczytów R. W tym celu zastosowano algorytm Pan-Tompkins, który
+jest powszechnie uznawanym narzêdziem do wykrywania charakterystycznych
+za³amków w sygna³ach EKG, zapewniaj¹cym wysok¹ precyzjê w detekcji szczytów R.
+Dziêki jego zastosowaniu mo¿liwe by³o uzyskanie precyzyjnych i wiarygodnych
+danych do dalszej analizy i modelowania. Algorytm sk³ada sie z kilku kluczowych
+etapów przetwarzania sygna³u: filtracja œrodkowoprzepustowa, ró¿niczkowanie,
+kwadratowanie, okno ca³kuj¹ce, ustalenie progów i detekcja szczytów R
+\cite{Fariha-PanTompkins}. Dodatkowo, aby dok³adnie dopasowaæ wykryte szczyty
+do rzeczywistych najwy¿szych wartoœci sygna³u, wprowadzono dodatkowy krok,
+polegaj¹cy na sprawdzaniu otoczenia wykrytego szczytu.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{Rysunki/Pan-Tomkins-scheme.png}
+    \caption{Schemat algorytmu Pan-Tompkins z dodatkowym krokiem}
+    \label{fig/PanTompkinsFlowChart}
+\end{figure}
+
+\subsection{Filtracja œrodkowoprzepustowa}
+Filtracja œrodkowoprzepustowa ma na celu usuniêcie zak³óceñ wystêpuj¹cych w
+sygnale, co za tym idzie zwiêkszenie stosunku sygna³u do szumu
+\cite{Fariha-PanTompkins}. W niniejszej pracy w znacznej czêœci zebranych
+danych zdecydowano sie na przefiltrowanie sygna³u w zakresie od 5 do 18 Hz.
+Przedzia³ ten zosta³ dobrany empirycznie, na bazie przeprowadzonych testów.
+
+\subsection{Ró¿niczkowanie}
+Po wstêpnym przefiltrowaniu sygna³ EKG jest poddawany ró¿niczkowaniu, co ma na
+celu uwypuklenie szybkoœci zmian w sygnale, co pozwala na lepsze wyró¿nienie
+charakterystycznych punktów, takich jak szczyty R. W procesie wyznaczania
+pochodnej nisko-czêstotliwoœciowe sk³adowe sygna³u s¹ t³umione, a
+gwa³towniejsze zmiany uwypuklane, skutkuje to m. in. st³umieniem fal P i T oraz
+wzmocnieniem bardziej stromych zbocz w kompleksie QRS
+\cite{Fariha-PanTompkins}.
+
+\subsection{Kwadratowanie}
+Kwadratowanie jest kolejnym etapem, w którym sygna³ uzyskany w poprzednim kroku
+zostaje podniesiony do kwadratu. Dziêki temu wszystkie wartoœci sygna³u staj¹
+siê dodatnie, a fragmenty odpowiadaj¹ce kompleksowi QRS staj¹ siê bardziej
+widoczne. Dodatkowo, proces kwadratowania wyraŸniej uwypukla ró¿nicê miêdzy
+kompleksem QRS a fal¹ T, co pozwala na ich lepsze rozró¿nienie i redukuje
+ryzyko fa³szywych wykryæ szczytów R \cite{Fariha-PanTompkins}.
+
+\subsection{Okno ca³kuj¹ce}
+Okno ca³kuj¹ce ma na celu wyg³adzenie i uœrednienie sygna³u w okreœlonym
+przedziale, oknie czasowym. Proces ten polega na obliczaniu sumy wartoœci
+próbek sygna³u w ramach przesuwaj¹cego sie okna, co prowadzi do uzyskania
+bardziej spójnego i wyg³adzonego sygna³u wyjœciowego. W ten sposób uwypuklane
+s¹ d³ugotrwa³e trendy i zmiany sygna³u, co znacznie u³atwia wykrywanie
+charakterystycznych za³amków QRS. Okno ca³kuj¹ce pomaga równie¿ w eliminacji
+mniejszych zak³óceñ, które mog³yby powodowaæ fa³szywe wykrycia szczytów,
+zwiêkszaj¹c precyzjê i wiarygodnoœæ procesu detekcji. Dziêki zastosowaniu tego
+etapu mo¿liwe jest uzyskanie lepszej separacji szczytów R od pozosta³ych
+elementów sygna³u. Dla danych pochodz¹cych z czujnika Polar H10 zastosowano
+okno o szerokoœci 50 ms, co przek³ada³o siê na oko³o 6 próbek, bior¹c pod uwagê
+czêstotliwoœæ próbkowania czujnika: 130 Hz.
+
+\subsection{Ustalenie progu i detekcja szczytów R}
+Ustalenie progu ma na celu detekcjê szczytów R, przy jednoczesnej minimalizacji
+fa³szywych wykryæ. W tym celu ustalany jest próg na bazie którego podejmowana
+jest decyzja. Próg ten mo¿e byæ wartoœci¹ sta³¹ lub byæ dynamicznie
+dostosowywany, aby uwzglêdniæ zmiany amplitudy w ró¿nych odcinkach sygna³u.
+Podczas oznaczania danych pochodz¹cych z czujnika Polar H10 zastosowano próg
+obliczany jako œrednia wartoœæ sygna³u ca³kowanego powiêkszona o 0,6-krotnoœæ
+odchylenia standardowego tego sygna³u.
+
+Podczas procesu detekcji wartoœci sygna³u porównywane s¹ z ustalonym progiem.
+Gdy sygna³ przekroczy wartoœæ progu, wstêpnie identyfikowany jest jako
+potencjalny szczyt R. W celu minimalizacji fa³szywych wykryæ stosuje siê
+dodatkowe regu³y, takie jak minimalny odstêp czasowy pomiêdzy wykrytymi
+szczytami. Podczas analizy danych pochodz¹cych z czujnika Polar H10 zastosowano
+odstêp wynosz¹cy 400 ms.
+
+\subsection{Doprecyzowanie pozycji szczytów}
+W dodatkowym kroku przeanalizowano otoczenie wykrytych szczytów w pierwotnym
+sygnale EKG w celu zwiêkszenia precyzji detekcji. Bez tej dodatkowej analizy
+wykryte za³amki czêsto by³y lekko przesuniête wzglêdem faktycznego maksimum
+sygna³u. Dlatego dla ka¿dego wykrytego punktu zbadano jego otoczenie i jako
+szczyt oznaczono wartoœæ maksymaln¹ w tym zakresie. W przypadku danych
+pochodz¹cych z czujnika Polar H10 rozmiar okna, w którym poszukiwano wartoœci
+maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.
