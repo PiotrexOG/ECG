@@ -16,16 +16,17 @@ nieinwazyjnoœæ oraz prêdkoœæ wykonania. Umo¿liwia wykwalifikowanym lekarzom
 ocenê stanu uk³adu sercowo-naczyniowego pacjenta oraz rozpoznanie wystêpuj¹cych
 nieprawid³owoœci, które mog¹ byæ spowodowane wszelakimi schorzeniami.
 
-\section{Charakterystyki sygna³u EKG}
+\section{Sk³adowe sygna³u EKG}
 
 % Sygna³ EKG sk³ada siê z cyklicznie powtarzaj¹cych siê fal i segmentów, które odzwierciedlaj¹ ró¿ne fazy pracy serca. Cykl serca zaczyna sie za³amkiem P, odpowiadaj¹cym za depolaryzacjê przedsionków serca, prowadz¹cej do ich skurczu. Po nim nastêpuje kompleks QRS, który jest odpowiedzialny za depolaryzacjê komór serca - kluczowego momentu skurczu miêœnia. Kompleks sk³ada sie z trzech fal: za³amka Q - pierwszego negatywnego w kompleksie - przedstawiaj¹cego rozchodzenie siê impulsu elektrycznego w przegrodzie miêdzykomorowej. Po nim nastêpuje za³amek R - dodatni, zazwyczaj najbadziej widoczny komponent kompleksu - odzwierciedlaj¹cy g³own¹ fazê depolaryzacji, kiedy wiêkszoœc masy miêsniowej komór jest pobudzana do skurczu. Kompleks koñczy kolejny za³amek negatywny S, reprezentuj¹cy koñcow¹ fazê depolaryzacji - na wykresie charakteryzuje go spadek poni¿ej linii izoelektrycznej, bazowej wykresu. 
 
 Sygna³ EKG sk³ada siê z cyklicznie powtarzaj¹cych siê fal i segmentów, które
 odzwierciedlaj¹ ró¿ne fazy pracy serca. Typowo segmenty te s¹ oznaczane kolejno
-jako \textbf{P-QRS-T}. Cykl serca rozpoczyna siê za³amkiem P, który odpowiada
-za depolaryzacjê przedsionków, prowadz¹c¹ do ich skurczu. Nastêpnie wystêpuje
-kompleks QRS, odpowiedzialny za depolaryzacjê komór serca – kluczowy moment
-skurczu miêœnia sercowego. Kompleks ten sk³ada siê z trzech fal:
+jako \textbf{P-QRS-T} Rys. \ref{fig/ekgGraph}. Cykl serca rozpoczyna siê
+za³amkiem P, który odpowiada za depolaryzacjê przedsionków, prowadz¹c¹ do ich
+skurczu. Nastêpnie wystêpuje kompleks QRS, odpowiedzialny za depolaryzacjê
+komór serca – kluczowy moment skurczu miêœnia sercowego. Kompleks ten sk³ada
+siê z trzech fal:
 
 \begin{itemize}
     \item \textbf{Za³amek Q} to pierwszy negatywny za³amek w kompleksie, który odzwierciedla pocz¹tkow¹ fazê rozchodzenia siê impulsu elektrycznego przez przegrodê miêdzykomorow¹.
@@ -51,5 +52,34 @@ ró¿norodnych zaburzeñ i patologii sercowych.
     \includegraphics[scale=0.25]{Rysunki/Normal-ECG-signal-with-his-different-features.png}
     \caption{Normalny sygna³ EKG z jego cechami.}
     \caption*{ród³o:  \url{https://www.researchgate.net/figure/Normal-ECG-signal-with-his-different-features_fig1_299575422} [Data uzyskania dostêpu 02.11.2024]}
-    \label{img/template1}
+    \label{fig/ekgGraph}
 \end{figure}
+
+\section{Charakterystyki sygna³u EKG}
+
+Podczas analizy sygna³u EKG wyró¿niæ mo¿na wiele charakterystyk, które
+dostarczaj¹ szczegó³owych informacji o pracy serca i kondycji uk³adu
+sercowo-naczyniowego badanej osoby. Jendymi z najwa¿niejszych takich
+charakterystyk s¹ zmiennoœæ rytmu serca - HRV - oraz arytmia oddechowa - RSA.
+
+\subsection{HRV}
+
+HRV to skrót od "Heat Rate Variability", oznaczaj¹cego zmiennoœæ rytmu pracy
+serca. Charakterystyka ta odnosi siê do zmiennoœci odleg³oœci czasowej pomiêdzy
+kolejnymi szczytami R w sygnale. Za jej pomoc¹ okreœla siê jak serce reaguje na
+wystêpuj¹ce warunki, takie jak stres, aktywnoœæ fizyczna czy zmiany w
+oddychaniu.
+
+HRV mo¿na analizowac z wykorzystaniem ró¿nych metod, wœród którcyh znajduje siê
+m. in. analiza czasowa. Jednymi z najwa¿niejszych wskaŸników czasowych s¹ takie
+miary jak SDNN, "Standart Deviation of NN intervals", czyli odchylenie
+standardowe odstêpów miedzy za³amkami R w sygnale oraz RMSSD, "Root Mean Square
+of the Successive Differences", oznaczaj¹cego pierwiastek kwadratowy ze
+œredniej ró¿nic kwadratrów miedzy kolejnymi odleg³oœciami miedzy za³amkami R w
+sygnale. Wysoka wartoœæ HRV jest wzkaŸnikiem dobrej zdolnoœci adaptacji i
+efektynoœci regulacji uk³adu sercowo-naczyniowego, natomiast niska wartoœæ HRV
+mo¿e wkazywaæ na stres, zaburzenia uk³adu autonominczego lub byæ oznak¹ chorób
+sercowo-naczyniowcych.
+
+\subsection{RSA}
+
