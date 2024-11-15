@@ -119,26 +119,26 @@ class EcgPlotter:
                 if r_peaks[i, 0] < self._plot_data[0][0]:
                     r_peaks = r_peaks[i + 1 :, :]
                     break
-            p = self.ecg_data.raw_data[self.ecg_data.p, :]
-            for i in range(len(p) - 1, -1, -1):
-                if p[i, 0] < self._plot_data[0][0]:
-                    p = p[i + 1 :, :]
-                    break
+            # p = self.ecg_data.raw_data[self.ecg_data.p, :]
+            # for i in range(len(p) - 1, -1, -1):
+            #     if p[i, 0] < self._plot_data[0][0]:
+            #         p = p[i + 1 :, :]
+            #         break
 
-            q = self.ecg_data.raw_data[self.ecg_data.q, :]
-            for i in range(len(q) - 1, -1, -1):
-                if q[i, 0] < self._plot_data[0][0]:
-                    q = q[i + 1 :, :]
-                    break
+            # q = self.ecg_data.raw_data[self.ecg_data.q, :]
+            # for i in range(len(q) - 1, -1, -1):
+            #     if q[i, 0] < self._plot_data[0][0]:
+            #         q = q[i + 1 :, :]
+            #         break
 
-            test = self.ecg_data.raw_data[self.ecg_data.test, :]
-            for i in range(len(test) - 1, -1, -1):
-                if test[i, 0] < self._plot_data[0][0]:
-                    test = test[i + 1 :, :]
-                    break
+            # test = self.ecg_data.raw_data[self.ecg_data.test, :]
+            # for i in range(len(test) - 1, -1, -1):
+            #     if test[i, 0] < self._plot_data[0][0]:
+            #         test = test[i + 1 :, :]
+            #         break
 
-            rows_to_delete = np.concatenate((q, p))
-            test = np.array([row for row in test if not any((row == x).all() for x in rows_to_delete)])
+            # rows_to_delete = np.concatenate((q, p))
+            # test = np.array([row for row in test if not any((row == x).all() for x in rows_to_delete)])
 
             # r_peaks = self.ecg_data.r_peaks_piotr
             if r_peaks.any():  # Check if any R-peaks were found
@@ -150,19 +150,19 @@ class EcgPlotter:
                     np.array([r_peak_times_normalized, r_peak_values]).T
                 )
 
-                p_times, p_values = zip(*p)
-                p_times_normalized = np.array(p_times) - x[0]
-                self.ax_p.set_offsets(np.array([p_times_normalized, p_values]).T)
+                # p_times, p_values = zip(*p)
+                # p_times_normalized = np.array(p_times) - x[0]
+                # self.ax_p.set_offsets(np.array([p_times_normalized, p_values]).T)
 
-                q_times, q_values = zip(*q)
-                q_times_normalized = np.array(q_times) - x[0]
-                self.ax_q.set_offsets(np.array([q_times_normalized, q_values]).T)
+                # q_times, q_values = zip(*q)
+                # q_times_normalized = np.array(q_times) - x[0]
+                # self.ax_q.set_offsets(np.array([q_times_normalized, q_values]).T)
 
-                test_times, test_values = zip(*test)
-                test_times_normalized = np.array(test_times) - x[0]
-                self.ax_test.set_offsets(
-                    np.array([test_times_normalized, test_values]).T
-                )
+                # test_times, test_values = zip(*test)
+                # test_times_normalized = np.array(test_times) - x[0]
+                # self.ax_test.set_offsets(
+                #     np.array([test_times_normalized, test_values]).T
+                # )
                 # for i in range(len(test_times_normalized)):
                 #     self.ax_ecg.text(test_times_normalized[i]+0.1, test_value[i], 'P', fontsize=12, ha='left', color='blue')
             else:
