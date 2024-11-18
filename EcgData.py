@@ -104,8 +104,8 @@ class EcgData:
         self.b, self.a = self.create_bandpass_filter(self.lowcut, self.highcut,4)
         self.zi = signal.lfilter_zi(self.b, self.a)  # Stan filtra dla lfilter
 
-        self.lowcutHR = 5
-        self.highcutHR = 30
+        self.lowcutHR = 3
+        self.highcutHR = 10
         self.buffer_sizeHR = 200
         self.data_bufferHR = np.zeros(self.buffer_sizeHR)  # Inicjalizacja bufora o stałej wielkości
         self.bHR, self.aHR = self.create_bandpass_filter1(self.lowcutHR, self.highcutHR,4)

@@ -7,7 +7,7 @@ VALUES_IN_PACKET_COUNT = int(SAMPLING_RATE / 2)  # send packet twice a second
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
-CSV_PATH = "data/nowe_danemecz1.csv"
+CSV_PATH = "data/nowe1_dane_rsa8.csv"
 
 PRINT_ECG_DATA = False
 NEGATE_INCOMING_DATA = False
@@ -22,7 +22,7 @@ APP_MODE = AppModeEnum.LOAD_CSV
 TIME_SCALE_FACTOR = 1e9
 LOOP_DATA = False
 NORMALIZED_TEST_DATA_TIME = False
-SIZE = 4
+SIZE = 12
 ###
 
 ### PLOT SETTINGS
