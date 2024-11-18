@@ -105,7 +105,7 @@ class EcgData:
         self.zi = signal.lfilter_zi(self.b, self.a)  # Stan filtra dla lfilter
 
         self.lowcutHR = 5
-        self.highcutHR = 15
+        self.highcutHR = 30
         self.buffer_sizeHR = 200
         self.data_bufferHR = np.zeros(self.buffer_sizeHR)  # Inicjalizacja bufora o stałej wielkości
         self.bHR, self.aHR = self.create_bandpass_filter1(self.lowcutHR, self.highcutHR,4)
@@ -179,6 +179,8 @@ class EcgData:
 
         FFT.fft(self.__rr_intervals)
 
+        self.print_data()
+
 
         #self.hr_filtered = self.filter_hr()
 
@@ -190,21 +192,21 @@ class EcgData:
         rmssd = round(self.rmssd, 2) if self.rmssd is not None else None
         pnn50 = round(self.pnn50, 2) if self.rmssd is not None else None
 
-        print("poczatki wdechu: ")
-        print(self.__inhalation_starts_moments)
-        print("poczatki wydechu: ")
-        print(self.__exhalation_starts_moments)
+        # print("poczatki wdechu: ")
+        # print(self.__inhalation_starts_moments)
+        # print("poczatki wydechu: ")
+        # print(self.__exhalation_starts_moments)
 
         self.__find_inex_haletion_moments()
 
-        # Wyświetlenie wyników końcowych
-        print("\nLista wdechów (początek, koniec, czas trwania):")
-        for start, end, czas, roznicaHR in self.wdechy:
-            print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
-
-        print("\nLista wydechów (początek, koniec, czas trwania):")
-        for start, end, czas, roznicaHR in self.wydechy:
-            print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
+        # # Wyświetlenie wyników końcowych
+        # print("\nLista wdechów (początek, koniec, czas trwania):")
+        # for start, end, czas, roznicaHR in self.wdechy:
+        #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
+        #
+        # print("\nLista wydechów (początek, koniec, czas trwania):")
+        # for start, end, czas, roznicaHR in self.wydechy:
+        #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
 
         # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
         if self.wdechy:
@@ -400,12 +402,12 @@ class EcgData:
 
     @staticmethod
     def find_hr_ups(data: np.ndarray, frequency: int, a: float, b: float) -> np.ndarray:
-        return PanTompkins.find_hr_peaks(data, frequency, a,b, 5)
+        return PanTompkins.find_hr_peaks(data, frequency, a,b, SIZE)
 
     @staticmethod
     def find_hr_downs(data: np.ndarray, frequency: int, a: float, b: float) -> np.ndarray:
 
-        return PanTompkins.find_hr_peaks(data, frequency, a,b, 5, -1)
+        return PanTompkins.find_hr_peaks(data, frequency, a,b, SIZE, -1)
 
     def __find_new_r_peaks(self):
         if len(self.raw_data) < self.frequency * 2:
