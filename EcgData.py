@@ -1,4 +1,6 @@
 import numpy as np
+
+import FFT
 import PanTompkins
 import NAME_THIS_MODULE_YOURSELF_PIOTER
 from PanTompkins import derivative_filter
@@ -175,6 +177,8 @@ class EcgData:
         # self.__is_dirty = True
         self.__refresh_data()
 
+        FFT.fft(self.__rr_intervals)
+
 
         #self.hr_filtered = self.filter_hr()
 
@@ -212,6 +216,12 @@ class EcgData:
             print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
 
         print(f"rsa index wynosi: {self.calculate_rsa_index()}")
+
+        print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
+
+        print(f"mean heart rate wynosi: {self.calculate_mean_heart_rate_diff()}")
+
+        print(f"średnie tętno wynosi: {self.calculate_mean_heart_rate()}")
         # print("ECG peaks---------------")
         # print (self.r_peaks)
         # print("ECG intervals---------------")
@@ -265,6 +275,31 @@ class EcgData:
     def calculate_rsa_index(self):
         hr_values = self.__hr[:, 1]
         return np.max(hr_values) - np.min(hr_values)
+
+    def calculate_mean_heart_rate(self):
+        hr_values = self.__hr[:, 1]
+        return np.mean(hr_values) if len(hr_values) > 0 else 0
+
+    def calculate_mean_heart_rate_diff(self):
+        total_heart_rate_diff = 0
+        number_of_cycles = len(self.wdechy) + len(self.wydechy)
+
+        for _, _, _, diff in self.wdechy:
+            total_heart_rate_diff += abs(diff)
+
+        for _, _, _, diff in self.wydechy:
+            total_heart_rate_diff += abs(diff)
+
+        mean_absolute_difference = total_heart_rate_diff / number_of_cycles if number_of_cycles > 0 else 0
+
+        return mean_absolute_difference
+
+    def calculate_relative_rsa_index_(self):
+        max_relative_rsa_diff = max(
+            max(abs(diff) for _, _, _, diff in self.wdechy),
+            max(abs(diff) for _, _, _, diff in self.wydechy)
+        )
+        return max_relative_rsa_diff
 
     def create_bandpass_filter1(self, lowcut, highcut, order):
         nyquist = 0.5 * self.frequency
