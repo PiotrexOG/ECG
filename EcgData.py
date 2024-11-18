@@ -102,15 +102,15 @@ class EcgData:
         self.b, self.a = self.create_bandpass_filter(self.lowcut, self.highcut,4)
         self.zi = signal.lfilter_zi(self.b, self.a)  # Stan filtra dla lfilter
 
-        self.lowcutHR = 2
-        self.highcutHR = 30
+        self.lowcutHR = 5
+        self.highcutHR = 15
         self.buffer_sizeHR = 200
         self.data_bufferHR = np.zeros(self.buffer_sizeHR)  # Inicjalizacja bufora o stałej wielkości
         self.bHR, self.aHR = self.create_bandpass_filter1(self.lowcutHR, self.highcutHR,4)
         self.ziHR = signal.lfilter_zi(self.bHR, self.aHR)  # Stan filtra dla lfilter
 
-        self.__inhalation_starts_moments = np.empty(0)
-        self.__exhalation_starts_moments = np.empty(0)
+        self.__inhalation_starts_moments = np.empty((0,2))
+        self.__exhalation_starts_moments = np.empty((0,2))
 
         self.wdechy = []  # Lista par (początek wdechu, koniec wdechu)
         self.wydechy = []  # Lista par (początek wydechu, koniec wydechu)
@@ -186,7 +186,32 @@ class EcgData:
         rmssd = round(self.rmssd, 2) if self.rmssd is not None else None
         pnn50 = round(self.pnn50, 2) if self.rmssd is not None else None
 
+        print("poczatki wdechu: ")
+        print(self.__inhalation_starts_moments)
+        print("poczatki wydechu: ")
+        print(self.__exhalation_starts_moments)
 
+        self.__find_inex_haletion_moments()
+
+        # Wyświetlenie wyników końcowych
+        print("\nLista wdechów (początek, koniec, czas trwania):")
+        for start, end, czas, roznicaHR in self.wdechy:
+            print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
+
+        print("\nLista wydechów (początek, koniec, czas trwania):")
+        for start, end, czas, roznicaHR in self.wydechy:
+            print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
+
+        # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
+        if self.wdechy:
+            srednia_wdechu = sum(czas for _, _, czas, _ in self.wdechy) / len(self.wdechy)
+            print(f"\nŚredni czas trwania wdechu: {srednia_wdechu:.2f}")
+
+        if self.wydechy:
+            srednia_wydechu = sum(czas for _, _, czas, _ in self.wydechy) / len(self.wydechy)
+            print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
+
+        print(f"rsa index wynosi: {self.calculate_rsa_index()}")
         # print("ECG peaks---------------")
         # print (self.r_peaks)
         # print("ECG intervals---------------")
@@ -237,6 +262,10 @@ class EcgData:
         b, a = signal.butter(order, [low, high], btype="band")
         return b, a
 
+    def calculate_rsa_index(self):
+        hr_values = self.__hr[:, 1]
+        return np.max(hr_values) - np.min(hr_values)
+
     def create_bandpass_filter1(self, lowcut, highcut, order):
         nyquist = 0.5 * self.frequency
         low = lowcut / nyquist
@@ -270,52 +299,24 @@ class EcgData:
         self.__calc_hr()
         if(len(self.__hr) > 28):
             self.hr_filtered = self.filter_hr()
-            self.__exhalation_starts_moments = self.__find_hr_ups()[:, 0] - self.__hr[0][0]
-            self.__inhalation_starts_moments = self.__find_hr_downs()[:, 0] - self.__hr[0][0]
+            ups = self.__find_hr_ups()
+            self.__exhalation_starts_moments = np.column_stack((
+                ups[:, 0] - self.__hr[0][0],  # Znormalizowane czasy (pierwsza kolumna)
+                ups[:, 1]  # Oryginalne wartości (druga kolumna)
+            ))
+
+            downs = self.__find_hr_downs()
+            self.__inhalation_starts_moments = np.column_stack((
+                downs[:, 0] - self.__hr[0][0],  # Znormalizowane czasy (pierwsza kolumna)
+                downs[:, 1]  # Oryginalne wartości (druga kolumna)
+            ))
 
             # Zakładając posortowane listy minima (wdechy) i maksima (wydechy)
-            minima = self.__inhalation_starts_moments
-            maksima = self.__exhalation_starts_moments
 
 
 
-            i, j = 0, 0  # Indeksy do list minimów i maksimów
-
-            while i < len(minima) and j < len(maksima):
-                if minima[i] < maksima[j]:
-                    if not (i + 1 < len(minima) and minima[i + 1] < maksima[j]):
-                        czas = maksima[j] - minima[i]
-                        self.wdechy.append((minima[i], maksima[j], czas))
-                    i += 1
-                else:
-                    if not (j + 1 < len(maksima) and maksima[j + 1] < minima[i]):
-                        czas =  minima[i] - maksima[j]
-                        self.wydechy.append((maksima[j], minima[i], czas))
-                    j += 1
-
-            print("poczatki wdechu: ")
-            print(self.inhalation_starts_moments)
-            print("poczatki wydechu: ")
-            print(self.exhalation_starts_moments)
-
-            # Wyświetlenie wyników końcowych
-            print("\nLista wdechów (początek, koniec, czas trwania):")
-            for start, end, czas in self.wdechy:
-                print(f"Od {start} do {end}, czas trwania: {czas}")
 
 
-            print("\nLista wydechów (początek, koniec, czas trwania):")
-            for start, end, czas in self.wydechy:
-                print(f"Od {start} do {end}, czas trwania: {czas}")
-
-            # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
-            if self.wdechy:
-                srednia_wdechu = sum(czas for _, _, czas in self.wdechy) / len(self.wdechy)
-                print(f"\nŚredni czas trwania wdechu: {srednia_wdechu:.2f}")
-
-            if self.wydechy:
-                srednia_wydechu = sum(czas for _, _, czas in self.wydechy) / len(self.wydechy)
-                print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
         return
 
     def __find_hr_downs(self):
@@ -333,6 +334,30 @@ class EcgData:
     def __find_r_peaks_filtered(self):
         self.__r_peaks_filtered = self.find_r_peaks(self.filtered_data, self.frequency)
         return self.__r_peaks_filtered
+
+    def __find_inex_haletion_moments(self):
+        minima = self.__inhalation_starts_moments[:,0]
+        maksima = self.__exhalation_starts_moments[:,0]
+        minimaHR = self.__inhalation_starts_moments[:,1]
+        maksimaHR = self.__exhalation_starts_moments[:,1]
+        self.wdechy.clear()
+        self.wydechy.clear()
+
+        i, j = 0, 0  # Indeksy do list minimów i maksimów
+
+        while i < len(minima) and j < len(maksima):
+            if minima[i] < maksima[j]:
+                if not (i + 1 < len(minima) and minima[i + 1] < maksima[j]):
+                    czas = maksima[j] - minima[i]
+                    roznica_hr = maksimaHR[j] - minimaHR[i]
+                    self.wdechy.append((minima[i], maksima[j], czas, roznica_hr))
+                i += 1
+            else:
+                if not (j + 1 < len(maksima) and maksima[j + 1] < minima[i]):
+                    czas = minima[i] - maksima[j]
+                    roznica_hr = minimaHR[i] - maksimaHR[j]
+                    self.wydechy.append((maksima[j], minima[i], czas, roznica_hr))
+                j += 1
 
     @staticmethod
     def find_r_peaks(data: np.ndarray, frequency: int) -> np.ndarray:
