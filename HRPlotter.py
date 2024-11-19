@@ -86,6 +86,15 @@ class HRPlotter:
         self._r_peaks_plot_data.clear()
         self._r_peaks_plot_data.extend(recent_peaks)
 
+    def _update_r_peaks_plot_data1(self) -> None:
+        if len(self.ecg_data.rr_intervals) == 0:
+            return
+
+        recent_peaks = self.ecg_data.rr_intervals[-self.PEAKS_TO_PLOT:]
+
+        self._r_peaks_fil_plot_data.clear()
+        self._r_peaks_fil_plot_data.extend(recent_peaks)
+
     def _update_hr_plot_data(self) -> None:
         if len(self.ecg_data.hr) == 0:
             return
@@ -110,6 +119,7 @@ class HRPlotter:
         self._update_r_peaks_plot_data()  # Update R-peak plot data
         self._update_hr_plot_data()  # Update HR plot data
         self._update_hr_fil_plot_data()  # Update HR plot data
+        self._update_r_peaks_plot_data1()
 
         r_peaks = self._r_peaks_plot_data
         if r_peaks:
@@ -125,6 +135,17 @@ class HRPlotter:
             self.ax_rr.autoscale_view()
         else:
             self.ax_r_peaks.set_offsets(np.empty((0, 2)))  # Wyczyszczenie wykresu, jeśli brak danych
+
+        rr_intervals = self._r_peaks_fil_plot_data
+        if rr_intervals:
+            r_peak_times, r_peak_values = zip(*rr_intervals)
+            r_peak_times_normalized = np.array(r_peak_times) - r_peak_times[0]
+
+            self.line_r_peaks_fil.set_data(r_peak_times_normalized, r_peak_values)
+
+            self.ax_rr_fil.relim()
+            self.ax_rr_fil.autoscale_view()
+
 
         hrs = self._hr_plot_data
 

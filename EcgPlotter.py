@@ -124,7 +124,7 @@ class EcgPlotter:
             current_voltage = ecg_values[-1]  # Get latest voltage value
             current_time = timestamps[-1]  # Get latest timestamp
             if self.ecg_data.rr_intervals.any():
-                current_interval = self.ecg_data.rr_intervals[-1]
+                current_interval = self.ecg_data.rr_intervals[:,1][-1]
                 current_hr = 60 / current_interval
                 current_r_peak = self.ecg_data.r_peaks[-1][1]
                 self.text_box.set_text(

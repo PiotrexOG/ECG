@@ -85,7 +85,7 @@ class EcgData:
         self.__hr_downs = np.empty(0)
         self.__r_peaks_filtered = np.empty(0)
         self.__r_peaks_piotr = np.empty(0)
-        self.__rr_intervals = np.empty(0)
+        self.__rr_intervals = np.empty((0,2))
         self.__hr = np.empty((0, 2))
         self.hr_filtered = np.empty((0, 2))
 
@@ -104,8 +104,8 @@ class EcgData:
         self.b, self.a = self.create_bandpass_filter(self.lowcut, self.highcut,4)
         self.zi = signal.lfilter_zi(self.b, self.a)  # Stan filtra dla lfilter
 
-        self.lowcutHR = 3
-        self.highcutHR = 10
+        self.lowcutHR = LOW
+        self.highcutHR = HIGH
         self.buffer_sizeHR = 200
         self.data_bufferHR = np.zeros(self.buffer_sizeHR)  # Inicjalizacja bufora o stałej wielkości
         self.bHR, self.aHR = self.create_bandpass_filter1(self.lowcutHR, self.highcutHR,4)
@@ -177,9 +177,18 @@ class EcgData:
         # self.__is_dirty = True
         self.__refresh_data()
 
-        FFT.fft(self.__rr_intervals)
+        FFT.fft(self.__rr_intervals[:,1])
 
         self.print_data()
+
+        # print(self.__hr[:,1])
+        # print(len(self.__hr[:,1]))
+        # print(len(self.__hr[:,0]))
+        #
+        # print("intervals")
+        #
+        # print(self.__rr_intervals[:,1])
+        # print(len(self.__rr_intervals))
 
 
         #self.hr_filtered = self.filter_hr()
@@ -201,27 +210,35 @@ class EcgData:
 
         # # Wyświetlenie wyników końcowych
         # print("\nLista wdechów (początek, koniec, czas trwania):")
-        # for start, end, czas, roznicaHR in self.wdechy:
-        #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
+        # for start, end, czas, roznicaHR, roznicaRR in self.wdechy:
+        #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}, roznica rr: {roznicaRR}")
         #
         # print("\nLista wydechów (początek, koniec, czas trwania):")
-        # for start, end, czas, roznicaHR in self.wydechy:
-        #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}")
+        # for start, end, czas, roznicaHR, roznicaRR in self.wydechy:
+        #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}, roznica rr: {roznicaRR}")
 
         # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
         if self.wdechy:
-            srednia_wdechu = sum(czas for _, _, czas, _ in self.wdechy) / len(self.wdechy)
+            srednia_wdechu = sum(czas for _, _, czas, _, _ in self.wdechy) / len(self.wdechy)
             print(f"\nŚredni czas trwania wdechu: {srednia_wdechu:.2f}")
 
         if self.wydechy:
-            srednia_wydechu = sum(czas for _, _, czas, _ in self.wydechy) / len(self.wydechy)
+            srednia_wydechu = sum(czas for _, _, czas, _, _ in self.wydechy) / len(self.wydechy)
             print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
 
-        print(f"rsa index wynosi: {self.calculate_rsa_index()}")
+        print(f"rsa index wynosi: {self.calculate_rsa_index(self.__hr[:,1])}")
 
         print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
 
-        print(f"mean heart rate wynosi: {self.calculate_mean_heart_rate_diff()}")
+        print(f"mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diff()}")
+
+        print("rr")
+
+        print(f"RR rsa index wynosi: {self.calculate_rsa_index(self.__rr_intervals[:,1])}")
+
+        print(f"RR rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_RR()}")
+
+        print(f"RR mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diffRR()}")
 
         print(f"średnie tętno wynosi: {self.calculate_mean_heart_rate()}")
         # print("ECG peaks---------------")
@@ -231,14 +248,14 @@ class EcgData:
         # print("ECG hr---------------")
         # print (self.hr)
         # print("\n*********************\n")
-        # if mean_rr is not None:
-        #    print(f"Mean RR: {mean_rr} ms")
-        # if sdnn is not None:
-        #     print(f"SDNN: {sdnn}")
-        # if rmssd is not None:
-        #     print(f"RMSSD: {rmssd}")
-        # if pnn50 is not None:
-        #     print(f"PNN50: {pnn50}%")
+        if mean_rr is not None:
+           print(f"Mean RR: {mean_rr} ms")
+        if sdnn is not None:
+            print(f"SDNN: {sdnn}")
+        if rmssd is not None:
+            print(f"RMSSD: {rmssd}")
+        if pnn50 is not None:
+            print(f"PNN50: {pnn50}%")
         return
 
     # def push_raw_data(self, x, y):
@@ -274,22 +291,36 @@ class EcgData:
         b, a = signal.butter(order, [low, high], btype="band")
         return b, a
 
-    def calculate_rsa_index(self):
-        hr_values = self.__hr[:, 1]
+    def calculate_rsa_index(self, values):
+        hr_values = values
         return np.max(hr_values) - np.min(hr_values)
 
     def calculate_mean_heart_rate(self):
-        hr_values = self.__hr[:, 1]
+        hr_values = self.__hr[:,1]
         return np.mean(hr_values) if len(hr_values) > 0 else 0
 
     def calculate_mean_heart_rate_diff(self):
         total_heart_rate_diff = 0
         number_of_cycles = len(self.wdechy) + len(self.wydechy)
 
-        for _, _, _, diff in self.wdechy:
+        for _, _, _, diff, _ in self.wdechy:
             total_heart_rate_diff += abs(diff)
 
-        for _, _, _, diff in self.wydechy:
+        for _, _, _, diff, _ in self.wydechy:
+            total_heart_rate_diff += abs(diff)
+
+        mean_absolute_difference = total_heart_rate_diff / number_of_cycles if number_of_cycles > 0 else 0
+
+        return mean_absolute_difference
+
+    def calculate_mean_heart_rate_diffRR(self):
+        total_heart_rate_diff = 0
+        number_of_cycles = len(self.wdechy) + len(self.wydechy)
+
+        for _, _, _, _, diff in self.wdechy:
+            total_heart_rate_diff += abs(diff)
+
+        for _, _, _, _, diff in self.wydechy:
             total_heart_rate_diff += abs(diff)
 
         mean_absolute_difference = total_heart_rate_diff / number_of_cycles if number_of_cycles > 0 else 0
@@ -298,10 +329,17 @@ class EcgData:
 
     def calculate_relative_rsa_index_(self):
         max_relative_rsa_diff = max(
-            max(abs(diff) for _, _, _, diff in self.wdechy),
-            max(abs(diff) for _, _, _, diff in self.wydechy)
+            max(abs(diff) for _, _, _, diff, _ in self.wdechy),
+            max(abs(diff) for _, _, _, diff, _ in self.wydechy)
         )
         return max_relative_rsa_diff
+
+    def calculate_relative_rsa_index_RR(self):
+        max_relative_rsa_diffRR = max(
+            max(abs(diff) for _, _, _, _, diff in self.wdechy),
+            max(abs(diff) for _, _, _, _, diff in self.wydechy)
+        )
+        return max_relative_rsa_diffRR
 
     def create_bandpass_filter1(self, lowcut, highcut, order):
         nyquist = 0.5 * self.frequency
@@ -387,13 +425,15 @@ class EcgData:
                 if not (i + 1 < len(minima) and minima[i + 1] < maksima[j]):
                     czas = maksima[j] - minima[i]
                     roznica_hr = maksimaHR[j] - minimaHR[i]
-                    self.wdechy.append((minima[i], maksima[j], czas, roznica_hr))
+                    roznica_rr = 60/maksimaHR[j] - 60/minimaHR[i]
+                    self.wdechy.append((minima[i], maksima[j], czas, roznica_hr, roznica_rr))
                 i += 1
             else:
                 if not (j + 1 < len(maksima) and maksima[j + 1] < minima[i]):
                     czas = minima[i] - maksima[j]
                     roznica_hr = minimaHR[i] - maksimaHR[j]
-                    self.wydechy.append((maksima[j], minima[i], czas, roznica_hr))
+                    roznica_rr = 60/minimaHR[i] - 60/maksimaHR[j]
+                    self.wydechy.append((maksima[j], minima[i], czas, roznica_hr, roznica_rr))
                 j += 1
 
     @staticmethod
@@ -529,10 +569,15 @@ class EcgData:
             return np.empty(0)
 
         rr_intervals = np.diff([peak[0] for peak in r_peaks])
-        return rr_intervals
+
+        timestamps = r_peaks[1:, 0]
+
+        # Połącz znaczniki czasowe i wartości tętna w kolumny
+        result = np.column_stack((timestamps, rr_intervals))
+        return result
 
     def __calc_mean_rr(self):
-        self.__mean_rr = self.calc_mean_rr(self.__rr_intervals)
+        self.__mean_rr = self.calc_mean_rr(self.__rr_intervals[:,1])
         return self.__mean_rr
 
     @staticmethod
@@ -540,7 +585,7 @@ class EcgData:
         return np.mean(rr_intervals) if len(rr_intervals) > 0 else None
 
     def __calc_sdnn(self):
-        self.__sdnn = self.calc_sdnn(self.__rr_intervals)
+        self.__sdnn = self.calc_sdnn(self.__rr_intervals[:,1])
         return self.__sdnn
 
     @staticmethod
@@ -575,7 +620,7 @@ class EcgData:
         #     return result2
         return result
     def __calc_rmssd(self):
-        self.__rmssd = self.calc_rmssd(self.__rr_intervals)
+        self.__rmssd = self.calc_rmssd(self.__rr_intervals[:,1])
         return self.__rmssd
 
     @staticmethod
@@ -588,7 +633,7 @@ class EcgData:
         )
 
     def __calc_pnn50(self):
-        self.__pnn50 = self.calc_pnn50(self.__rr_intervals)
+        self.__pnn50 = self.calc_pnn50(self.__rr_intervals[:,1])
         return self.__pnn50
 
     @staticmethod
