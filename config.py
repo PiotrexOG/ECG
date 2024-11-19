@@ -42,14 +42,14 @@ def get_params_for_breath_length(breath_length):
         raise ValueError("Invalid breath length. Supported values are from 2 to 10.")
 
 # Przykład użycia
-BREATH_LENGTH = 8  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
+BREATH_LENGTH = 5  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
 params = get_params_for_breath_length(BREATH_LENGTH)
 
 SIZE = params["SIZE"]
 LOW = params["LOW"]
 HIGH = params["HIGH"]
 
-CSV_PATH = f"data/nowe_arkusz_rsa{BREATH_LENGTH}.csv"  # Dynamiczna ścieżka do pliku
+CSV_PATH = f"data/dlugie_dane_rsa{BREATH_LENGTH}.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
-SECONDS_TO_PLOT = 200
+SECONDS_TO_PLOT = 1000

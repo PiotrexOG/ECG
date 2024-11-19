@@ -31,14 +31,14 @@ def fft(intervals):
     print (f"moc w hf: {hf_power}")
     print (f"moc w lf: {lf_power}")
 
-    # plt.figure()
-    # plt.plot(positive_freqs, positive_fft)
-    # plt.title("Widmo mocy HRV - Analiza HF")
-    # plt.xlabel("Częstotliwość (Hz)")
-    # plt.ylabel("Amplituda")
-    # plt.xlim(0, 0.5)  # Ograniczenie widoku do 0.5 Hz (możesz zmodyfikować)
-    # plt.axvspan(0.15, 0.4, color='lightgray', alpha=0.5, label="Pasmo HF (0.15-0.4 Hz)")
-    # plt.legend()
-    # plt.show()
+    plt.figure()
+    plt.plot(positive_freqs, positive_fft)
+    plt.title("Widmo mocy HRV - Analiza HF")
+    plt.xlabel("Częstotliwość (Hz)")
+    plt.ylabel("Amplituda")
+    plt.xlim(0, 0.5)  # Ograniczenie widoku do 0.5 Hz (możesz zmodyfikować)
+    plt.axvspan(0.15, 0.4, color='lightgray', alpha=0.5, label="Pasmo HF (0.15-0.4 Hz)")
+    plt.legend()
+    plt.show()
 
 
