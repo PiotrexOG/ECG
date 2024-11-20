@@ -53,6 +53,7 @@ HIGH = params["HIGH"]
 
 #CSV_PATH = f"data/0lezedlugie_dane_rsa{BREATH_LENGTH}.csv"  # Dynamiczna ścieżka do pliku
 #CSV_PATH = f"data/nowe_danemecz1.csv"  # Dynamiczna ścieżka do pliku
+#CSV_PATH = f"data/4csgo.csv"  # Dynamiczna ścieżka do pliku
 CSV_PATH = f"data/dodpoczynek.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
