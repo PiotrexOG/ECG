@@ -32,6 +32,18 @@ class EcgData:
         return self.__r_peaks
 
     @property
+    def r_peaks_ind(self):
+        return self.__r_peaks_ind
+
+    @property
+    def loaded_r_peaks(self):
+        return self.__raw_data[self.__loaded_r_peaks_ind]
+
+    @property
+    def loaded_r_peak_ind(self):
+        return self.__loaded_r_peaks_ind
+
+    @property
     def r_peaks_piotr(self):
         # self.__refresh_if_dirty()
         return self.__r_peaks_piotr
@@ -356,6 +368,40 @@ class EcgData:
         y_train = np.expand_dims(y_train, axis=2)
 
         return X_train, y_train, R_per_w
+    
+    def extract_windows_loaded_peaks(self, window_size):
+        win_count = int(len(self.__raw_data) / window_size)
+
+        X_train = np.zeros((win_count, window_size), dtype=np.float64)
+        y_train = np.zeros((win_count, window_size))
+        R_per_w = []
+
+        normalize = partial(processing.normalize_bound, lb=-1, ub=1)
+
+        for i in tqdm(range(win_count)):
+            win_start = i * window_size
+            end = win_start + window_size
+            r_peaks_ind = np.where(
+                (self.__loaded_r_peaks_ind >= win_start) & (self.__loaded_r_peaks_ind < end)
+            )
+            R_per_w.append(self.__loaded_r_peaks_ind[r_peaks_ind] - win_start)
+
+            for j in self.__loaded_r_peaks_ind[r_peaks_ind]:
+                r = int(j) - win_start
+                y_train[i, r - 2 : r + 3] = 1
+
+            if self.__raw_data[win_start:end][1].any():
+                X_train[i:] = np.squeeze(
+                    np.apply_along_axis(normalize, 0, self.__raw_data[win_start:end, 1])
+                )
+            else:
+                X_train[i, :] = self.__raw_data[win_start:end, 1].T
+
+        X_train = np.expand_dims(X_train, axis=2)
+
+        y_train = np.expand_dims(y_train, axis=2)
+
+        return X_train, y_train, R_per_w
 
     def extract_test_windows(self, win_size, stride):
         normalize = partial(processing.normalize_bound, lb=-1, ub=1)
@@ -406,7 +452,7 @@ class EcgData:
             y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
 
         return X_train, y_train
-    
+
     def extract_hrv_windows_with_detected_peaks(self, window_size):
         win_count = int(len(self.__rr_intervals) / window_size)
 
@@ -423,10 +469,31 @@ class EcgData:
             y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
 
         return X_train, y_train
-    
-    
-    def check_detected_peaks(self):
-        intersection = np.intersect1d(self.__r_peaks_ind, self.__loaded_r_peaks_ind)
-        pass
-        
 
+    def check_detected_peaks(self):
+        intersection1 = np.intersect1d(self.__r_peaks_ind, self.__loaded_r_peaks_ind)
+        test = PanTompkins.refine_peak_positions(
+            self.raw_data[:, 1], self.__loaded_r_peaks_ind, 20
+        )
+        test = self.refined_loaded_peaks_ind
+        intersection2 = np.intersect1d(self.__r_peaks_ind, test)
+        print(
+            f"Correctly classified: {intersection2.size / self.__loaded_r_peaks_ind.size * 100}%"
+        )
+        pass
+
+    @property
+    def refined_loaded_peaks_ind(self, max_distance = -1):
+        if max_distance == -1:
+            max_distance = int(0.07* self.frequency)
+        result_indexes = np.array(
+            [
+                val
+                for idx, val in enumerate(self.__r_peaks_ind)
+                if any(abs(val - a1) <= max_distance for a1 in self.loaded_r_peak_ind)
+            ]
+        )
+        return result_indexes
+        # return PanTompkins.refine_peak_positions(
+        #     self.raw_data[:, 1], self.__loaded_r_peaks_ind, 25
+        # )
