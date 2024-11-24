@@ -1,5 +1,5 @@
 from EcgData import EcgData
-from PanTompkinsFinder import PanTompkinsFinder
+from Finders.PanTompkinsFinder import PanTompkinsFinder
 from EcgPlotter import EcgPlotter
 import matplotlib.pyplot as plt
 

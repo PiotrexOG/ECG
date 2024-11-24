@@ -1,4 +1,4 @@
-from RPeaksFinder import RPeaksFinder
+from Finders.RPeaksFinder import RPeaksFinder
 from abc import *
 import PanTompkins
 

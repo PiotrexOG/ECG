@@ -1,4 +1,4 @@
-from RPeaksFinder import RPeaksFinder
+from Finders.RPeaksFinder import RPeaksFinder
 from models import *
 from functools import partial
 from wfdb import processing
@@ -6,25 +6,25 @@ import numpy as np
 from nnHelpers import *
 
 
-class CnnFinder(RPeaksFinder):
+class UNetFinder(RPeaksFinder):
 
     def __init__(self, model_path, input_size) -> None:
         super().__init__()
-        self.__win_size = input_size
+        self._win_size = input_size
         model = sig2sig_unet(input_size)
         model.load_weights(model_path)
-        self.__model = model
+        self._model = model
 
     def find_r_peaks_ind(self, ecg_signal, frequency: float, threshold=0.5):
         # print(len(ecg_signal) > 256)
-        stride = int(6 / 8 * self.__win_size)
+        stride = int(6 / 8 * self._win_size)
         padded_indices, data_windows = self.extract_windows(ecg_signal, stride)
-        predictions = self.__model.predict(data_windows, verbose = 0)
+        predictions = self._model.predict(data_windows, verbose = 0)
         predictions = mean_preds(
             win_idx=padded_indices,
             preds=predictions,
             orig_len=ecg_signal.shape[0],
-            win_size=self.__win_size,
+            win_size=self._win_size,
             stride=stride,
         )
         filtered_peaks, filtered_proba = filter_predictions(
@@ -43,7 +43,7 @@ class CnnFinder(RPeaksFinder):
         signal = np.squeeze(ecg_signal)
 
         pad_sig = np.pad(
-            signal, (self.__win_size - stride, self.__win_size), mode="edge"
+            signal, (self._win_size - stride, self._win_size), mode="edge"
         )
 
         data_windows = []
@@ -52,14 +52,14 @@ class CnnFinder(RPeaksFinder):
         pad_id = np.arange(pad_sig.shape[0])
 
         for win_id in range(0, len(pad_sig), stride):
-            if win_id + self.__win_size < len(pad_sig):
+            if win_id + self._win_size < len(pad_sig):
 
-                window = pad_sig[win_id : win_id + self.__win_size]
+                window = pad_sig[win_id : win_id + self._win_size]
                 if window.any():
                     window = np.squeeze(np.apply_along_axis(normalize, 0, window))
 
                 data_windows.append(window)
-                win_idx.append(pad_id[win_id : win_id + self.__win_size])
+                win_idx.append(pad_id[win_id : win_id + self._win_size])
 
         data_windows = np.asarray(data_windows)
         data_windows = data_windows.reshape(

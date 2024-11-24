@@ -8,8 +8,9 @@ from EcgPlotter import *
 from config import *
 from dataSenderEmulator import run_emulator_thread
 from nnHelpers import *
-from PanTompkinsFinder import PanTompkinsFinder
-from CnnFinder import CnnFinder
+from Finders.PanTompkinsFinder import PanTompkinsFinder
+from Finders.UNetFinder import UNetFinder
+from Finders.CnnFinder import CnnFinder
 
 
 import tensorflow as tf
@@ -117,13 +118,14 @@ def run_load_CSV(data):
 
 
 if __name__ == "__main__":
-    data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # data = EcgData(SAMPLING_RATE, CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
+    # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE))
+    # data = EcgData(SAMPLING_RATE, CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE))
     # data1 = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # data1 = EcgData(SAMPLING_RATE, CnnFinder("models/proszePieknie.keras", WINDOW_SIZE))
+    # data1 = EcgData(SAMPLING_RATE, UNetFinder("models/proszePieknie.keras", WINDOW_SIZE))
     ecg_plotter = EcgPlotter("ECG", data)
     # ecg_plotter2 = EcgPlotter("PanTomkins", data1)
-    # data.load_data_from_mitbih("data\\mit-bih\\100")
+    # data.load_data_from_mitbih("data\\mit-bih\\104")
 
     match APP_MODE:
         case AppModeEnum.NORMAL:

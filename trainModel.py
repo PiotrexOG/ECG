@@ -1,17 +1,17 @@
 from config import *
 from EcgData import EcgData
-from PanTompkinsFinder import PanTompkinsFinder
+from Finders.PanTompkinsFinder import PanTompkinsFinder
 from nnHelpers import *
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 
-from CnnFinder import CnnFinder
-from PanTompkinsFinder import PanTompkinsFinder
+from Finders.UNetFinder import UNetFinder
+from Finders.PanTompkinsFinder import PanTompkinsFinder
 
 
 def get_patient_data_mitbih(path, input_length = WINDOW_SIZE):
     data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # data = EcgData(SAMPLING_RATE, CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
+    # data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
     data.load_data_from_mitbih(path)
     data.check_detected_peaks()
     # X_train, y_train = data.extract_hrv_windows_with_loaded_peaks(input_length)
@@ -40,7 +40,7 @@ def get_patients_data_mithbih(dir_path: str, patients: list):
 if __name__ == "__main__":
     X_train, y_train, R_p_w= get_patients_data_mithbih(
     "data\\mit-bih",
-    ["100", "101", "102", "103", "106", "107", "109"],
+    ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
     )
 
 
@@ -52,4 +52,6 @@ if __name__ == "__main__":
     # # data.load_csv_data_with_timestamps("data/arkusz_rsa7.csv")
     # data.load_data_from_mitbih("data\\mit-bih\\100")
     # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
-    train(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
+    
+    train_unet(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
+    # train_cnn(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")

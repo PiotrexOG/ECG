@@ -299,11 +299,16 @@ def filter_predictions(signal, preds, threshold):
 
     return filtered_peaks, filtered_probs
 
+def train_unet(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
+    train(X_train, y_train, R_p_w, epochs, f"{model_file_name}_unet", sig2sig_unet(input_size))
+    
+def train_cnn(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
+    train(X_train, y_train, R_p_w, epochs, f"{model_file_name}_cnn", sig2sig_cnn(input_size))
 
-def train(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
+def train(X_train, y_train, R_p_w, epochs, model_file_name, model):
     start = time.process_time()
 
-    model = sig2sig_unet(input_size)
+    # model = sig2sig_unet(input_size)
     
     model_path = "models\\" + model_file_name + ".keras"
 

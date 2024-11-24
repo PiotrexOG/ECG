@@ -3,7 +3,7 @@ import PanTompkins
 import NAME_THIS_MODULE_YOURSELF_PIOTER
 from config import *
 from dataSenderEmulator import read_csv
-from RPeaksFinder import RPeaksFinder
+from Finders.RPeaksFinder import RPeaksFinder
 import threading
 
 from functools import partial
@@ -477,15 +477,27 @@ class EcgData:
         )
         test = self.refined_loaded_peaks_ind
         intersection2 = np.intersect1d(self.__r_peaks_ind, test)
-        print(
-            f"Correctly classified: {intersection2.size / self.__loaded_r_peaks_ind.size * 100}%"
-        )
+        # print(
+        #     f"Correctly classified: {round(intersection2.size / self.__loaded_r_peaks_ind.size * 100, 2)}%"
+        # )
+        TP = intersection2.size
+        FP = np.setdiff1d(self.__r_peaks_ind, intersection2).size
+        FN = self.__loaded_r_peaks_ind.size - intersection2.size
+        # print(f"TP {TP}")
+        # print(f"FP {FP}")
+        # print(f"FN {FN}")
+        sens = TP/(TP+FN)
+        prec = TP/(TP+FP)
+        f1 = 2*prec*sens/(prec+sens)
+        # print(f"Sensitivity {sens}")
+        # print(f"Precision {prec}")
+        print(f"F1-score {f1}")
         pass
 
     @property
     def refined_loaded_peaks_ind(self, max_distance = -1):
         if max_distance == -1:
-            max_distance = int(0.07* self.frequency)
+            max_distance = int(0.05* self.frequency)
         result_indexes = np.array(
             [
                 val

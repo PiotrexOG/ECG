@@ -11,14 +11,15 @@ from tensorflow.keras.layers import (
 )
 from EcgData import EcgData
 from config import *
-from PanTompkinsFinder import PanTompkinsFinder
-from CnnFinder import CnnFinder
+from Finders.PanTompkinsFinder import PanTompkinsFinder
+from Finders.UNetFinder import UNetFinder
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from EcgPlotter import EcgPlotter
+from Finders.CnnFinder import CnnFinder
 
 
 def create_hrv_model(input_length):
@@ -43,8 +44,9 @@ def create_hrv_model(input_length):
     return model
 
 
+
 def get_patient_data_mitbih(path):
-    data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    data = EcgData(SAMPLING_RATE, finder)
     data.load_data_from_mitbih(path)
     data.check_detected_peaks()
     # X_train, y_train = data.extract_hrv_windows_with_loaded_peaks(input_length)
@@ -68,6 +70,9 @@ def get_patients_data_mithbih(dir_path: str, patients: list):
 
 
 input_length = 50  # Długość sekwencji interwałów RR
+finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
+# finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
+# finder = PanTompkinsFinder()
 model = create_hrv_model(input_length)
 
 model.compile(
@@ -76,28 +81,27 @@ model.compile(
 
 # model.summary()
 
-# data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+# data1 = EcgData(SAMPLING_RATE, finder)
 # # data.load_csv_data_with_timestamps(CSV_PATH)
-# data.load_data_from_mitbih("data\\mit-bih\\100")
-# # EcgPlotter("100", data)
-
-# data1 = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-# # data.load_csv_data_with_timestamps(CSV_PATH)
-# data1.load_data_from_mitbih("data\\mit-bih\\101")
-# # EcgPlotter("101", data1)
-
-# data1 = EcgData(SAMPLING_RATE, CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
-# data1 = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-# # data.load_csv_data_with_timestamps(CSV_PATH)
-# data1.load_data_from_mitbih("data\\mit-bih\\109")
+# data1.load_data_from_mitbih("data\\mit-bih\\108")
+# data1.check_detected_peaks()
 # EcgPlotter("112", data1)
+# plt.show()
+# exit()
+
+# val_data = EcgData(SAMPLING_RATE, finder)
+# # # data.load_csv_data_with_timestamps(CSV_PATH)
+# val_data.load_data_from_mitbih("data\\mit-bih\\108")
+# val_data.check_detected_peaks()
+# EcgPlotter("109", val_data)
 # plt.show()
 # exit()
 
 
 X_train, y_train = get_patients_data_mithbih(
     "data\\mit-bih",
-    ["100", "101", "102", "103", "106", "107", "109"],
+    ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
+    # ["200", "201", "202"],
 )
 # X_train, y_train = data.extract_hrv_windows(input_length)
 # X_train1, y_train1 = data1.extract_hrv_windows(input_length)
@@ -112,21 +116,29 @@ X_train, y_train = get_patients_data_mithbih(
 X_train, y_train = shuffle(X_train, y_train)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15)
 
+model_path = "models\\test.keras"
+checkpoint = tf.keras.callbacks.ModelCheckpoint(
+        model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
+    )
+# callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=6)
 
-history = model.fit(
-    X_train,
-    y_train,
-    validation_data=(X_val, y_val),
-    epochs=500,
-    batch_size=32,
-    verbose=1,
-)
 
-# val_data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-# # data.load_csv_data_with_timestamps(CSV_PATH)
-# val_data.load_data_from_mitbih("data\\mit-bih\\112")
-x, y = get_patient_data_mitbih("data\\mit-bih\\112")
+# history = model.fit(
+#     X_train,
+#     y_train,
+#     validation_data=(X_val, y_val),
+#     epochs=500,
+#     batch_size=32,
+#     verbose=1,
+#     # callbacks=[checkpoint]
+# )
 
+# x, y = get_patient_data_mitbih("data\\mit-bih\\112")
+data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
+data.load_csv_data_with_timestamps(CSV_PATH)
+x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
+
+model.load_weights(model_path)
 result = model.predict(x)
 
 mae = mean_absolute_error(y, result)
