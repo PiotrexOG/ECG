@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import deque
 from EcgData import *
-
+from matplotlib.font_manager import FontProperties
 from config import *
 
 
@@ -45,17 +45,32 @@ class EcgPlotter:
             [], [], color="red", label="R-peaks", marker="x", s=100
         )
 
-        self.ax_p = self.ax_ecg.scatter(
-            [], [], color="yellow", label="P", marker="x", s=100
+        self.ax_loaded_r_peaks = self.ax_ecg.scatter(
+            [], [], color="yellow", label="Loaded R-peaks", marker="x", s=100
         )
 
-        self.ax_q = self.ax_ecg.scatter(
-            [], [], color="blue", label="Q", marker="x", s=100
+        self.ax_detected_r_peaks = self.ax_ecg.scatter(
+            [], [], color="blue", label="Detected R-peaks", marker="x", s=100
         )
 
-        self.ax_test = self.ax_ecg.scatter(
-            [], [], color="white", label="test", marker="x", s=100
+        self.ax_within_spec_r_peaks = self.ax_ecg.scatter(
+            [], [], color="white", label="Within spec R-peaks", marker="x", s=100
         )
+        
+        handles, labels = self.ax_ecg.get_legend_handles_labels()
+        
+        # Add the legend
+        legend = self.ax_ecg.legend(
+            loc="lower right",
+            fontsize=12,
+            facecolor="black",
+            edgecolor="green"
+        )
+
+        # Change text color for the legend
+        for text in legend.get_texts():
+            text.set_color("white")
+        
 
         self.stats_text = self.ax_ecg.text(
             0.01,
@@ -114,33 +129,81 @@ class EcgPlotter:
             self.ax_ecg.relim()  # Recalculate limits
             self.ax_ecg.autoscale_view()  # Auto scale the view
 
-            r_peaks = self.ecg_data.r_peaks
+            # r_peaks_ind = self.ecg_data.r_peaks_ind
+            loaded_r_peaks_ind = self.ecg_data.loaded_r_peak_ind
+            detected_r_peaks_ind = self.ecg_data.r_peaks_ind
+
+            if loaded_r_peaks_ind.size != np.empty(0).size:
+                r_peaks_ind = np.intersect1d(loaded_r_peaks_ind, detected_r_peaks_ind)
+                within_spec_ind = np.intersect1d(self.ecg_data.refined_loaded_peaks_ind, detected_r_peaks_ind)
+                # new_arr = np.empty(0)
+                # for i in range(within_spec_ind.size):
+                #     if within_spec_ind[i] != loaded_r_peaks_ind[i]
+                    
+                within_spec_ind = np.setdiff1d(within_spec_ind, r_peaks_ind)
+                # r_peaks_ind = np.union1d(within_spec_ind, r_peaks_ind)
+                loaded_r_peaks_ind = np.setdiff1d(loaded_r_peaks_ind, r_peaks_ind)
+                detected_r_peaks_ind = np.setdiff1d(detected_r_peaks_ind, r_peaks_ind)
+
+                r_peaks = self.ecg_data.raw_data[r_peaks_ind]
+                loaded_r_peaks = self.ecg_data.raw_data[loaded_r_peaks_ind]
+                detected_r_peaks = self.ecg_data.raw_data[detected_r_peaks_ind]
+                within_spec_r_peaks = self.ecg_data.raw_data[within_spec_ind]
+                for i in range(len(loaded_r_peaks) - 1, -1, -1):
+                    if loaded_r_peaks[i, 0] < self._plot_data[0][0]:
+                        loaded_r_peaks = loaded_r_peaks[i + 1 :, :]
+                        break
+
+                for i in range(len(detected_r_peaks) - 1, -1, -1):
+                    if detected_r_peaks[i, 0] < self._plot_data[0][0]:
+                        detected_r_peaks = detected_r_peaks[i + 1 :, :]
+                        break
+                    
+                for i in range(len(within_spec_r_peaks) - 1, -1, -1):
+                    if within_spec_r_peaks[i, 0] < self._plot_data[0][0]:
+                        within_spec_r_peaks = within_spec_r_peaks[i + 1 :, :]
+                        break
+                    
+                if loaded_r_peaks.any():  # Check if any R-peaks were found
+                    r_peak_times, r_peak_values = zip(*loaded_r_peaks)
+                    # Normalize the R-peak timestamps
+                    r_peak_times_normalized = np.array(r_peak_times) - x[0]
+                    # Update scatter plot with R-peaks
+                    self.ax_loaded_r_peaks.set_offsets(
+                        np.array([r_peak_times_normalized, r_peak_values]).T
+                    )
+                else:
+                    self.ax_loaded_r_peaks.set_offsets(np.empty((0, 2)))
+
+                if detected_r_peaks.any():  # Check if any R-peaks were found
+                    r_peak_times, r_peak_values = zip(*detected_r_peaks)
+                    # Normalize the R-peak timestamps
+                    r_peak_times_normalized = np.array(r_peak_times) - x[0]
+                    # Update scatter plot with R-peaks
+                    self.ax_detected_r_peaks.set_offsets(
+                        np.array([r_peak_times_normalized, r_peak_values]).T
+                    )
+                else:
+                    self.ax_detected_r_peaks.set_offsets(np.empty((0, 2)))
+                    
+                if within_spec_r_peaks.any():  # Check if any R-peaks were found
+                    r_peak_times, r_peak_values = zip(*within_spec_r_peaks)
+                    # Normalize the R-peak timestamps
+                    r_peak_times_normalized = np.array(r_peak_times) - x[0]
+                    # Update scatter plot with R-peaks
+                    self.ax_within_spec_r_peaks.set_offsets(
+                        np.array([r_peak_times_normalized, r_peak_values]).T
+                    )
+                else:
+                    self.ax_within_spec_r_peaks.set_offsets(np.empty((0, 2)))
+            else:
+                r_peaks = self.ecg_data.r_peaks
+
             for i in range(len(r_peaks) - 1, -1, -1):
                 if r_peaks[i, 0] < self._plot_data[0][0]:
                     r_peaks = r_peaks[i + 1 :, :]
                     break
-            # p = self.ecg_data.raw_data[self.ecg_data.p, :]
-            # for i in range(len(p) - 1, -1, -1):
-            #     if p[i, 0] < self._plot_data[0][0]:
-            #         p = p[i + 1 :, :]
-            #         break
 
-            # q = self.ecg_data.raw_data[self.ecg_data.q, :]
-            # for i in range(len(q) - 1, -1, -1):
-            #     if q[i, 0] < self._plot_data[0][0]:
-            #         q = q[i + 1 :, :]
-            #         break
-
-            # test = self.ecg_data.raw_data[self.ecg_data.test, :]
-            # for i in range(len(test) - 1, -1, -1):
-            #     if test[i, 0] < self._plot_data[0][0]:
-            #         test = test[i + 1 :, :]
-            #         break
-
-            # rows_to_delete = np.concatenate((q, p))
-            # test = np.array([row for row in test if not any((row == x).all() for x in rows_to_delete)])
-
-            # r_peaks = self.ecg_data.r_peaks_piotr
             if r_peaks.any():  # Check if any R-peaks were found
                 r_peak_times, r_peak_values = zip(*r_peaks)
                 # Normalize the R-peak timestamps
@@ -149,24 +212,9 @@ class EcgPlotter:
                 self.ax_r_peaks.set_offsets(
                     np.array([r_peak_times_normalized, r_peak_values]).T
                 )
-
-                # p_times, p_values = zip(*p)
-                # p_times_normalized = np.array(p_times) - x[0]
-                # self.ax_p.set_offsets(np.array([p_times_normalized, p_values]).T)
-
-                # q_times, q_values = zip(*q)
-                # q_times_normalized = np.array(q_times) - x[0]
-                # self.ax_q.set_offsets(np.array([q_times_normalized, q_values]).T)
-
-                # test_times, test_values = zip(*test)
-                # test_times_normalized = np.array(test_times) - x[0]
-                # self.ax_test.set_offsets(
-                #     np.array([test_times_normalized, test_values]).T
-                # )
-                # for i in range(len(test_times_normalized)):
-                #     self.ax_ecg.text(test_times_normalized[i]+0.1, test_value[i], 'P', fontsize=12, ha='left', color='blue')
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
+
         if PRINT_ECG_DATA:
             self.stats_text.set_text(self.ecg_data.print_data_string())
             # self.ecg_data.print_data()
