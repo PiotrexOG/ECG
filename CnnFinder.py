@@ -16,7 +16,7 @@ class CnnFinder(RPeaksFinder):
         self.__model = model
 
     def find_r_peaks_ind(self, ecg_signal, frequency: float, threshold=0.5):
-        print(len(ecg_signal) > 256)
+        # print(len(ecg_signal) > 256)
         stride = int(6 / 8 * self.__win_size)
         padded_indices, data_windows = self.extract_windows(ecg_signal, stride)
         predictions = self.__model.predict(data_windows, verbose = 0)
