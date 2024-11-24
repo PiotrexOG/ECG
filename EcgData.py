@@ -13,11 +13,11 @@ from tqdm import tqdm
 
 
 class EcgData:
-    
+
     @property
     def raw_data(self):
         return self.__raw_data
-    
+
     @raw_data.setter
     def raw_data(self, raw_data):
         self.__lock.acquire()
@@ -97,36 +97,32 @@ class EcgData:
         sample_rate = record.fs
         channel_names = record.sig_name
         r_peak_locations = annotation.sample
-        
-        
-        timestamps = np.array([i/sample_rate for i in range(len(ecg_signal))])
-        
+
+        timestamps = np.array([i / sample_rate for i in range(len(ecg_signal))])
 
         self.frequency = sample_rate
         self.__loaded_r_peaks_ind = r_peak_locations
         self.raw_data = np.column_stack((timestamps, ecg_signal))
-        
-        
-    def load_data_from_qt(self, path, record_num = 0):
+
+    def load_data_from_qt(self, path, record_num=0):
         record = wfdb.rdrecord(path)
         ecg_signal = record.p_signal[:, record_num]
-        #header = wfdb.rdann(path, "hea")
+        # header = wfdb.rdann(path, "hea")
         annotation_q1c = wfdb.rdann(path, "q1c")
         annotation_qt1 = wfdb.rdann(path, "qt1")
         annotation_pu = wfdb.rdann(path, "pu")
         annotation_pu0 = wfdb.rdann(path, "pu0")
-        
+
         self.test = annotation_pu.sample
-        
-        p_indexes = np.where(np.array(annotation_pu.symbol)=='p')[0]
+
+        p_indexes = np.where(np.array(annotation_pu.symbol) == "p")[0]
         self.p = annotation_pu.sample[p_indexes]
-        q_indexes = np.where(np.array(annotation_pu.symbol)=='N')[0]
+        q_indexes = np.where(np.array(annotation_pu.symbol) == "N")[0]
         self.q = annotation_pu.sample[q_indexes]
-        
+
         sample_rate = record.fs
-        timestamps = np.array([i/sample_rate for i in range(len(ecg_signal))])
-        
-        
+        timestamps = np.array([i / sample_rate for i in range(len(ecg_signal))])
+
         self.frequency = sample_rate
         self.raw_data = np.column_stack((timestamps, ecg_signal))
 
@@ -134,7 +130,7 @@ class EcgData:
         print("ECG DATA---------------")
         print(self.print_data_string())
         return
-    
+
     def print_data_string(self):
         mean_rr = round(self.mean_rr * 1e3, 2) if self.mean_rr is not None else None
         sdnn = round(self.sdnn, 2) if self.sdnn is not None else None
@@ -142,13 +138,13 @@ class EcgData:
         pnn50 = round(self.pnn50, 2) if self.rmssd is not None else None
         output = str()
         if mean_rr is not None:
-            output+=f"Mean RR: {mean_rr} ms\n"
+            output += f"Mean RR: {mean_rr} ms\n"
         if sdnn is not None:
-            output+=f"SDNN: {sdnn}\n"
+            output += f"SDNN: {sdnn}\n"
         if rmssd is not None:
-            output+=f"RMSSD: {rmssd}\n"
+            output += f"RMSSD: {rmssd}\n"
         if pnn50 is not None:
-            output+=f"PNN50: {pnn50}%\n"
+            output += f"PNN50: {pnn50}%\n"
         if len(output) > 0:
             output = output[:-1]
         return output
@@ -157,7 +153,9 @@ class EcgData:
         self.__lock.acquire()
         try:
             if isinstance(x, list) and isinstance(y, list):
-                self.__raw_data = np.concatenate((self.__raw_data, np.column_stack((x, y))))
+                self.__raw_data = np.concatenate(
+                    (self.__raw_data, np.column_stack((x, y)))
+                )
             else:
                 self.__raw_data = np.append(self.__raw_data, [[x, y]], axis=0)
         finally:
@@ -389,3 +387,46 @@ class EcgData:
         win_idx = win_idx.reshape(win_idx.shape[0] * win_idx.shape[1])
 
         return win_idx, data_windows
+
+    def extract_hrv_windows_with_loaded_peaks(self, window_size):
+        win_count = int(len(self.__rr_intervals) / window_size)
+        r_peaks = self.raw_data[self.__loaded_r_peaks_ind]
+        rr_intervals = np.diff([peak[0] for peak in r_peaks])
+
+        X_train = np.zeros((win_count, window_size), dtype=np.float64)
+        # y_train = np.zeros((win_count, 3))
+        y_train = np.zeros((win_count, 2))
+
+        for i in range(win_count):
+            win_start = i * window_size
+            win_end = win_start + window_size
+            # X_train[i] = self.rr_intervals[win_start:win_end]
+            X_train[i] = rr_intervals[win_start:win_end]
+            # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
+            y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
+
+        return X_train, y_train
+    
+    def extract_hrv_windows_with_detected_peaks(self, window_size):
+        win_count = int(len(self.__rr_intervals) / window_size)
+
+        X_train = np.zeros((win_count, window_size), dtype=np.float64)
+        # y_train = np.zeros((win_count, 3))
+        y_train = np.zeros((win_count, 2))
+
+        for i in range(win_count):
+            win_start = i * window_size
+            win_end = win_start + window_size
+            # X_train[i] = self.rr_intervals[win_start:win_end]
+            X_train[i] = self.__rr_intervals[win_start:win_end]
+            # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
+            y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
+
+        return X_train, y_train
+    
+    
+    def check_detected_peaks(self):
+        intersection = np.intersect1d(self.__r_peaks_ind, self.__loaded_r_peaks_ind)
+        pass
+        
+
