@@ -1,0 +1,220 @@
+\chapter{Sieci neuronowe}
+Lorem ipsum
+
+\section{Sieci neuronowe}
+Sieci neuronowe, zwane równie¿ sztucznymi sieciami neuronowymi (ang. Artificial
+Neural Networks, Ann) to grupa algorytmów uczenia maszynowego, inspirowanych
+sposobem przetwarzania informacji przez ludzki mózg.
+
+\subsection{Budowa neuronu}
+
+Podstawowym elementem budowy sieci neuronowej jest sztuczny neuron, który
+naœladuje funkcjonowanie biologicznego neuronu. Zadaniem sztucznego neuronu
+jest przetwarzanie wartoœci wejœciowych w pojedyncz¹ wartoœæ wyjœciow¹. Neuron
+ten sk³ada siê z kilku kluczowych elementów:
+% (zob. Rys. \ref{fig/neuron})
+
+\begin{itemize}
+    \item Wejœcia (inputs) - ka¿dy neuron odbiera dane wejœciowe, które mog¹ byæ
+          wartoœciami liczbowymi pochodz¹cymi z danych lub wynikami dzia³ania innych
+          neuronów z poprzedniej warstwy. Ka¿demu wejœciu przypisana jest waga (weight),
+          która okreœla znaczenie danego wejœcia dla obliczeñ neuronu.
+
+    \item Blok sumuj¹cy - neuron oblicza sumê wa¿on¹ wejœæ, dodaj¹c równie¿ wartoœæ biasu
+          (bias). Bias jest dodatkowym parametrem, który umo¿liwia przesuniêcie funkcji
+          aktywacji i lepsze dopasowanie modelu. Wyra¿enie matematyczne opisuj¹ce tê
+          operacjê to:
+          \[
+              z = \sum_{i=1}^n w_i x_i + b
+          \]
+          gdzie:
+          \begin{itemize}
+              \item \(w_i\) to wagi wejœæ,
+              \item \(x_i\) to wartoœci wejœciowe,
+              \item \(b\) to bias,
+              \item \(z\) to wynik sumy wa¿onej.
+          \end{itemize}
+
+    \item Funkcja aktywacji (activation function) - wynik \(z\) przechodzi przez funkcjê
+          aktywacji, która wprowadza nieliniowoœæ do modelu, pozwalaj¹c sieci neuronowej
+          uczyæ siê skomplikowanych zale¿noœci. Popularne funkcje aktywacji to:
+          \begin{itemize}
+              \item ReLU (Rectified Linear Unit): \(\text{ReLU}(z) = \max(0, z)\),
+              \item Sigmoidalna: \(\text{sigmoid}(z) = \frac{1}{1 + e^{-z}}\),
+              \item Tangens hiperboliczny: \(\text{tanh}(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}\).
+          \end{itemize}
+\end{itemize}
+
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[scale=0.6]{Rysunki/neuron-structure.jpg}
+%     \caption{Budowa sztucznego neuronu}
+%     \caption*{ród³o: \url{https://naadispeaks.blog/2017/11/08/artificial-neural-networks-with-net-in-azure-ml-studio/} [Data uzyskania dostêpu 25.11.2024]}
+%     \label{fig/neuron_jpg}
+% \end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[
+            init/.style={
+                    draw,
+                    circle,
+                    inner sep=2pt,
+                    font=\Huge,
+                    join = by -latex
+                },
+            squa/.style={
+                    draw,
+                    inner sep=2pt,
+                    font=\Large,
+                    join = by -latex
+                },
+            start chain=2,node distance=13mm
+        ]
+        \node[on chain=2]
+        (x2) {$x_2$};
+        \node[on chain=2,join=by o-latex]
+        {$w_2$};
+        \node[on chain=2,init] (sigma)
+        {$\displaystyle\Sigma$};
+        \node[on chain=2,squa,label=above:{\parbox{2cm}{\centering Activate \\ function}}]
+        {$f$};
+        \node[on chain=2,label=above:Output,join=by -latex]
+        {$y$};
+        \begin{scope}[start chain=1]
+            \node[on chain=1] at (0,1.5cm)
+            (x1) {$x_1$};
+            \node[on chain=1,join=by o-latex]
+            (w1) {$w_1$};
+        \end{scope}
+        \begin{scope}[start chain=3]
+            \node[on chain=3] at (0,-1.5cm)
+            (x3) {$x_3$};
+            \node[on chain=3,label=below:Weights,join=by o-latex]
+            (w3) {$w_3$};
+        \end{scope}
+        \node[label=above:\parbox{2cm}{\centering Bias \\ $b$}] at (sigma|-w1) (b) {};
+
+        \draw[-latex] (w1) -- (sigma);
+        \draw[-latex] (w3) -- (sigma);
+        \draw[o-latex] (b) -- (sigma);
+
+        \draw[decorate,decoration={brace,mirror}] (x1.north west) -- node[left=10pt] {Inputs} (x3.south west);
+    \end{tikzpicture}
+    \caption{Budowa sztucznego neuronu}
+    \caption*{ród³o: \url{https://tex.stackexchange.com/questions/132444/diagram-of-an-artificial-neural-network} [Data uzyskania dostêpu 25.11.2024]}
+    %     \caption*{ród³o: \url{https://naadispeaks.blog/2017/11/08/artificial-neural-networks-with-net-in-azure-ml-studio/}
+    \label{fig/neuron}
+\end{figure}
+
+\subsection{Budowa sieci neuronowych}
+
+Struktura sieci neuronowej sk³ada siê z grup sztucznych neuronów, zwanych
+warstwami. Sieæ sk³ada siê z trzech g³ównych typów warstw: warstwy wejœciowej,
+jednej lub wiêcej warstw ukrytych oraz warstwy wyjœciowej. Ka¿da z tych warstw
+pe³ni okreœlon¹ funkcjê w przetwarzaniu danych, a ich odpowiednie po³¹czenie
+umo¿liwia rozwi¹zywanie z³o¿onych problemów z zakresu klasyfikacji, regresji
+czy analizy danych.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[
+            plain/.style={
+                    draw=none,
+                    fill=none,
+                },
+            net/.style={
+                    matrix of nodes,
+                    nodes={
+                            draw,
+                            circle,
+                            inner sep=10pt
+                        },
+                    nodes in empty cells,
+                    column sep=2cm,
+                    row sep=-9pt
+                },
+            >=latex
+        ]
+        \matrix[net] (mat)
+        {
+        |[plain]| \parbox{1.3cm}{\centering Input\\layer} & |[plain]| \parbox{1.3cm}{\centering Hidden\\layer} & |[plain]| \parbox{1.3cm}{\centering Output\\layer} \\
+        & |[plain]| \\
+        |[plain]| & \\
+        & |[plain]| \\
+        |[plain]| & |[plain]| \\
+        & & \\
+        |[plain]| & |[plain]| \\
+        & |[plain]| \\
+        |[plain]| & \\
+        & |[plain]| \\    };
+        \foreach \ai [count=\mi ]in {2,4,...,10}
+        \draw[<-] (mat-\ai-1) -- node[above] {Input \mi} +(-2cm,0);
+        \foreach \ai in {2,4,...,10}
+            {\foreach \aii in {3,6,9}
+                \draw[->] (mat-\ai-1) -- (mat-\aii-2);
+            }
+        \foreach \ai in {3,6,9}
+        \draw[->] (mat-\ai-2) -- (mat-6-3);
+        \draw[->] (mat-6-3) -- node[above] {Ouput} +(2cm,0);
+    \end{tikzpicture}
+    \caption{Uogólniona budowa sieci neuronowej}
+    \caption*{ród³o: \url{https://tex.stackexchange.com/questions/132444/diagram-of-an-artificial-neural-network} [Data uzyskania dostêpu 25.11.2024]}
+    %     \caption*{ród³o: \url{https://naadispeaks.blog/2017/11/08/artificial-neural-networks-with-net-in-azure-ml-studio/}
+    \label{fig/neural_network_basic_scheme}
+\end{figure}
+
+Warstwa wejœciowa to pierwsza czêœæ sieci neuronowej, której g³ównym zadaniem
+jest odbiór danych wejœciowych. Ka¿dy neuron w tej warstwie reprezentuje jedn¹
+cechê z danych wejœciowych, co oznacza, ¿e liczba neuronów w warstwie
+wejœciowej jest równa liczbie zmiennych lub parametrów w analizowanym zbiorze
+danych. Na przyk³ad w przypadku analizy sygna³u EKG, ka¿dy neuron w warstwie
+wejœciowej mo¿e odpowiadaæ pojedynczej próbce sygna³u lub cechom wyodrêbnionym
+z tego sygna³u, takim jak wartoœæ amplitudy w danym momencie.
+
+Neurony w warstwie wejœciowej nie wykonuj¹ ¿adnych operacji matematycznych. Ich
+rola ogranicza siê do przekazania otrzymanych danych do nastêpnych warstw w
+sieci. Dane te s¹ nastêpnie przekszta³cane i analizowane w warstwach ukrytych.
+
+Warstwy ukryte stanowi¹ centraln¹ czêœæ sieci neuronowej, gdzie odbywa siê
+wiêkszoœæ przetwarzania danych. W warstwach tych neurony s¹ po³¹czone z
+neuronami z poprzedniej i nastêpnej warstwy, a ka¿de po³¹czenie ma przypisan¹
+wagê. Wagi te s¹ kluczowe, poniewa¿ okreœlaj¹, jak silny wp³yw ma dany neuron
+na aktywacjê innych neuronów.
+
+Ka¿dy neuron w warstwie ukrytej wykonuje typowe operacje dla sztucznego
+neuronu: oblicza sumê wa¿on¹ swoich wejœæ, dodaje wartoœæ biasu, a nastêpnie
+przekszta³ca wynik za pomoc¹ funkcji aktywacji. Funkcja aktywacji wprowadza
+nieliniowoœæ, co pozwala sieci neuronowej uczyæ siê bardziej z³o¿onych wzorców
+w danych. Szczegó³y dotycz¹ce tych operacji zosta³y opisane w podrozdziale
+dotycz¹cym budowy neuronu.
+
+Liczba warstw ukrytych oraz liczba neuronów w ka¿dej warstwie jest parametrem
+sieci, który dobiera siê w zale¿noœci od z³o¿onoœci problemu. G³êbokie sieci
+neuronowe, które posiadaj¹ wiele warstw ukrytych, s¹ zdolne do automatycznego
+wyodrêbniania i przetwarzania z³o¿onych cech danych, co czyni je efektywnymi w
+takich zadaniach jak rozpoznawanie wzorców w sygnale EKG czy przewidywanie
+wartoœci zmiennych opisuj¹cych HRV i RSA.
+
+Warstwa wyjœciowa jest ostatni¹ warstw¹ sieci neuronowej. Jej zadaniem jest
+przekszta³cenie wyników przetwarzania uzyskanych w warstwach ukrytych na postaæ
+wynikow¹, zgodn¹ z celem analizy. Liczba neuronów w warstwie wyjœciowej zale¿y
+od rodzaju problemu. Na przyk³ad w zadaniach klasyfikacyjnych liczba neuronów
+odpowiada liczbie klas, natomiast w zadaniach regresji warstwa wyjœciowa sk³ada
+siê z jednego neuronu, który przewiduje wartoœæ liczbow¹.
+
+Wartoœci w warstwie wyjœciowej s¹ czêsto poddawane dodatkowym przekszta³ceniom,
+takim jak funkcja softmax w przypadku klasyfikacji wieloklasowej lub funkcja
+liniowa w zadaniach regresyjnych. Ostateczne wyniki s¹ nastêpnie porównywane z
+oczekiwanymi wynikami (danymi referencyjnymi), co umo¿liwia obliczenie b³êdu i
+optymalizacjê wag w sieci.
+
+£¹czenie warstw i propagacja danych
+Sieci neuronowe dzia³aj¹ na zasadzie przep³ywu informacji pomiêdzy warstwami. Dane wejœciowe przechodz¹ przez warstwê wejœciow¹ do warstw ukrytych, gdzie s¹ przetwarzane przez neurony. Wyniki tego przetwarzania trafiaj¹ do warstwy wyjœciowej, która generuje koñcowy wynik. Proces ten nazywa siê propagacj¹ w przód (ang. forward propagation).
+
+Podczas treningu sieci neuronowej stosuje siê algorytm wstecznej propagacji
+b³êdu (ang. backpropagation), który umo¿liwia aktualizacjê wag po³¹czeñ miêdzy
+neuronami na podstawie ró¿nicy miêdzy wynikiem przewidzianym przez sieæ a
+oczekiwanym wynikiem. Dziêki temu sieæ uczy siê dostosowywaæ swoje parametry,
+aby lepiej modelowaæ zale¿noœci w danych.
+
