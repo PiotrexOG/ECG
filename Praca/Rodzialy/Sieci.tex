@@ -107,7 +107,7 @@ ten sk³ada siê z kilku kluczowych elementów:
     \label{fig/neuron}
 \end{figure}
 
-\subsection{Budowa sieci neuronowych}
+\subsection{Budowa sieci neuronowej}
 
 Struktura sieci neuronowej sk³ada siê z grup sztucznych neuronów, zwanych
 warstwami. Sieæ sk³ada siê z trzech g³ównych typów warstw: warstwy wejœciowej,
@@ -164,6 +164,7 @@ czy analizy danych.
     \label{fig/neural_network_basic_scheme}
 \end{figure}
 
+\subsubsection{Warstwa wejœciowa}
 Warstwa wejœciowa to pierwsza czêœæ sieci neuronowej, której g³ównym zadaniem
 jest odbiór danych wejœciowych. Ka¿dy neuron w tej warstwie reprezentuje jedn¹
 cechê z danych wejœciowych, co oznacza, ¿e liczba neuronów w warstwie
@@ -176,6 +177,7 @@ Neurony w warstwie wejœciowej nie wykonuj¹ ¿adnych operacji matematycznych. Ich
 rola ogranicza siê do przekazania otrzymanych danych do nastêpnych warstw w
 sieci. Dane te s¹ nastêpnie przekszta³cane i analizowane w warstwach ukrytych.
 
+\subsubsection{Warstwy ukryte}
 Warstwy ukryte stanowi¹ centraln¹ czêœæ sieci neuronowej, gdzie odbywa siê
 wiêkszoœæ przetwarzania danych. W warstwach tych neurony s¹ po³¹czone z
 neuronami z poprzedniej i nastêpnej warstwy, a ka¿de po³¹czenie ma przypisan¹
@@ -196,6 +198,7 @@ wyodrêbniania i przetwarzania z³o¿onych cech danych, co czyni je efektywnymi w
 takich zadaniach jak rozpoznawanie wzorców w sygnale EKG czy przewidywanie
 wartoœci zmiennych opisuj¹cych HRV i RSA.
 
+\subsubsection{Warstwa wyjœciowa}
 Warstwa wyjœciowa jest ostatni¹ warstw¹ sieci neuronowej. Jej zadaniem jest
 przekszta³cenie wyników przetwarzania uzyskanych w warstwach ukrytych na postaæ
 wynikow¹, zgodn¹ z celem analizy. Liczba neuronów w warstwie wyjœciowej zale¿y
@@ -209,12 +212,101 @@ liniowa w zadaniach regresyjnych. Ostateczne wyniki s¹ nastêpnie porównywane z
 oczekiwanymi wynikami (danymi referencyjnymi), co umo¿liwia obliczenie b³êdu i
 optymalizacjê wag w sieci.
 
-£¹czenie warstw i propagacja danych
-Sieci neuronowe dzia³aj¹ na zasadzie przep³ywu informacji pomiêdzy warstwami. Dane wejœciowe przechodz¹ przez warstwê wejœciow¹ do warstw ukrytych, gdzie s¹ przetwarzane przez neurony. Wyniki tego przetwarzania trafiaj¹ do warstwy wyjœciowej, która generuje koñcowy wynik. Proces ten nazywa siê propagacj¹ w przód (ang. forward propagation).
+\subsubsection{£¹czenie warstw i propagacja danych}
+Sieci neuronowe dzia³aj¹ na zasadzie przep³ywu informacji pomiêdzy warstwami.
+Dane wejœciowe przechodz¹ przez warstwê wejœciow¹ do warstw ukrytych, gdzie s¹
+przetwarzane przez neurony. Wyniki tego przetwarzania trafiaj¹ do warstwy
+wyjœciowej, która generuje koñcowy wynik. Proces ten nazywa siê propagacj¹ w
+przód (ang. forward propagation).
 
 Podczas treningu sieci neuronowej stosuje siê algorytm wstecznej propagacji
 b³êdu (ang. backpropagation), który umo¿liwia aktualizacjê wag po³¹czeñ miêdzy
 neuronami na podstawie ró¿nicy miêdzy wynikiem przewidzianym przez sieæ a
 oczekiwanym wynikiem. Dziêki temu sieæ uczy siê dostosowywaæ swoje parametry,
 aby lepiej modelowaæ zale¿noœci w danych.
+
+\subsection{Sieci konwolucyjne}
+% Sieci konwolucyjne (Convolutional Neural Networks, CNN) to zaawansowany rodzaj sieci neuronowych, które zosta³y zaprojektowane z myœl¹ o przetwarzaniu danych o strukturze przestrzennej, takich jak obrazy czy sygna³y czasowe. W przeciwieñstwie do klasycznej architektury feed-forward, CNN wykorzystuj¹ operacje splotu, które pozwalaj¹ na wyodrêbnianie lokalnych wzorców w danych i ich hierarchiczne przetwarzanie.+
+
+Sieci konwolucyjne (ang. Convolutional Neural Networks, CNN) to szczególny
+rodzaj sieci neuronowych, zaprojektowany do analizy danych o strukturze
+przestrzennej, takich jak obrazy, sygna³y czasowe czy dane
+przestrzenno-czasowe. W odró¿nieniu od klasycznych sieci neuronowych, CNN
+wykorzystuj¹ operacje konwolucji, które umo¿liwiaj¹ ekstrakcjê lokalnych cech
+danych, jednoczeœnie redukuj¹c liczbê parametrów i zachowuj¹c istotne
+informacje.
+
+% \subsubsection{Budowa sieci konwolucyjnej}
+
+Budowa sieci konwolucyjnych ró¿ni siê od klasycznych sieci neuronowych poprzez
+wprowadzenie nowych typów warstw: warstw konwolucyjnych, warstw spajaj¹cych
+(ang. pooling layers) oraz warstw w pe³ni po³¹czonych (ang. fully connected
+layers). Te elementy pozwalaj¹ sieci konwolucyjnej efektywnie analizowaæ dane
+przestrzenne.
+
+\subsubsection{Warstwa konwolucyjna}
+Warstwa konwolucyjna jest kluczowym elementem CNN. Jej zadaniem jest wykrywanie
+lokalnych wzorców w danych wejœciowych poprzez operacjê konwolucji. W warstwie
+tej stosuje siê filtry (zwane równie¿ j¹drami lub kernelami), które s¹
+macierzami o niewielkich rozmiarach (np. 3x3, 5x5, 3x1, 5x1). Ka¿dy filtr
+przesuwa siê po danych wejœciowych (np. obrazie lub sygnale), obliczaj¹c
+iloczyn skalarny wartoœci w filtrze i fragmentu danych wejœciowych. Wynikiem
+jest mapa cech (ang. feature map), która reprezentuje wykryte wzorce. Wyra¿enie
+matematyczne opisuj¹ce konwolucjê dla danych 2-wymiarowych mo¿na zapisaæ jako:
+\begin{equation}
+    S(i, j) = \sum_{m=1}^M \sum_{n=1}^N I(m, n)K(i-m, j-n)
+\end{equation}
+gdzie:
+\begin{itemize}
+    \item \(I(m, n)\) to dane wejœciowe,
+    \item \(K(i, j)\) to wartoœci filtra,
+    \item \(S(i, j)\) to wynik konwolucji w danym miejscu.
+    \item \(M\) i \(N\) to wymiary filtra
+\end{itemize}
+Splot jest operacj¹ przemienn¹, wiêc mo¿na to równanie zapisaæ w postaci
+\begin{equation}
+    S(i, j) = \sum_{m=1}^M \sum_{n=1}^N I(i-m, j-n)K(m, n)
+\end{equation}
+Warstwa konwolucyjna w sieciach neuronowych zwykle implementuje operacjê korelacji krzy¿owej (ang. cross-correlation), która matematycznie jest bardzo zbli¿ona do klasycznej konwolucji, ale nie odwraca filtra (j¹dra) przed obliczeniami \cite{Goodfellow-DeepLearning}.
+Wyra¿enie opisuj¹ce korelacjê krzy¿ow¹ to:
+\begin{equation}
+    S(i, j) = \sum_{m=1}^M \sum_{n=1}^N I(i+m, j+n)K(m, n)
+\end{equation}
+Analogicznie, operacje korelacji krzy¿owej na danych 1-wymiarowych opisuje równanie:
+\begin{equation}
+    S(i) = \sum_{m=1}^M I(i+m)K(m)
+\end{equation}
+Operacja splotu w warstwie konwolucyjnej jest odpowiednikiem obliczenia sumy wa¿onej w bloku sumuj¹cym klasycznego sztucznego neuronu. Wynik tej operacji, podobnie jak w klasycznym neuronie, jest przekazywany do funkcji aktywacji w celu wprowadzenia nieliniowoœci.\\
+
+Dzia³anie warstwy konwolucyjnej mo¿na dostosowaæ poprzez odpowiedni¹
+konfiguracjê jej hiperparametrów. Do najwa¿niejszych z nich nale¿¹ m.in.
+\begin{itemize}
+    \item Przesuniêcie filtru (stride) - okreœla liczbê pozycji, o jakie filtr przesuwa
+          siê w danych wejœciowych. Zwiêkszenie wartoœci tego parametru zmniejsza rozmiar
+          map cech, co obni¿a koszt obliczeniowy, jednak mo¿e skutkowaæ utrat¹ drobnych
+          informacji.
+    \item Dope³nianie zerami (padding) - umo¿liwia zachowanie informacji na krawêdziach
+          danych wejœciowych. Bez dope³niania mapa cech ulega naturalnemu zmniejszeniu.
+    \item Rozmiar filtra (kernel size) - okreœla wymiary filtra. Mniejsze filtry
+          wykrywaj¹ drobniejsze wzorce, wiêksze analizuj¹ szerszy kontekst danych.
+    \item Liczba filtrów - decyduje o liczbie generowanych map cech, co zwiêksza zdolnoœæ
+          sieci do wykrywania ró¿nych wzorców.
+\end{itemize}
+
+\subsubsection{Warstwa spajaj¹ca (pooling layer)}
+Warstwa spajaj¹ca (ang. pooling layer) zmniejsza wymiary danych wejœciowych,
+zachowuj¹c kluczowe informacje. Redukuje liczbê parametrów modelu, co zapobiega
+przeuczeniu i zwiêksza wydajnoœæ obliczeñ. Najczêœciej stosowane operacje to:
+\begin{itemize}
+    \item \textit{Max pooling} – wybiera maksymaln¹ wartoœæ z fragmentu danych wejœciowych, wykrywaj¹c najbardziej znacz¹ce cechy.
+    \item \textit{Average pooling} – oblicza œredni¹ wartoœæ w analizowanym fragmencie, zachowuj¹c informacje o ogólnym kontekœcie danych.
+\end{itemize}
+Warstwa ta u³atwia modelowi analizê wzorców, zmniejszaj¹c jednoczeœnie wra¿liwoœæ na drobne przesuniêcia w danych.
+
+\subsubsection{Warstwa w pe³ni po³¹czone (fully connected layer)}
+Ostateczna analiza przetworzonych cech odbywa siê w warstwach w pe³ni
+po³¹czonych. Wyniki uzyskane z warstw konwolucyjnych i spajaj¹cych s¹
+przekszta³cane w jeden wymiar, a nastêpnie przechodz¹ przez standardowe neurony
+w celu uzyskania finalnych wyników, takich jak klasyfikacja czy predykcja
+wartoœci liczbowych.
 
