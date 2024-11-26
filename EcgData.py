@@ -118,8 +118,12 @@ class EcgData:
 
     def load_data_from_qt(self, path, record_num=0):
         record = wfdb.rdrecord(path)
+        sample_rate = record.fs
+        self.frequency = sample_rate
         ecg_signal = record.p_signal[:, record_num]
         # header = wfdb.rdann(path, "hea")
+        # ann = wfdb.rdann(path, 'atr')
+        # self.__loaded_r_peaks_ind = ann.sample
         annotation_q1c = wfdb.rdann(path, "q1c")
         annotation_qt1 = wfdb.rdann(path, "qt1")
         annotation_pu = wfdb.rdann(path, "pu")
@@ -131,12 +135,57 @@ class EcgData:
         self.p = annotation_pu.sample[p_indexes]
         q_indexes = np.where(np.array(annotation_pu.symbol) == "N")[0]
         self.q = annotation_pu.sample[q_indexes]
+        # self.__loaded_r_peaks_ind = self.q
+        # self.__loaded_r_peaks_ind = EcgData.remove_duplicates_and_adjacent(self.q, self.frequency)
+        self.__loaded_r_peaks_ind = EcgData.filter_similar_elements(self.q, self.frequency)
 
-        sample_rate = record.fs
+        
         timestamps = np.array([i / sample_rate for i in range(len(ecg_signal))])
-
-        self.frequency = sample_rate
+        
         self.raw_data = np.column_stack((timestamps, ecg_signal))
+
+    @staticmethod
+    def remove_duplicates_and_adjacent(array, frequency):
+        # Remove duplicates and sort
+        array = np.unique(array)
+        result = []
+        
+        
+        
+        # for num in array:
+        #     if not result or num != result[-1] + 1:
+        #         result.append(num)
+        
+        for i in range(len(array)-1, -1, -1):
+            # Add to result if it doesn't differ by 1 from the last added number
+            if not result or array[i] < result[-1] - int(0.05* frequency):
+                result.append(array[i])
+        result.sort()
+        return np.array(result)
+    
+    @staticmethod
+    def filter_similar_elements(arr, frequency):
+        arr = np.unique(arr)
+        sorted_arr = np.sort(arr)
+        
+        result = []
+        
+        group = [sorted_arr[0]]
+        
+        for i in range(1, len(sorted_arr)):
+            if sorted_arr[i] - sorted_arr[i-1] <= int(0.05* frequency):
+                group.append(sorted_arr[i])
+            else:
+                mean_value = np.mean(group)
+                closest_element = min(group, key=lambda x: abs(x - mean_value))
+                result.append(closest_element)
+                group = [sorted_arr[i]]
+        
+        mean_value = np.mean(group)
+        closest_element = min(group, key=lambda x: abs(x - mean_value))
+        result.append(closest_element)
+        
+        return np.array(result)
 
     def print_data(self):
         print("ECG DATA---------------")
@@ -344,7 +393,8 @@ class EcgData:
 
         normalize = partial(processing.normalize_bound, lb=-1, ub=1)
 
-        for i in tqdm(range(win_count)):
+        for i in range(win_count):
+        # for i in tqdm(range(win_count)):
             win_start = i * window_size
             end = win_start + window_size
             r_peaks_ind = np.where(
@@ -378,7 +428,8 @@ class EcgData:
 
         normalize = partial(processing.normalize_bound, lb=-1, ub=1)
 
-        for i in tqdm(range(win_count)):
+        for i in range(win_count):
+        # for i in tqdm(range(win_count)):
             win_start = i * window_size
             end = win_start + window_size
             r_peaks_ind = np.where(
