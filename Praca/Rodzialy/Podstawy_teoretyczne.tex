@@ -68,11 +68,19 @@ sercowo-naczyniowego badanej osoby.
 
 Jednym z kluczowych parametrów opisuj¹cych sygna³ EKG jest czas up³ywaj¹cy pomiêdzy kolejnymi szczytami R, wyra¿any w milisekundach (ms). Parametr ten bywa nazywany \textit{odstêpem RR} (ang. \textit{RR interval}). Jego analiza pozwala bezpoœrednio okreœliæ inn¹ istotn¹ metrykê, jak¹ jest puls, czyli \textit{HR} (ang. \textit{heart rate}), który oznacza liczbê uderzeñ serca na minutê. Ka¿demu skurczowi serca towarzyszy charakterystyczny wzrost potencja³u elektrycznego, rejestrowany jako szczyt $R$ na wykresie EKG.
 
-Puls w chwili $t_{R_n}$, czyli w momencie wyst¹pienia $n$-tego szczytu $R$, mo¿na wyraziæ za pomoc¹ wzoru:
+Chwilowe têtno w chwili \( t_{R_n} \), czyli w momencie wyst¹pienia \( n \)-tego szczytu \( R \), mo¿na wyraziæ za pomoc¹ wzoru:
+
 \[
-HR = \frac{60}{t_{R_n} - t_{R_{n-1}}}
+HR_n = \frac{60}{t_{R_n} - t_{R_{n-1}}}
 \]
-gdzie $t_{R_{n-1}}$ oznacza czas wyst¹pienia poprzedniego szczytu $R$. Oznacza to, ¿e jesteœmy w stanie okreœliæ chwilowe têtno dok³adnie w momencie ka¿dego szczytu $R$. 
+
+gdzie:
+
+\begin{itemize}
+    \item \( t_{R_n} \) to czas wyst¹pienia \( n \)-tego szczytu \( R \),
+    \item \( t_{R_{n-1}} \) to czas wyst¹pienia poprzedniego szczytu \( R \),
+    \item wynik \( HR_n \) wyra¿ony jest w uderzeniach na minutê (bpm, \textit{beats per minute}).
+\end{itemize}
 
 Jeœli jednak chcielibyœmy przybli¿yæ wartoœæ têtna w dowolnym punkcie pomiêdzy szczytami, nale¿a³oby tê wartoœæ odpowiednio ekstrapolowaæ.
 
@@ -85,7 +93,7 @@ Metody analizy czasowej opieraj¹ siê na bezpoœrednim pomiarze odstêpów RR w sygn
 
 \subsubsection{SDNN}
 SDNN, czyli odchylenie standardowe wszystkich odstêpów RR w badanym okresie, jest jedn¹ z podstawowych miar zmiennoœci rytmu serca. Wartoœæ SDNN odzwierciedla ca³kowit¹ zmiennoœæ sygna³u rytmu serca, poniewa¿ wariancja sygna³u, bêd¹ca kwadratem odchylenia standardowego, jest równa sumie mocy w ca³ym zakresie czêstotliwoœci. SDNN jest prost¹ miar¹ do obliczenia, jednak nie jest dobrze zdefiniowan¹ zmienn¹ statystyczn¹, poniewa¿ jej wartoœæ zale¿y od d³ugoœci badania. Wielkoœæ SDNN wzrasta wraz z czasem trwania rejestracji, dlatego porównywanie wyników miêdzy badaniami o ró¿nej d³ugoœci wymaga wczeœniejszej normalizacji do okreœlonych okresów, np. do nominalnych zapisów 24-godzinnych lub krótkoterminowych trwaj¹cych 5 minut.
-:
+
 \[
 \text{SDNN} = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} \left( RR_i - \overline{RR} \right)^2}
 \]
@@ -99,7 +107,7 @@ gdzie:
 \end{itemize}
 
 \subsubsection{RMSSD}
-RMSSD, czyli pierwiastek ze œredniej kwadratowej ró¿nic pomiêdzy kolejnymi odstêpami RR, jest miar¹ szczególnie u¿yteczn¹ w ocenie krótkoterminowych wahañ rytmu serca i  dosyæ precyzyjnie wskazuje na aktywnoœæ przywspó³czuln¹ uk³adu nerwowego. Dziêki temu jest mniej podatne na wp³yw d³ugoterminowych fluktuacji oraz artefaktów, co czyni je jedn¹ z najczêœciej stosowanych miar krótkoterminowej zmiennoœci rytmu serca.:
+RMSSD, czyli pierwiastek ze œredniej kwadratowej ró¿nic pomiêdzy kolejnymi odstêpami RR, jest miar¹ szczególnie u¿yteczn¹ w ocenie krótkoterminowych wahañ rytmu serca i  dosyæ precyzyjnie wskazuje na aktywnoœæ przywspó³czuln¹ uk³adu nerwowego. Dziêki temu jest mniej podatne na wp³yw d³ugoterminowych fluktuacji oraz artefaktów, co czyni je jedn¹ z najczêœciej stosowanych miar krótkoterminowej zmiennoœci rytmu serca.
 \[
 \text{RMSSD} = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N-1} \left( RR_{i+1} - RR_i \right)^2}
 \]
@@ -139,7 +147,7 @@ gdzie:
 \end{itemize}
 pNN50 jest silnie skorelowana z RMSSD, jednak¿e to ta druga miara jest czêœciej u¿ywana w nomenklaturze do oceny krótkoterminowych zmiennoœci
 \subsubsection{SDANN}
-SDANN, czyli odchylenie standardowe œrednich odstêpów NN obliczonych dla krótkich segmentów czasowych, takich jak 5-minutowe odcinki, jest miar¹ d³ugoterminowej zmiennoœci rytmu serca. Proces obliczania SDANN polega na podzieleniu ca³ego okresu rejestracji, np. 24-godzinnego, na krótsze segmenty (np. 5-minutowe), a nastêpnie obliczeniu œrednich odstêpów NN dla ka¿dego z nich. Odchylenie standardowe tych œrednich wartoœci jest finaln¹ wartoœci¹ SDANN, co czyni tê miarê szczególnie przydatn¹ w analizie d³ugoterminowych zmian rytmu serca, takich jak ró¿nice miêdzy dniem a noc¹.:
+SDANN, czyli odchylenie standardowe œrednich odstêpów NN obliczonych dla krótkich segmentów czasowych, takich jak 5-minutowe odcinki, jest miar¹ d³ugoterminowej zmiennoœci rytmu serca. Proces obliczania SDANN polega na podzieleniu ca³ego okresu rejestracji, np. 24-godzinnego, na krótsze segmenty (np. 5-minutowe), a nastêpnie obliczeniu œrednich odstêpów NN dla ka¿dego z nich. Odchylenie standardowe tych œrednich wartoœci jest finaln¹ wartoœci¹ SDANN, co czyni tê miarê szczególnie przydatn¹ w analizie d³ugoterminowych zmian rytmu serca, takich jak ró¿nice miêdzy dniem a noc¹.
 \[
 \text{SDANN} = \sqrt{\frac{1}{M-1} \sum_{j=1}^{M} \left( \overline{NN}_j - \overline{\overline{NN}} \right)^2}
 \]
@@ -153,7 +161,7 @@ gdzie:
 \end{itemize}
 
 \subsubsection{SDNN Index}
-SDNN Index jest œredni¹ wartoœci¹ odchylenia standardowego odstêpów NN dla wszystkich 5-minutowych segmentów ca³ego okresu rejestracji. Ró¿ni siê on od SDANN tym, ¿e odnosi siê do krótkoterminowej zmiennoœci rytmu serca w obrêbie poszczególnych segmentów. Ta miara jest u¿ywana do oceny bardziej szczegó³owych zmian w rytmie serca w krótszych przedzia³ach czasowych.:
+SDNN Index jest œredni¹ wartoœci¹ odchylenia standardowego odstêpów NN dla wszystkich 5-minutowych segmentów ca³ego okresu rejestracji. Ró¿ni siê on od SDANN tym, ¿e odnosi siê do krótkoterminowej zmiennoœci rytmu serca w obrêbie poszczególnych segmentów. Ta miara jest u¿ywana do oceny bardziej szczegó³owych zmian w rytmie serca w krótszych przedzia³ach czasowych.
 \[
 \text{SDNN Index} = \frac{1}{M} \sum_{j=1}^{M} \sqrt{\frac{1}{N_j-1} \sum_{i=1}^{N_j} \left( RR_{i,j} - \overline{RR}_j \right)^2}
 \]
@@ -284,7 +292,8 @@ Do oceny HRV mo¿na wykorzystaæ miary podzielone na dwie grupy w zale¿noœci od ro
 \begin{itemize}
     \item \textbf{S³u¿¹ce do ogólnej oceny zmiennoœci rytmu serca:}
     \begin{itemize}
-        \item SDNN -- ró¿nica miêdzy najd³u¿szym a najkrótszym odstêpem RR.
+        \item SDNN 
+        \item ró¿nica miêdzy najd³u¿szym a najkrótszym odstêpem RR.
     \end{itemize}
     \item \textbf{S³u¿¹ce do oceny d³ugoterminowych zmiennoœci HRV, wynikaj¹cych m.in. z ró¿nic podczas cyklu dobowego czy aktywnoœci fizycznej:}
     \begin{itemize}
@@ -384,7 +393,7 @@ Pozwala to obliczyæ œredni¹ ró¿nicê lub œredni¹ kwadratow¹ ró¿nic w odstêpach RR
 
 \subsection {Zale¿noœæ RSA od czêstotliwoœci oddechów}
 
-W badaniach, które znalaz³em i których wyniki uda³o mi siê powtórzyæ, wykazano, ¿e efekt RSA jest maksymalny dla czêstotliwoœci 6 oddechów na minutê (0.1 Hz), co odpowiada cyklowi oddechowemu trwaj¹cemu 10 sekund (5 sekund wdech, 5 sekund wydech). Takie tempo oddychania powoduje rezonans w uk³adzie sercowo-naczyniowym, wynikaj¹cy z synchronizacji rytmu oddechowego z naturalnymi oscylacjami ciœnienia krwi w paœmie LF (~0.1 Hz), które s¹ regulowane przez barorefleksjê. Ten rezonans wzmacnia efekt RSA, czyni¹c go bardziej wyraŸnym.
+W badaniach, które znalaz³em i których wyniki w tej pracy uda³o siê powtórzyæ, wykazano, ¿e efekt RSA jest maksymalny dla czêstotliwoœci 6 oddechów na minutê (0.1 Hz), co odpowiada cyklowi oddechowemu trwaj¹cemu 10 sekund (5 sekund wdech, 5 sekund wydech). Takie tempo oddychania powoduje rezonans w uk³adzie sercowo-naczyniowym, wynikaj¹cy z synchronizacji rytmu oddechowego z naturalnymi oscylacjami ciœnienia krwi w paœmie LF (~0.1 Hz), które s¹ regulowane przez barorefleksjê. Ten rezonans wzmacnia efekt RSA, czyni¹c go bardziej wyraŸnym. \cite{Bartsch-PhaseTransitions}.
 
 
 \subsection {Problemy w interpretacji RSA w analizie FFT}
