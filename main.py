@@ -16,7 +16,6 @@ from Finders.CnnFinder import CnnFinder
 import tensorflow as tf
 import time
 import os
-from models import sig2sig_unet, sig2sig_cnn
 
 VERBOSE = False
 PRINT_PACKETS = False
@@ -114,18 +113,40 @@ def run_simulation():
 
 def run_load_CSV(data):
     data.load_csv_data_with_timestamps(CSV_PATH)
-    # data.load_data_from_mitbih("data\\mit-bih\\100")
+    
+def run_load_mitbih(data):
+    data.load_data_from_mitbih(f"{MITBIH_PATH}\\{MITBIH_PATIENT}")
+    data.check_detected_peaks()
+    
+def run_load_qt(data):
+    data.load_data_from_qt(f"{QT_PATH}\\{QT_PATIENT}")
+    data.check_detected_peaks()
+    
+def test_mitbih_patients(finder):
+    for patient in MITBIH_PATIENTS:
+        data = EcgData(SAMPLING_RATE, finder)
+        data.load_data_from_mitbih(f"{MITBIH_PATH}\\{patient}")
+        data.check_detected_peaks()
+        
+def test_qt_patients(finder):
+    for patient in QT_PATIENTS:
+        data = EcgData(SAMPLING_RATE, finder)
+        data.load_data_from_qt(f"{QT_PATH}\\{patient}")
+        data.check_detected_peaks()
 
 
 if __name__ == "__main__":
-    # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE))
-    # data = EcgData(SAMPLING_RATE, CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE))
-    # data1 = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # data1 = EcgData(SAMPLING_RATE, UNetFinder("models/proszePieknie.keras", WINDOW_SIZE))
+    # finder = PanTompkinsFinder()
+    finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
+    # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
+    
+    # test_mitbih_patients(finder)
+    # test_qt_patients(finder)
+    # exit()
+    
+    
+    data = EcgData(SAMPLING_RATE, finder)
     ecg_plotter = EcgPlotter("ECG", data)
-    # ecg_plotter2 = EcgPlotter("PanTomkins", data1)
-    # data.load_data_from_mitbih("data\\mit-bih\\104")
 
     match APP_MODE:
         case AppModeEnum.NORMAL:
@@ -136,13 +157,14 @@ if __name__ == "__main__":
 
         case AppModeEnum.LOAD_CSV:
             run_load_CSV(data)
+            
+        case AppModeEnum.LOAD_MITBIH:
+            run_load_mitbih(data)
+            
+        case AppModeEnum.LOAD_QT:
+            run_load_qt(data)
 
 
-    plt.show()
-
-    # print(f"data length: {len(data.raw_data)}")
-    # X_train, y_train, R_p_w = data.extract_windows(256)
-    # train(X_train, y_train, R_p_w, 256, epochs)
-    # test("", epochs, 256, data)
-
-    model_name = "sig2sig_unet"
+    plt.show()    
+    os.system("pause")
+    
