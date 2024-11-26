@@ -14,17 +14,26 @@ def get_patient_data_mitbih(path, input_length = WINDOW_SIZE):
     # data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
     data.load_data_from_mitbih(path)
     data.check_detected_peaks()
-    # X_train, y_train = data.extract_hrv_windows_with_loaded_peaks(input_length)
-    X_train, y_train, R_per_w = data.extract_windows(input_length)
+    X_train, y_train, R_per_w = data.extract_windows_loaded_peaks(input_length)
+    # X_train, y_train, R_per_w = data.extract_windows(input_length)
+    return X_train, y_train, R_per_w
+
+def get_patient_data_qt(path, input_length = WINDOW_SIZE):
+    data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    # data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
+    data.load_data_from_qt(path)
+    data.check_detected_peaks()
+    X_train, y_train, R_per_w = data.extract_windows_loaded_peaks(input_length)
+    # X_train, y_train, R_per_w = data.extract_windows(input_length)
     return X_train, y_train, R_per_w
 
 
-def get_patients_data_mithbih(dir_path: str, patients: list):
+def get_patients_data(dir_path: str, patients: list, get_patient_data_fun):
     X_train = None
     y_train = None
     R_per_w = None
     for patient in patients:
-        x, y, r= get_patient_data_mitbih(dir_path + "\\" + patient)
+        x, y, r= get_patient_data_fun(dir_path + "\\" + patient)
         if X_train is None:
             X_train = x
             y_train = y
@@ -38,9 +47,18 @@ def get_patients_data_mithbih(dir_path: str, patients: list):
 
 
 if __name__ == "__main__":
-    X_train, y_train, R_p_w= get_patients_data_mithbih(
-    "data\\mit-bih",
-    ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
+
+    X_train, y_train, R_p_w= get_patients_data(
+    MITBIH_PATH,
+    load_all_patient_indexes(f"{MITBIH_PATH}\\RECORDS"),
+    get_patient_data_mitbih
+    
+    # QT_PATH,
+    # load_all_patient_indexes(f"{QT_PATH}\\RECORDS"),
+    # get_patient_data_qt
+    
+    # ["100"]
+    # ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
     )
 
 
@@ -49,9 +67,20 @@ if __name__ == "__main__":
 
     epochs = EPOCHS
     data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # # data.load_csv_data_with_timestamps("data/arkusz_rsa7.csv")
-    # data.load_data_from_mitbih("data\\mit-bih\\100")
-    # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
     
     train_unet(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
     # train_cnn(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
+
+
+
+
+
+
+
+
+
+
+
+    # # data.load_csv_data_with_timestamps("data/arkusz_rsa7.csv")
+    # data.load_data_from_mitbih("data\\mit-bih\\100")
+    # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
