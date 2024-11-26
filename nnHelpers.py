@@ -6,6 +6,7 @@ import os
 from models import sig2sig_unet, sig2sig_cnn
 from wfdb import processing
 from tqdm import tqdm
+from sklearn.model_selection import train_test_split
 
 
 def calculate_stats(r_ref, r_ans, thr_, fs):
@@ -278,7 +279,7 @@ def filter_predictions(signal, preds, threshold):
         peak_inds=above_threshold_idx,
         search_radius=30,
         smooth_window_size=30,
-        peak_dir="up",
+        # peak_dir="up",
     )
 
     filtered_peaks = []
@@ -307,6 +308,7 @@ def train_cnn(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
 
 def train(X_train, y_train, R_p_w, epochs, model_file_name, model):
     start = time.process_time()
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15)
 
     # model = sig2sig_unet(input_size)
     
@@ -329,10 +331,12 @@ def train(X_train, y_train, R_p_w, epochs, model_file_name, model):
     history = model.fit(
         X_train,
         y_train,
+        validation_data=(X_val, y_val),
         epochs=epochs,
         batch_size=16,
         callbacks=[checkpoint, callback],
         shuffle=True,
+        verbose = 1
     )
 
     print(time.process_time() - start)
