@@ -5,6 +5,7 @@ from config import *
 from dataSenderEmulator import read_csv
 from Finders.RPeaksFinder import RPeaksFinder
 import threading
+from scipy.interpolate import interp1d
 
 from functools import partial
 from wfdb import processing
@@ -73,8 +74,8 @@ class EcgData:
         # self.__refresh_if_dirty()
         return self.__pnn50
 
-    def __init__(self, frequency, r_peaks_finder: RPeaksFinder):
-        self.frequency = frequency
+    def __init__(self, data_frequency, r_peaks_finder: RPeaksFinder, target_frequency:int = -1):
+        self.frequency = data_frequency
         self.__r_peaks_finder = r_peaks_finder
         self.__raw_data = np.empty((0, 2))
         self.__lock = threading.Lock()
@@ -89,6 +90,12 @@ class EcgData:
         self.__rmssd = -1
         self.__pnn50 = -1
         self.__is_dirty = False
+        
+        if target_frequency < 0:
+            self.target_frequency= None
+        else: self.target_frequency= target_frequency
+
+        
         return
 
     def load_csv_data_with_timestamps(self, path):
@@ -98,9 +105,36 @@ class EcgData:
         if NEGATE_INCOMING_DATA:
             csv_data[:, 1] *= -1
         csv_data[:, 0] /= TIME_SCALE_FACTOR
-        self.__raw_data = csv_data
+        
+        target_frequency = 360
+        interpolated_data = EcgData.interpolate_data(csv_data, target_frequency)
+        
+        self.frequency = target_frequency
+        self.__raw_data = interpolated_data
+        
+        # self.frequency = SAMPLING_RATE
+        # self.__raw_data = csv_data
         # self.__is_dirty = True
         self.__refresh_data()
+        
+    @staticmethod
+    def interpolate_data(data, target_frequency):
+        timestamps = data[:, 0] 
+        values = data[:, 1] 
+        
+        start_time = timestamps[0]  # Początkowy timestamp
+        end_time = timestamps[-1]   # Końcowy timestamp
+
+        # Nowa siatka czasowa z 400 Hz
+        new_timestamps = np.arange(0, end_time-start_time, 1 / target_frequency)
+        new_timestamps = new_timestamps + start_time
+        # Interpolacja
+        interpolator = interp1d(timestamps, values, kind='linear')#, fill_value="extrapolate")
+        # Można zmienić na 'cubic'
+        new_values = interpolator(new_timestamps)
+        # new_values = PanTompkins.bandpass_filter(new_values, 130)
+        interpolated_data = np.column_stack((new_timestamps, new_values))
+        return interpolated_data
 
     def load_data_from_mitbih(self, path, record_num=0):
         record = wfdb.rdrecord(path)
@@ -214,8 +248,18 @@ class EcgData:
         self.__lock.acquire()
         try:
             if isinstance(x, list) and isinstance(y, list):
+                new_data = np.column_stack((x, y))
+                
+                if self.target_frequencyis not None:
+                    if self.raw_data.size > 0:
+                        new_data = np.vstack((self.__raw_data[-1], new_data))
+                    
+                    new_data = EcgData.interpolate_data(new_data, self.__target_frequency)
+                    if self.raw_data.size > 0:
+                        new_data = new_data[1:]
+                
                 self.__raw_data = np.concatenate(
-                    (self.__raw_data, np.column_stack((x, y)))
+                    (self.__raw_data, new_data)
                 )
             else:
                 self.__raw_data = np.append(self.__raw_data, [[x, y]], axis=0)
