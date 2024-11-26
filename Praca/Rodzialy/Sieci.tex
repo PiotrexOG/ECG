@@ -3,8 +3,14 @@
 
 \section{Sieci neuronowe}
 Sieci neuronowe, zwane równie¿ sztucznymi sieciami neuronowymi (ang. Artificial
-Neural Networks, Ann) to grupa algorytmów uczenia maszynowego, inspirowanych
-sposobem przetwarzania informacji przez ludzki mózg.
+Neural Networks, ANN), to grupa algorytmów uczenia maszynowego inspirowanych
+sposobem przetwarzania informacji przez ludzki mózg. Wyró¿niaj¹ siê zdolnoœci¹
+do adaptacji do ró¿nych problemów dziêki procesowi uczenia. Dziêki warstwowej
+strukturze i zastosowaniu nieliniowych funkcji aktywacji s¹ w stanie modelowaæ
+z³o¿one zale¿noœci w danych i rozwi¹zywaæ problemy, z którymi nie radz¹ sobie
+bardziej tradycyjne metody. Ich uniwersalnoœæ sprawia, ¿e znajduj¹ zastosowanie
+w ró¿norodnych dziedzinach, takich jak rozpoznawanie obrazów, przetwarzanie
+jêzyka naturalnego czy analiza szeregów czasowych.
 
 \subsection{Budowa neuronu}
 
@@ -107,7 +113,7 @@ ten sk³ada siê z kilku kluczowych elementów:
     \label{fig/neuron}
 \end{figure}
 
-\subsection{Budowa sieci neuronowej}
+\subsection{Klasyczna budowa sieci neuronowej}
 
 Struktura sieci neuronowej sk³ada siê z grup sztucznych neuronów, zwanych
 warstwami. Sieæ sk³ada siê z trzech g³ównych typów warstw: warstwy wejœciowej,
@@ -198,7 +204,12 @@ wyodrêbniania i przetwarzania z³o¿onych cech danych, co czyni je efektywnymi w
 takich zadaniach jak rozpoznawanie wzorców w sygnale EKG czy przewidywanie
 wartoœci zmiennych opisuj¹cych HRV i RSA.
 
-Warto jednak zaznaczyæ, ¿e wiêksza liczba warstw ukrytych lub neuronów w sieci nie zawsze oznacza lepsze rezultaty. Zwiêkszanie liczby warstw lub neuronów mo¿e prowadziæ do problemów, takich jak przeuczenie (ang. overfitting), gdzie sieæ zbyt dok³adnie dopasowuje siê do danych treningowych kosztem generalizacji na nowych danych. Ponadto, wiêksza liczba warstw oznacza wy¿sze wymagania obliczeniowe i wiêksz¹ z³o¿onoœæ optymalizacji.
+Warto jednak zaznaczyæ, ¿e wiêksza liczba warstw ukrytych lub neuronów w sieci
+nie zawsze oznacza lepsze rezultaty. Zwiêkszanie liczby warstw lub neuronów
+mo¿e prowadziæ do problemów, takich jak przeuczenie (ang. overfitting), gdzie
+sieæ zbyt dok³adnie dopasowuje siê do danych treningowych kosztem generalizacji
+na nowych danych. Ponadto, wiêksza liczba warstw oznacza wy¿sze wymagania
+obliczeniowe i wiêksz¹ z³o¿onoœæ optymalizacji.
 
 \subsubsection{Warstwa wyjœciowa}
 Warstwa wyjœciowa jest ostatni¹ warstw¹ sieci neuronowej. Jej zadaniem jest
@@ -228,7 +239,6 @@ oczekiwanym wynikiem. Dziêki temu sieæ uczy siê dostosowywaæ swoje parametry,
 aby lepiej modelowaæ zale¿noœci w danych.
 
 \subsection{Sieci konwolucyjne}
-% Sieci konwolucyjne (Convolutional Neural Networks, CNN) to zaawansowany rodzaj sieci neuronowych, które zosta³y zaprojektowane z myœl¹ o przetwarzaniu danych o strukturze przestrzennej, takich jak obrazy czy sygna³y czasowe. W przeciwieñstwie do klasycznej architektury feed-forward, CNN wykorzystuj¹ operacje splotu, które pozwalaj¹ na wyodrêbnianie lokalnych wzorców w danych i ich hierarchiczne przetwarzanie.+
 
 Sieci konwolucyjne (ang. Convolutional Neural Networks, CNN) to szczególny
 rodzaj sieci neuronowych, zaprojektowany do analizy danych o strukturze
@@ -237,8 +247,6 @@ przestrzenno-czasowe. W odró¿nieniu od klasycznych sieci neuronowych, CNN
 wykorzystuj¹ operacje konwolucji, które umo¿liwiaj¹ ekstrakcjê lokalnych cech
 danych, jednoczeœnie redukuj¹c liczbê parametrów i zachowuj¹c istotne
 informacje.
-
-% \subsubsection{Budowa sieci konwolucyjnej}
 
 Budowa sieci konwolucyjnych ró¿ni siê od klasycznych sieci neuronowych poprzez
 wprowadzenie nowych typów warstw: warstw konwolucyjnych, warstw spajaj¹cych
@@ -311,4 +319,28 @@ po³¹czonych. Wyniki uzyskane z warstw konwolucyjnych i spajaj¹cych s¹
 przekszta³cane w jeden wymiar, a nastêpnie przechodz¹ przez standardowe neurony
 w celu uzyskania finalnych wyników, takich jak klasyfikacja czy predykcja
 wartoœci liczbowych.
+
+\subsubsection{Ró¿nice w warstwie wejœciowej CNN w porównaniu z klasycznymi sieciami neuronowymi}
+Warstwa wejœciowa w sieciach konwolucyjnych ró¿ni siê istotnie od warstwy
+wejœciowej opisanej w podrodziale dotycz¹cym klasycznej budowy sieci
+neuronowej. Ro¿nice wystêpuj¹ g³ównie pod wzglêdem sposobu przetwarzania i
+reprezentacji danych. W klasycznych sieciach neuronowych dane wejœciowe s¹
+przekszta³cane w jednowymiarowy wektor, niezale¿nie od pierwotnej struktury
+danych. Przyk³adowo obraz o wymiarach 100x100 jest zamieniany w wektor o
+dlugosci 10000 elementów. Taka reprezentacja prowadzi do utraty informacji o
+przestrzennych zale¿noœciach pomiêdzy poszczególnymi elementami danych.
+
+W CNN warstwa wejœciowa zachowuje przestrzenn¹ strukturê danych, co pozwala na
+analizê lokalnych wzorców w ich oryginalnym kontekœcie. Na przyk³ad, ten sam
+obraz 100x100 pozostaje macierz¹ o tych samych wymiarach, a w przypadku obrazów
+kolorowych uwzglêdniany jest dodatkowy wymiar g³êbokoœci, np. 3 kana³y
+dla RGB. Dziêki temu konwolucje wykonywane przez kolejne warstwy sieci mog¹
+wykrywaæ lokalne cechy, takie jak krawêdzie, tekstury czy inne bardziej z³o¿one
+wzorce.
+
+Ponadto, CNN wprowadza mechanizm wspó³dzielenia wag w warstwach konwolucyjnych,
+co dodatkowo redukuje liczbê parametrów, zwiêkszaj¹c efektywnoœæ i zdolnoœæ
+uogólniania modelu. W klasycznych sieciach ka¿da cecha wejœciowa ma swoj¹
+unikaln¹ wagê, co przy du¿ej liczbie danych wejœciowych prowadzi do znacz¹cego
+wzrostu liczby parametrów.
 
