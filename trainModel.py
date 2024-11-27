@@ -27,6 +27,12 @@ def get_patient_data_qt(path, input_length = WINDOW_SIZE):
     # X_train, y_train, R_per_w = data.extract_windows(input_length)
     return X_train, y_train, R_per_w
 
+def get_patient_data_csv(path, input_length = WINDOW_SIZE):
+    data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    data.load_csv_data_with_timestamps(path)
+    X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
+    return X_train, y_train, R_p_w
+
 
 def get_patients_data(dir_path: str, patients: list, get_patient_data_fun):
     X_train = None
@@ -48,10 +54,10 @@ def get_patients_data(dir_path: str, patients: list, get_patient_data_fun):
 
 if __name__ == "__main__":
 
-    X_train, y_train, R_p_w= get_patients_data(
-    MITBIH_PATH,
-    load_all_patient_indexes(f"{MITBIH_PATH}\\RECORDS"),
-    get_patient_data_mitbih
+    # X_train, y_train, R_p_w= get_patients_data(
+    # MITBIH_PATH,
+    # load_all_patient_indexes(f"{MITBIH_PATH}\\RECORDS"),
+    # get_patient_data_mitbih
     
     # QT_PATH,
     # load_all_patient_indexes(f"{QT_PATH}\\RECORDS"),
@@ -59,8 +65,15 @@ if __name__ == "__main__":
     
     # ["100"]
     # ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
-    )
+    # )
 
+
+    # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
+    # data.load_csv_data_with_timestamps(CSV_PATH)
+    # # data.load_data_from_mitbih("data\\mit-bih\\100")
+    # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
+    csvs = ["sen_merged.csv", "poranek_merged.csv"]
+    X_train, y_train, R_p_w = get_patients_data("data", csvs, get_patient_data_csv)
 
     # X_train, y_train = shuffle(X_train, y_train)
     # X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15)

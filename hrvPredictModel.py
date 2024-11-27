@@ -123,22 +123,22 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(
 # callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=6)
 
 
-# history = model.fit(
-#     X_train,
-#     y_train,
-#     validation_data=(X_val, y_val),
-#     epochs=500,
-#     batch_size=32,
-#     verbose=1,
-#     # callbacks=[checkpoint]
-# )
+history = model.fit(
+    X_train,
+    y_train,
+    validation_data=(X_val, y_val),
+    epochs=500,
+    batch_size=32,
+    verbose=1,
+    # callbacks=[checkpoint]
+)
 
-# x, y = get_patient_data_mitbih("data\\mit-bih\\112")
-data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
-data.load_csv_data_with_timestamps(CSV_PATH)
-x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
+x, y = get_patient_data_mitbih("data\\mit-bih\\112")
+# data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
+# data.load_csv_data_with_timestamps(CSV_PATH)
+# x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
 
-model.load_weights(model_path)
+# model.load_weights(model_path)
 result = model.predict(x)
 
 mae = mean_absolute_error(y, result)
