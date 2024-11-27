@@ -29,7 +29,7 @@ def get_patient_data_qt(path, input_length = WINDOW_SIZE):
 
 def get_patient_data_csv(path, input_length = WINDOW_SIZE):
     data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    data.load_csv_data_with_timestamps(path)
+    data.load_csv_data(path)
     X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
     return X_train, y_train, R_p_w
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
 
     # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # data.load_csv_data_with_timestamps(CSV_PATH)
+    # data.load_csv_data(CSV_PATH)
     # # data.load_data_from_mitbih("data\\mit-bih\\100")
     # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
     csvs = ["sen_merged.csv", "poranek_merged.csv"]
@@ -94,6 +94,6 @@ if __name__ == "__main__":
 
 
 
-    # # data.load_csv_data_with_timestamps("data/arkusz_rsa7.csv")
+    # # data.load_csv_data("data/arkusz_rsa7.csv")
     # data.load_data_from_mitbih("data\\mit-bih\\100")
     # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)

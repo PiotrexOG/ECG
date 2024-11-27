@@ -6,11 +6,41 @@ from dataSenderEmulator import read_csv
 from Finders.RPeaksFinder import RPeaksFinder
 import threading
 from scipy.interpolate import interp1d
+from filterpy.kalman import KalmanFilter
+from scipy.signal import butter, filtfilt, detrend
 
 from functools import partial
 from wfdb import processing
 import wfdb
 from tqdm import tqdm
+
+def setup_kalman_filter():
+    kf = KalmanFilter(dim_x=2, dim_z=1)
+    
+    # Model dynamiki sygnału
+    kf.F = np.array([[1, 1],
+                     [0, 1]])  # Macierz przejścia
+    kf.H = np.array([[1, 0]])  # Macierz obserwacji
+    
+    # Szumy
+    kf.Q = np.array([[0.0001, 0],  # Szum procesowy
+                     [0, 0.01]])
+    kf.R = np.array([[20]])       # Szum pomiarowy (dopasuj dla szumu)
+    kf.P = np.eye(2) * 0.1         # Początkowa macierz kowariancji
+    kf.x = np.array([[0], [0]])    # Początkowy stan
+    return kf
+
+# Filtrowanie sygnału
+def apply_kalman_filter(signal):
+    kf = setup_kalman_filter()
+    filtered_signal = []
+    
+    for z in signal:
+        kf.predict()
+        kf.update([z])
+        filtered_signal.append(kf.x[0, 0])
+    
+    return np.array(filtered_signal)
 
 
 class EcgData:
@@ -91,14 +121,37 @@ class EcgData:
         self.__pnn50 = -1
         self.__is_dirty = False
         
+        self.__callbacks = []
+        
         if target_frequency < 0:
             self.target_frequency= None
         else: self.target_frequency= target_frequency
 
         
         return
+    
+    def add_listener(self, callback):
+        if callable(callback):
+            self.__callbacks.append(callback)
+            
+    def remove_listener(self, callback):
+        if callback in self._callbacks:
+            self.__callbacks.remove(callback)
 
-    def load_csv_data_with_timestamps(self, path):
+    def on_data_updated(self):
+        for callback in self.__callbacks:
+            callback()      
+            
+            
+    @staticmethod
+    def highpass_filter(data, cutoff, fs, order=4):
+        nyquist = 0.5 * fs
+        cutoff_normalized = cutoff / nyquist
+        b, a = butter(order, cutoff_normalized, btype='high')
+        y = filtfilt(b, a, data)
+        return y  
+
+    def load_csv_data(self, path):
         csv_data = np.array(read_csv(path))
         if NORMALIZED_TEST_DATA_TIME:
             csv_data[:, 0] -= csv_data[0, 0]
@@ -106,21 +159,34 @@ class EcgData:
             csv_data[:, 1] *= -1
         csv_data[:, 0] /= TIME_SCALE_FACTOR
         
-        target_frequency = 360
-        interpolated_data = EcgData.interpolate_data(csv_data, target_frequency)
+        # filtered_signal = PanTompkins.bandpass_filter(csv_data[:, 1], self.frequency, 0.5, 40)
+        # baseline_corrected_signal = EcgData.highpass_filter(filtered_signal, cutoff=0.5, fs=self.frequency)
+        # csv_data = np.column_stack((csv_data[:, 0], baseline_corrected_signal))
         
-        self.frequency = target_frequency
-        self.__raw_data = interpolated_data
+        baseline_corrected_signal = EcgData.highpass_filter(csv_data[:, 1], cutoff=0.5, fs=self.frequency)
+        filtered_signal = PanTompkins.bandpass_filter(baseline_corrected_signal, self.frequency, 0.5, 40)
+        csv_data = np.column_stack((csv_data[:, 0], filtered_signal))
         
-        # self.frequency = SAMPLING_RATE
+        if self.target_frequency is not None:
+            interpolated_data = EcgData.interpolate_data(csv_data, self.target_frequency)
+            self.frequency = self.target_frequency
+            self.__raw_data = interpolated_data
+        else:
+            self.__raw_data = csv_data
+            self.frequency = SAMPLING_RATE
+        
+        self.frequency = SAMPLING_RATE
         # self.__raw_data = csv_data
         # self.__is_dirty = True
         self.__refresh_data()
+        
+        self.on_data_updated()
         
     @staticmethod
     def interpolate_data(data, target_frequency):
         timestamps = data[:, 0] 
         values = data[:, 1] 
+        # value = apply_kalman_filter(values)
         
         start_time = timestamps[0]  # Początkowy timestamp
         end_time = timestamps[-1]   # Końcowy timestamp
@@ -132,6 +198,7 @@ class EcgData:
         interpolator = interp1d(timestamps, values, kind='linear')#, fill_value="extrapolate")
         # Można zmienić na 'cubic'
         new_values = interpolator(new_timestamps)
+        # new_values = apply_kalman_filter(new_values)
         # new_values = PanTompkins.bandpass_filter(new_values, 130)
         interpolated_data = np.column_stack((new_timestamps, new_values))
         return interpolated_data
@@ -169,14 +236,18 @@ class EcgData:
         self.p = annotation_pu.sample[p_indexes]
         q_indexes = np.where(np.array(annotation_pu.symbol) == "N")[0]
         self.q = annotation_pu.sample[q_indexes]
-        # self.__loaded_r_peaks_ind = self.q
+        self.__loaded_r_peaks_ind = self.q
         # self.__loaded_r_peaks_ind = EcgData.remove_duplicates_and_adjacent(self.q, self.frequency)
-        self.__loaded_r_peaks_ind = EcgData.filter_similar_elements(self.q, self.frequency)
+        # self.__loaded_r_peaks_ind = EcgData.filter_similar_elements(self.q, self.frequency)
 
         
         timestamps = np.array([i / sample_rate for i in range(len(ecg_signal))])
         
         self.raw_data = np.column_stack((timestamps, ecg_signal))
+        
+        self.__refresh_data()
+        
+        self.on_data_updated()
 
     @staticmethod
     def remove_duplicates_and_adjacent(array, frequency):
@@ -250,11 +321,11 @@ class EcgData:
             if isinstance(x, list) and isinstance(y, list):
                 new_data = np.column_stack((x, y))
                 
-                if self.target_frequencyis not None:
+                if self.target_frequency is not None:
                     if self.raw_data.size > 0:
                         new_data = np.vstack((self.__raw_data[-1], new_data))
                     
-                    new_data = EcgData.interpolate_data(new_data, self.__target_frequency)
+                    new_data = EcgData.interpolate_data(new_data, self.target_frequency)
                     if self.raw_data.size > 0:
                         new_data = new_data[1:]
                 
@@ -267,6 +338,8 @@ class EcgData:
             self.__lock.release()
 
         self.__set_dirty()
+        self.refresh_if_dirty()
+        self.on_data_updated()
         return
 
     def __set_dirty(self):
@@ -604,3 +677,6 @@ class EcgData:
         # return PanTompkins.refine_peak_positions(
         #     self.raw_data[:, 1], self.__loaded_r_peaks_ind, 25
         # )
+        
+        
+        

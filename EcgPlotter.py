@@ -83,10 +83,11 @@ class EcgPlotter:
             bbox=dict(facecolor="black", alpha=0.5),
         )
 
-        self.timer = self.fig.canvas.new_timer(interval=500)
-        self.timer.add_callback(self.update_plot)
+        # self.timer = self.fig.canvas.new_timer(interval=500)
+        # self.timer.add_callback(self.update_plot)
 
-        self.timer.start()
+        # self.timer.start()
+        self.ecg_data.add_listener(self.update_plot)
 
     # def send_single_sample(self, timestamp, voltage):
     #     self._plot_data.append((timestamp, voltage))
@@ -117,7 +118,7 @@ class EcgPlotter:
                 return
 
     def update_plot(self) -> None:
-        self.ecg_data.refresh_if_dirty()
+        # self.ecg_data.refresh_if_dirty()
         self._update_plot_data()
         if len(self._plot_data) > 0:
             timestamps, ecg_values = zip(*self._plot_data)

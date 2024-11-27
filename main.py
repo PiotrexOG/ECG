@@ -112,7 +112,7 @@ def run_simulation():
 
 
 def run_load_CSV(data):
-    data.load_csv_data_with_timestamps(CSV_PATH)
+    data.load_csv_data(CSV_PATH)
     
 def run_load_mitbih(data):
     data.load_data_from_mitbih(f"{MITBIH_PATH}\\{MITBIH_PATIENT}")
@@ -136,8 +136,8 @@ def test_qt_patients(finder):
 
 
 if __name__ == "__main__":
-    # finder = PanTompkinsFinder()
-    finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
+    finder = PanTompkinsFinder()
+    # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
     # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
     
     # test_mitbih_patients(finder)
@@ -145,6 +145,7 @@ if __name__ == "__main__":
     # exit()
     
     
+    # data = EcgData(SAMPLING_RATE, finder, 360)
     data = EcgData(SAMPLING_RATE, finder)
     ecg_plotter = EcgPlotter("ECG", data)
 
@@ -166,5 +167,5 @@ if __name__ == "__main__":
 
 
     plt.show()    
-    os.system("pause")
+    # os.system("pause")
     

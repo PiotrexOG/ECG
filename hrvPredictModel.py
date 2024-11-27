@@ -82,7 +82,7 @@ model.compile(
 # model.summary()
 
 # data1 = EcgData(SAMPLING_RATE, finder)
-# # data.load_csv_data_with_timestamps(CSV_PATH)
+# # data.load_csv_data(CSV_PATH)
 # data1.load_data_from_mitbih("data\\mit-bih\\108")
 # data1.check_detected_peaks()
 # EcgPlotter("112", data1)
@@ -90,7 +90,7 @@ model.compile(
 # exit()
 
 # val_data = EcgData(SAMPLING_RATE, finder)
-# # # data.load_csv_data_with_timestamps(CSV_PATH)
+# # # data.load_csv_data(CSV_PATH)
 # val_data.load_data_from_mitbih("data\\mit-bih\\108")
 # val_data.check_detected_peaks()
 # EcgPlotter("109", val_data)
@@ -135,7 +135,7 @@ history = model.fit(
 
 x, y = get_patient_data_mitbih("data\\mit-bih\\112")
 # data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
-# data.load_csv_data_with_timestamps(CSV_PATH)
+# data.load_csv_data(CSV_PATH)
 # x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
 
 # model.load_weights(model_path)
