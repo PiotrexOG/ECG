@@ -1,5 +1,7 @@
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 import FFT
 import Wave
 import PanTompkins
@@ -214,7 +216,7 @@ class EcgData:
 
     def on_data_updated(self):
         for callback in self.__callbacks:
-            callback()
+                callback()  # Wywołuje update_plot, który obsługuje przekierowanie do głównego wątku
 
     @staticmethod
     def highpass_filter(data, cutoff, fs, order=4):
@@ -224,17 +226,6 @@ class EcgData:
         y = filtfilt(b, a, data)
         return y
 
-    def add_listener(self, callback):
-        if callable(callback):
-            self.__callbacks.append(callback)
-
-    def remove_listener(self, callback):
-        if callback in self._callbacks:
-            self.__callbacks.remove(callback)
-
-    def on_data_updated(self):
-        for callback in self.__callbacks:
-            callback()
 
     def update_and_filter(self, new_data):
         # Aktualizacja bufora danych
@@ -727,6 +718,31 @@ class EcgData:
         self.__find_new_r_peaks_filtered()
         self.__find_r_peaks_piotr()
         self.__calc_rr_intervals()
+
+        # Pobierz tylko interwały RR
+        rr_values = self.__rr_intervals[:, 1] * 1000
+
+        window_size = 1000
+        # Oblicz liczbę okien
+        num_windows = len(rr_values) // window_size
+
+        # Lista na SDNN dla każdego okna
+        sdnn_values = []
+
+        # Iteracja przez każde okno i obliczanie SDNN
+        for i in range(num_windows):
+            window = rr_values[i * window_size:(i + 1) * window_size]
+            sdnn = np.std(window, ddof=0)  # Odchylenie standardowe (ddof=1 to standardowe odchylenie)
+            sdnn_values.append(sdnn)
+
+        # Rysowanie wykresu
+        plt.figure(figsize=(10, 6))
+        plt.plot(sdnn_values, marker='o')
+        plt.title('SDNN dla każdego okna z 300 interwałami')
+        plt.xlabel('Numer okna')
+        plt.ylabel('SDNN (ms)')
+        plt.grid(True)
+        plt.show()
 
         # median_rr = np.median(self.__rr_intervals[:,1])
         # anomalies = np.abs(self.__rr_intervals[:,1] - median_rr) > 0.10 * median_rr

@@ -124,6 +124,7 @@ class EcgPlotter:
                 return
 
     def update_plot(self) -> None:
+
         # if np.count_nonzero(self.ecg_data.data_buffer) < 1000:
         #     return
         # self.ecg_data.refresh_if_dirty()

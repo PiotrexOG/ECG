@@ -8,6 +8,7 @@ from config import *
 class HRPlotter:
 
     def __init__(self, title: str, ecg_data: EcgData):
+
         self.ecg_data = ecg_data
         self.PEAKS_TO_PLOT = int(SECONDS_TO_PLOT/0.75)
         self._hr_plot_data = deque(maxlen=self.PEAKS_TO_PLOT)  # Queue for HR data
@@ -70,10 +71,34 @@ class HRPlotter:
         self.text_box = self.fig.text(0.87, 0.5, '', fontsize=14, color='white',
                                       bbox=dict(facecolor='black', alpha=0.5))
 
-        # self.timer = self.fig.canvas.new_timer(interval=2000)
-        # self.timer.add_callback(self.update_plot)
-        # self.timer.start()
-        self.ecg_data.add_listener(self.update_plot)
+
+
+        self.stats_text = self.ax_hr.text(
+            0.01,
+            0.01,
+            "",
+            transform=self.ax_hr.transAxes,
+            color="white",
+            fontsize=12,
+            verticalalignment="bottom",
+            bbox=dict(facecolor="black", alpha=0.5),
+        )
+
+
+        interv = 1500
+        # if(APP_MODE.LOAD_CSV):
+        #     interv = 50000
+        self.timer = self.fig.canvas.new_timer(interval=1000)
+        self.timer.add_callback(self.check_for_data)
+        self.timer.start()
+        self.data_handled = False  # Flaga, aby wywołać update_plot tylko raz
+
+    def check_for_data(self):
+        if not self.data_handled and len(self.ecg_data.r_peaks) > 0:
+            self.update_plot()
+            self.data_handled = True  # Zapobiega kolejnemu wywołaniu
+
+       # self.ecg_data.add_listener(self.update_plot)
 
     def _update_r_peaks_plot_data(self) -> None:
         if len(self.ecg_data.r_peaks) == 0:
@@ -215,6 +240,6 @@ class HRPlotter:
         #     )
 
         if PRINT_ECG_DATA:
-            self.ecg_data.print_data()
+            self.stats_text.set_text(self.ecg_data.print_data_string())
 
         self.fig.canvas.draw_idle()

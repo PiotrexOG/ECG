@@ -13,14 +13,15 @@ VALUES_IN_PACKET_COUNT = 73  # int(SAMPLING_RATE / 2)  # send packet twice a sec
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
+SLEEP_MULTIPLIER = 20
 csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
     3: "poranek_merged.csv",
     4: "ecg_data1.csv",
-    5: "arkusz_rsa5.csv",
-    6: "arkusz_rsa7.csv",
-    7: "arkusz_rsa10.csv",
+    5: "nowe_arkusz_rsa5.csv",
+    6: "nowe_arkusz_rsa7.csv",
+    7: "nowe_arkusz_rsa10.csv",
     8: "arkusz2.csv",
     9: "arkusz3.csv",
     10: "nowe_danemecz1.csv",
@@ -29,10 +30,11 @@ csvs = {
     13: "dlugie_dane_rsa5.csv",
 }
 
-CSV_PATH = "data\\" + csvs[5]
+CSV_PATH = "data\\" + csvs[2]
+#CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034415.csv"
 
 
-PRINT_ECG_DATA = False
+PRINT_ECG_DATA = True
 NEGATE_INCOMING_DATA = False
 
 
@@ -45,7 +47,7 @@ class AppModeEnum(Enum):
     LOAD_QT = 4
 
 
-APP_MODE = AppModeEnum.SIMULATION
+APP_MODE = AppModeEnum.LOAD_CSV
 TIME_SCALE_FACTOR = 1e9
 LOOP_DATA = False
 NORMALIZED_TEST_DATA_TIME = False
@@ -80,7 +82,7 @@ def get_params_for_breath_length(breath_length):
 
 
 # Przykład użycia
-BREATH_LENGTH = 2  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
+BREATH_LENGTH = 7  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
 params = get_params_for_breath_length(BREATH_LENGTH)
 
 SIZE = params["SIZE"]
