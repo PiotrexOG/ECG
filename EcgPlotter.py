@@ -40,6 +40,7 @@ class EcgPlotter:
             axis="y",
         )
         self.ax_ecg.set_xlabel("Time (s)")
+        #self.ax_ecg.set_ylim([-100, 100])
 
         self.ax_r_peaks = self.ax_ecg.scatter(
             [], [], color="red", label="R-peaks", marker="x", s=100
@@ -93,6 +94,7 @@ class EcgPlotter:
     #     self._plot_data.append((timestamp, voltage))
 
     def _update_plot_data(self) -> None:
+        #self._plot_data = self.ecg_data.filtered_data
         if 0 == len(self.ecg_data.raw_data) or self._is_plot_up_to_date:
             return
         else:
@@ -109,8 +111,12 @@ class EcgPlotter:
                     self._plot_data.append(row)
                 return
             else:
+                # Timestamp z ostatniego elementu w _plot_data
+                target_timestamp = self._plot_data[-1][0]
+
+                # Szukanie indeksu z tym samym timestampem w ecg_data.filtered_data
                 last_index = np.where(
-                    np.all(self.ecg_data.raw_data == self._plot_data[-1], axis=1)
+                    np.array([row[0] == target_timestamp for row in self.ecg_data.raw_data])
                 )[0][0]
 
                 for row in self.ecg_data.raw_data[last_index + 1 :]:
@@ -118,8 +124,11 @@ class EcgPlotter:
                 return
 
     def update_plot(self) -> None:
+        # if np.count_nonzero(self.ecg_data.data_buffer) < 1000:
+        #     return
         # self.ecg_data.refresh_if_dirty()
         self._update_plot_data()
+
         if len(self._plot_data) > 0:
             timestamps, ecg_values = zip(*self._plot_data)
             x = np.array(timestamps)
@@ -215,6 +224,18 @@ class EcgPlotter:
                 )
             else:
                 self.ax_r_peaks.set_offsets(np.empty((0, 2)))
+
+            # Update dynamic text (e.g., current voltage)
+            current_voltage = ecg_values[-1]  # Get latest voltage value
+            current_time = timestamps[-1]  # Get latest timestamp
+            if self.ecg_data.rr_intervals.any():
+                current_interval = self.ecg_data.rr_intervals[:,1][-1]
+                current_hr = 60 / current_interval
+                current_r_peak = self.ecg_data.r_peaks[-1][1]
+                # self.text_box.set_text(
+                #     f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV\nHR: {current_hr:.2f}")
+            # self.text_box.set_text(f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV")
+
 
         if PRINT_ECG_DATA:
             self.stats_text.set_text(self.ecg_data.print_data_string())

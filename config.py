@@ -1,35 +1,38 @@
 from enum import Enum
 
+
 def load_all_patient_indexes(path):
     with open(path, encoding="utf-8", mode="r") as file:
         return [line.rstrip("\n") for line in file]
 
+
 HOST = "127.0.0.1"
 PORT = 12345
 SAMPLING_RATE = 130  # HZ
-VALUES_IN_PACKET_COUNT = 73 # int(SAMPLING_RATE / 2)  # send packet twice a second
+VALUES_IN_PACKET_COUNT = 73  # int(SAMPLING_RATE / 2)  # send packet twice a second
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
-csvs = [
-    "24h\\merged.csv",
-    "sen_merged.csv",
-    "poranek_merged.csv",
-    "ecg_data1.csv",
-    "arkusz_rsa5.csv",
-    "arkusz_rsa7.csv",
-    "arkusz_rsa10.csv",
-    "arkusz2.csv",
-    "arkusz3.csv",
-    "nowe_danemecz1.csv",
-    "luz0lezedlugie_dane_rsa.csv",
-    "nowe_danemecz1.csv",
-    "dlugie_dane_rsa5.csv",
-]
-CSV_PATH = "data\\" + csvs[1]
+csvs = {
+    1: "24h\\merged.csv",
+    2: "sen_merged.csv",
+    3: "poranek_merged.csv",
+    4: "ecg_data1.csv",
+    5: "arkusz_rsa5.csv",
+    6: "arkusz_rsa7.csv",
+    7: "arkusz_rsa10.csv",
+    8: "arkusz2.csv",
+    9: "arkusz3.csv",
+    10: "nowe_danemecz1.csv",
+    11: "luz0lezedlugie_dane_rsa.csv",
+    12: "nowe_danemecz1.csv",
+    13: "dlugie_dane_rsa5.csv",
+}
+
+CSV_PATH = "data\\" + csvs[5]
 
 
-PRINT_ECG_DATA = True
+PRINT_ECG_DATA = False
 NEGATE_INCOMING_DATA = False
 
 
@@ -42,7 +45,7 @@ class AppModeEnum(Enum):
     LOAD_QT = 4
 
 
-APP_MODE = AppModeEnum.LOAD_CSV
+APP_MODE = AppModeEnum.SIMULATION
 TIME_SCALE_FACTOR = 1e9
 LOOP_DATA = False
 NORMALIZED_TEST_DATA_TIME = False
@@ -53,7 +56,42 @@ QT_PATH = "data\\qt-database"
 QT_PATIENT = "sel30"
 QT_PATIENTS = load_all_patient_indexes(f"{QT_PATH}\\RECORDS")
 
-###
+### Automatyczne mapowanie SIZE, LOW, i HIGH
+breath_length_to_params = {
+    2: {"SIZE": 2, "LOW": 20, "HIGH": 35},
+    #  2: {"SIZE": 2, "LOW": 35, "HIGH": 50},
+    #  2: {"SIZE": 1, "LOW": 16, "HIGH": 50},
+    3: {"SIZE": 4, "LOW": 14, "HIGH": 33},
+    4: {"SIZE": 6, "LOW": 10, "HIGH": 30},
+    5: {"SIZE": 8, "LOW": 8, "HIGH": 25},
+    6: {"SIZE": 10, "LOW": 8, "HIGH": 23},
+    7: {"SIZE": 12, "LOW": 6, "HIGH": 17},
+    8: {"SIZE": 12, "LOW": 3, "HIGH": 14},
+    9: {"SIZE": 14, "LOW": 3, "HIGH": 10},
+    10: {"SIZE": 14, "LOW": 3, "HIGH": 10},
+}
+
+
+def get_params_for_breath_length(breath_length):
+    if breath_length in breath_length_to_params:
+        return breath_length_to_params[breath_length]
+    else:
+        raise ValueError("Invalid breath length. Supported values are from 2 to 10.")
+
+
+# Przykład użycia
+BREATH_LENGTH = 2  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
+params = get_params_for_breath_length(BREATH_LENGTH)
+
+SIZE = params["SIZE"]
+LOW = params["LOW"]
+HIGH = params["HIGH"]
+
+# CSV_PATH = f"data/MECZ1.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"data/01leze.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"data/nowe_arkusz_rsa5.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"data/sen_merged.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
 SECONDS_TO_PLOT = 6000000000
@@ -64,4 +102,3 @@ SECONDS_TO_PLOT = 6000000000
 WINDOW_SIZE = 256 * 2
 EPOCHS = 30
 ###
-

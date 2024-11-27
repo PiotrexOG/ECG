@@ -5,6 +5,8 @@ import threading
 import queue
 from EcgData import *
 from EcgPlotter import *
+from EcgPlotterFILTERED import *
+from HRPlotter import HRPlotter
 from config import *
 from dataSenderEmulator import run_emulator_thread
 from nnHelpers import *
@@ -148,24 +150,21 @@ if __name__ == "__main__":
     # data = EcgData(SAMPLING_RATE, finder, 360)
     data = EcgData(SAMPLING_RATE, finder)
     ecg_plotter = EcgPlotter("ECG", data)
+    #ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
+    # hr_plotter = HRPlotter("HR", data)
 
-    match APP_MODE:
-        case AppModeEnum.NORMAL:
-            run_normal_mode()
-
-        case AppModeEnum.SIMULATION:
-            run_simulation()
-
-        case AppModeEnum.LOAD_CSV:
-            run_load_CSV(data)
-            
-        case AppModeEnum.LOAD_MITBIH:
-            run_load_mitbih(data)
-            
-        case AppModeEnum.LOAD_QT:
-            run_load_qt(data)
+    if APP_MODE == AppModeEnum.NORMAL:
+        run_normal_mode()
+    elif APP_MODE == AppModeEnum.SIMULATION:
+        run_simulation()
+    elif APP_MODE == AppModeEnum.LOAD_CSV:
+        run_load_CSV(data)        
+    elif APP_MODE == AppModeEnum.LOAD_MITBIH:
+        run_load_mitbih(data)        
+    elif APP_MODE == AppModeEnum.LOAD_QT:
+        run_load_qt(data)
 
 
     plt.show()    
-    # os.system("pause")
+    os.system("pause")
     
