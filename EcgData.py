@@ -1210,10 +1210,12 @@ class EcgData:
         win_count = int(len(self.__rr_intervals) / window_size)
         r_peaks = self.raw_data[self.__loaded_r_peaks_ind]
         rr_intervals = np.diff([peak[0] for peak in r_peaks])
+        
+        
 
         X_train = np.zeros((win_count, window_size), dtype=np.float64)
         # y_train = np.zeros((win_count, 3))
-        y_train = np.zeros((win_count, 2))
+        y_train = np.zeros((win_count, 1))
 
         for i in range(win_count):
             win_start = i * window_size
@@ -1221,7 +1223,8 @@ class EcgData:
             # X_train[i] = self.rr_intervals[win_start:win_end]
             X_train[i] = rr_intervals[win_start:win_end]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
-            y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
+            # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
+            y_train[i] = EcgData.calc_sdnn(X_train[i])
 
         return X_train, y_train
 
@@ -1230,7 +1233,7 @@ class EcgData:
 
         X_train = np.zeros((win_count, window_size), dtype=np.float64)
         # y_train = np.zeros((win_count, 3))
-        y_train = np.zeros((win_count, 2))
+        y_train = np.zeros((win_count, 4))
 
         for i in range(win_count):
             win_start = i * window_size
@@ -1238,7 +1241,9 @@ class EcgData:
             # X_train[i] = self.rr_intervals[win_start:win_end]
             X_train[i] = self.__rr_intervals[win_start:win_end, 1]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
-            y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
+            lf, hf = FFT.calc_lf_hf(X_train[i])
+            y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
+                
 
         return X_train, y_train
 

@@ -38,7 +38,7 @@ def create_hrv_model(input_length):
     x = Dense(128, activation="relu")(x)
     x = Dropout(0.3)(x)
 
-    outputs = Dense(2, activation="linear")(x)
+    outputs = Dense(4, activation="linear")(x)
     model = Model(inputs, outputs)
 
     return model
@@ -56,6 +56,26 @@ def get_patient_data_mitbih(path, loaded=True):
         X_train, y_train = data.extract_hrv_windows_with_detected_peaks(input_length)
     return X_train, y_train
 
+def get_patient_data_csv(path):
+    data = EcgData(SAMPLING_RATE, finder)
+    data.load_csv_data(path)
+    X_train, y_train = data.extract_hrv_windows_with_detected_peaks(input_length)
+    return X_train, y_train
+
+
+def get_patients_data_csv(dir_path: str, patients: list):
+    X_train = None
+    y_train = None
+    for patient in patients:
+        x, y = get_patient_data_csv(dir_path + "\\" + patient)
+        if X_train is None:
+            X_train = x
+            y_train = y
+        else:
+            X_train = np.vstack((X_train, x))
+            y_train = np.vstack((y_train, y))
+
+    return X_train, y_train
 
 def get_patients_data_mithbih(dir_path: str, patients: list):
     X_train = None
@@ -72,7 +92,7 @@ def get_patients_data_mithbih(dir_path: str, patients: list):
     return X_train, y_train
 
 
-input_length = 50  # Długość sekwencji interwałów RR
+input_length = 300  # Długość sekwencji interwałów RR
 # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
 # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
 finder = PanTompkinsFinder()
@@ -101,11 +121,15 @@ model.compile(
 # exit()
 
 
-X_train, y_train = get_patients_data_mithbih(
-    "data\\mit-bih",
-    ["100", "101", "102", "103"],
-    # ["200", "201", "202"],
-)
+# X_train, y_train = get_patients_data_mithbih(
+#     "data\\mit-bih",
+#     ["100", "101", "102", "103"],
+#     # ["200", "201", "202"],
+# )
+
+# X_train, y_train = get_patient_data_csv(CSV_PATH)
+X_train, y_train = get_patients_data_csv("data", [csvs[2], csvs[3]])
+
 # X_train, y_train = data.extract_hrv_windows(input_length)
 # X_train1, y_train1 = data1.extract_hrv_windows(input_length)
 # X_train = np.vstack((X_train, X_train1))
@@ -116,8 +140,8 @@ X_train, y_train = get_patients_data_mithbih(
 # )
 
 
-X_train, y_train = shuffle(X_train, y_train)
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15)
+# X_train, y_train = shuffle(X_train, y_train)
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
 model_path = "models\\test.keras"
 checkpoint = tf.keras.callbacks.ModelCheckpoint(
@@ -126,22 +150,26 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint(
 # callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=6)
 
 
-history = model.fit(
-    X_train,
-    y_train,
-    validation_data=(X_val, y_val),
-    epochs=500,
-    batch_size=32,
-    verbose=1,
-    # callbacks=[checkpoint]
-)
+# history = model.fit(
+#     X_train,
+#     y_train,
+#     # validation_data=(X_val, y_val),
+#     epochs=500,
+#     batch_size=32,
+#     verbose=1,
+#     shuffle = True,
+#     callbacks=[checkpoint]
+# )
 
-x, y = get_patient_data_mitbih("data\\mit-bih\\112")
+# x, y = get_patient_data_mitbih("data\\mit-bih\\112")
+# x, y = get_patient_data_csv(CSV_PATH)#"data\\sen_merged.csv")
+x = X_val
+y = y_val
 # data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
 # data.load_csv_data(CSV_PATH)
 # x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
 
-# model.load_weights(model_path)
+model.load_weights(model_path)
 result = model.predict(x)
 
 mae = mean_absolute_error(y, result)
@@ -182,5 +210,33 @@ plt.plot(result[:, 1], label="Przewidywane RMSSD", linestyle="--")
 plt.legend()
 plt.title("Przebieg czasowy RMSSD")
 plt.show()
+
+plt.scatter(y[:, 2], result[:, 2], alpha=0.5)
+plt.plot([min(y[:, 2]), max(y[:, 2])], [min(y[:, 2]), max(y[:, 2])], "r--")
+plt.xlabel("Rzeczywiste LF")
+plt.ylabel("Przewidywane LF")
+plt.title("Porównanie rzeczywistych i przewidywanych wartości LF")
+plt.show()
+
+plt.scatter(y[:, 3], result[:, 3], alpha=0.5)
+plt.plot([min(y[:, 3]), max(y[:, 3])], [min(y[:, 3]), max(y[:, 3])], "r--")
+plt.xlabel("Rzeczywiste HF")
+plt.ylabel("Przewidywane HF")
+plt.title("Porównanie rzeczywistych i przewidywanych wartości HF")
+plt.show()
+
+plt.scatter(y[:, 2]/y[:, 3], result[:, 2]/ result[:, 3], alpha=0.5)
+plt.plot([min(y[:, 2]/y[:, 3]), max(y[:, 2]/y[:, 3])], [min(y[:, 2]/y[:, 3]), max(y[:, 2]/y[:, 3])], "r--")
+plt.xlabel("Rzeczywiste HF")
+plt.ylabel("Przewidywane HF")
+plt.title("Porównanie rzeczywistych i przewidywanych wartości LF/HF")
+plt.show()
+
+plt.plot(y[:, 2]/y[:, 3], label="Rzeczywiste LF/HF")
+plt.plot(result[:, 2]/ result[:, 3], label="Rzeczywiste LF/HF", linestyle="--")
+plt.legend()
+plt.title("Rzeczywiste LF/HF")
+plt.show()
+
 
 pass
