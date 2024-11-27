@@ -344,11 +344,13 @@ class EcgData:
 
         # self.__set_dirty()
         # self.__refresh_if_dirty()
+        
+        
 
         self.hr_filtered = self.filter_hr()
-        FFT.fft(self.__rr_intervals[:, 1])
+        # FFT.fft(self.__rr_intervals[:, 1])
 
-        Wave.analyze(self.__rr_intervals)
+        # Wave.analyze(self.__rr_intervals)
         self.print_data()
 
         self.on_data_updated()
@@ -415,6 +417,8 @@ class EcgData:
         self.frequency = sample_rate
         self.__loaded_r_peaks_ind = r_peak_locations
         self.raw_data = np.column_stack((timestamps, ecg_signal))
+        self.__refresh_data()
+        self.on_data_updated()
 
     def load_data_from_qt(self, path, record_num=0):
         record = wfdb.rdrecord(path)
@@ -1232,7 +1236,7 @@ class EcgData:
             win_start = i * window_size
             win_end = win_start + window_size
             # X_train[i] = self.rr_intervals[win_start:win_end]
-            X_train[i] = self.__rr_intervals[win_start:win_end]
+            X_train[i] = self.__rr_intervals[win_start:win_end, 1]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
             y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
 
@@ -1263,17 +1267,32 @@ class EcgData:
         pass
 
     @property
-    def refined_loaded_peaks_ind(self, max_distance=-1):
-        if max_distance == -1:
-            max_distance = int(0.05 * self.frequency)
+    def refined_loaded_peaks_ind(self):
+        max_distance = int(0.05 * self.frequency)
+        distances = []
+        
+        # Refine R peaks indices
         result_indexes = np.array(
             [
                 val
                 for idx, val in enumerate(self.__r_peaks_ind)
-                if any(abs(val - a1) <= max_distance for a1 in self.loaded_r_peak_ind)
+                if any(
+                    abs(val - a1) <= max_distance for a1 in self.loaded_r_peak_ind
+                )
             ]
         )
-        return result_indexes
+        
+        # Calculate distances
+        for val in result_indexes:
+            closest_peak = min(self.loaded_r_peak_ind, key=lambda a1: abs(val - a1))
+            distances.append(abs(val - closest_peak))
+            print(distances[-1])
+        
+        # Compute average distance
+        average_distance = np.mean(distances) if distances else 0
+        print(average_distance/self.frequency*1000)
+        
+        return result_indexes#, average_distance
         # return PanTompkins.refine_peak_positions(
         #     self.raw_data[:, 1], self.__loaded_r_peaks_ind, 25
         # )

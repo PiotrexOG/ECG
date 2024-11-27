@@ -44,13 +44,16 @@ def create_hrv_model(input_length):
     return model
 
 
-
-def get_patient_data_mitbih(path):
+def get_patient_data_mitbih(path, loaded=True):
     data = EcgData(SAMPLING_RATE, finder)
+    # EcgPlotter("halo", data)
     data.load_data_from_mitbih(path)
     data.check_detected_peaks()
-    # X_train, y_train = data.extract_hrv_windows_with_loaded_peaks(input_length)
-    X_train, y_train = data.extract_hrv_windows_with_detected_peaks(input_length)
+    # plt.show()
+    if loaded:
+        X_train, y_train = data.extract_hrv_windows_with_loaded_peaks(input_length)
+    else:
+        X_train, y_train = data.extract_hrv_windows_with_detected_peaks(input_length)
     return X_train, y_train
 
 
@@ -58,7 +61,7 @@ def get_patients_data_mithbih(dir_path: str, patients: list):
     X_train = None
     y_train = None
     for patient in patients:
-        x, y = get_patient_data_mitbih(dir_path + "\\" + patient)
+        x, y = get_patient_data_mitbih(dir_path + "\\" + patient, True)
         if X_train is None:
             X_train = x
             y_train = y
@@ -70,9 +73,9 @@ def get_patients_data_mithbih(dir_path: str, patients: list):
 
 
 input_length = 50  # Długość sekwencji interwałów RR
-finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
+# finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
 # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
-# finder = PanTompkinsFinder()
+finder = PanTompkinsFinder()
 model = create_hrv_model(input_length)
 
 model.compile(
@@ -100,7 +103,7 @@ model.compile(
 
 X_train, y_train = get_patients_data_mithbih(
     "data\\mit-bih",
-    ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
+    ["100", "101", "102", "103"],
     # ["200", "201", "202"],
 )
 # X_train, y_train = data.extract_hrv_windows(input_length)
@@ -118,8 +121,8 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 
 model_path = "models\\test.keras"
 checkpoint = tf.keras.callbacks.ModelCheckpoint(
-        model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
-    )
+    model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
+)
 # callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=6)
 
 

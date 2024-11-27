@@ -31,6 +31,8 @@ class UNetFinder(RPeaksFinder):
             signal=ecg_signal, preds=predictions, threshold=threshold
         )
         
+        filtered_peaks, _ = verifier(ecg_signal, filtered_peaks, filtered_proba, ver_wind = (80/400)*frequency)
+        
         if 0 == len(filtered_peaks) or 0 == len(filtered_proba):
             return np.empty(0)
         

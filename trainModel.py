@@ -81,8 +81,8 @@ if __name__ == "__main__":
     epochs = EPOCHS
     data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
     
-    train_unet(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
-    # train_cnn(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
+    # train_unet(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
+    train_cnn(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
 
 
 
