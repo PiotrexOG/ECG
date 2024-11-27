@@ -525,37 +525,40 @@ class EcgData:
         #     print(f"Od {start} do {end}, czas trwania: {czas}, roznica hr: {roznicaHR}, roznica rr: {roznicaRR}")
 
         # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
-        if self.wdechy:
-            srednia_wdechu = sum(czas for _, _, czas, _, _ in self.wdechy) / len(
-                self.wdechy
+        try:
+            if self.wdechy:
+                srednia_wdechu = sum(czas for _, _, czas, _, _ in self.wdechy) / len(
+                    self.wdechy
+                )
+                print(f"\nŚredni czas trwania wdechu: {srednia_wdechu:.2f}")
+
+            if self.wydechy:
+                srednia_wydechu = sum(czas for _, _, czas, _, _ in self.wydechy) / len(
+                    self.wydechy
+                )
+                print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
+
+            print(f"rsa index wynosi: {self.calculate_rsa_index(self.__hr[:,1])}")
+
+            # print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
+
+            print(f"mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diff()}")
+
+            print("rr")
+
+            print(
+                f"RR rsa index wynosi: {self.calculate_rsa_index(self.__rr_intervals[:,1])}"
             )
-            print(f"\nŚredni czas trwania wdechu: {srednia_wdechu:.2f}")
 
-        if self.wydechy:
-            srednia_wydechu = sum(czas for _, _, czas, _, _ in self.wydechy) / len(
-                self.wydechy
+            #        print(f"RR rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_RR()}")
+
+            print(
+                f"RR mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diffRR()}"
             )
-            print(f"Średni czas trwania wydechu: {srednia_wydechu:.2f}")
 
-        print(f"rsa index wynosi: {self.calculate_rsa_index(self.__hr[:,1])}")
-
-        # print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
-
-        print(f"mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diff()}")
-
-        print("rr")
-
-        print(
-            f"RR rsa index wynosi: {self.calculate_rsa_index(self.__rr_intervals[:,1])}"
-        )
-
-        #        print(f"RR rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_RR()}")
-
-        print(
-            f"RR mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diffRR()}"
-        )
-
-        print(f"średnie tętno wynosi: {self.calculate_mean_heart_rate()}")
+            print(f"średnie tętno wynosi: {self.calculate_mean_heart_rate()}")
+        except:
+            pass
         output = str()
         # print("ECG peaks---------------")
         # print (self.r_peaks)
