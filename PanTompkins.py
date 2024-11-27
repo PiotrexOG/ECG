@@ -54,7 +54,7 @@ def refine_peak_positions(ecg_signal, detected_peaks, search_window=10):
     
     return np.array(refined_peaks)
 
-def find_r_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float = 18, size: float = 0.4):
+def find_r_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float = 18, size: float = 0.45):
     filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency, lowcut, highcut)
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)

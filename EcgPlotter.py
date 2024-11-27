@@ -51,10 +51,11 @@ class EcgPlotter:
         self.text_box = self.fig.text(0.87, 0.5, '', fontsize=14, color='white',
                                       bbox=dict(facecolor='black', alpha=0.5))
 
-        self.timer = self.fig.canvas.new_timer(interval=500)
-        self.timer.add_callback(self.update_plot)
-
-        self.timer.start()
+        # self.timer = self.fig.canvas.new_timer(interval=2000)
+        # self.timer.add_callback(self.update_plot)
+        #
+        # self.timer.start()
+        self.ecg_data.add_listener(self.update_plot)
 
     # def send_single_sample(self, timestamp, voltage):
     #     self._plot_data.append((timestamp, voltage))

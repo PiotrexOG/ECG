@@ -12,8 +12,8 @@ def fft(intervals):
     interp_time = np.linspace(time[0], time[-1], int((time[-1] - time[0]) * fs))
     interp_rr = np.interp(interp_time, time, rr_intervals)
 
-    # Krok 2: Przeprowadzenie FFT
-    fft_result = np.fft.fft(interp_rr)
+    window = np.hanning(len(interp_rr))
+    fft_result = np.fft.fft(interp_rr * window)
     freqs = np.fft.fftfreq(len(fft_result), 1 / fs)
 
     # Filtracja do pasma HF (0.15-0.4 Hz)
@@ -23,6 +23,8 @@ def fft(intervals):
     # Filtracja do pasma HF (0.15-0.4 Hz)
     lf_band = (freqs >= 0.04) & (freqs <= 0.15)
     lf_power = np.sum(np.abs(fft_result[lf_band]) ** 2)  # Moc w paśmie HF
+
+
 
     # Wykres widma mocy
     positive_freqs = freqs[freqs >= 0]
@@ -39,6 +41,6 @@ def fft(intervals):
     plt.xlim(0, 0.5)  # Ograniczenie widoku do 0.5 Hz (możesz zmodyfikować)
     plt.axvspan(0.15, 0.4, color='lightgray', alpha=0.5, label="Pasmo HF (0.15-0.4 Hz)")
     plt.legend()
-    plt.show()
+    plt.show(block=False)  # Nie blokuje programu
 
 

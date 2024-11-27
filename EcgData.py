@@ -1,6 +1,7 @@
 import numpy as np
 
 import FFT
+import Wave
 import PanTompkins
 import NAME_THIS_MODULE_YOURSELF_PIOTER
 from PanTompkins import derivative_filter
@@ -89,6 +90,7 @@ class EcgData:
         self.__hr = np.empty((0, 2))
         self.hr_filtered = np.empty((0, 2))
 
+        self.__callbacks = []
 
         self.__mean_rr = -1
         self.__sdnn = -1
@@ -102,6 +104,7 @@ class EcgData:
         self.buffer_size = 4000
         self.data_buffer = np.zeros(self.buffer_size)  # Inicjalizacja bufora o stałej wielkości
         self.b, self.a = self.create_bandpass_filter(self.lowcut, self.highcut,4)
+        self.b1, self.a1 = self.create_bandpass_filter(0.5, 40,4)
         self.zi = signal.lfilter_zi(self.b, self.a)  # Stan filtra dla lfilter
 
         self.lowcutHR = LOW
@@ -121,6 +124,18 @@ class EcgData:
         # self.ziHR = signal.lfilter_zi(self.bHR, self.aHR) * 0  # Inicjalizacja współczynników stanu filtra
 
         return
+
+    def add_listener(self, callback):
+        if callable(callback):
+            self.__callbacks.append(callback)
+
+    def remove_listener(self, callback):
+        if callback in self._callbacks:
+            self.__callbacks.remove(callback)
+
+    def on_data_updated(self):
+        for callback in self.__callbacks:
+            callback()
 
     def update_and_filter(self, new_data):
         # Aktualizacja bufora danych
@@ -163,37 +178,56 @@ class EcgData:
 
         filtered_signal = signal.filtfilt(self.b, self.a, csv_data[:, 1])
 
+        vals = signal.filtfilt(self.b1, self.a1, csv_data[:, 1])
+
+
         # Zapisanie przefiltrowanych danych do raw_data
-        self.raw_data = np.column_stack((csv_data[:, 0], csv_data[:, 1]))
+        self.raw_data = np.column_stack((csv_data[:, 0], vals))
+
+        #self.raw_data = self.detect_and_remove_artifacts(self.raw_data)
+
         print(len(self.raw_data))
-
-
 
 
         self.filtered_data = np.column_stack((csv_data[:, 0], filtered_signal))
         print(len(self.filtered_data))
 
 
-        # self.__is_dirty = True
-        self.__refresh_data()
+        self.__set_dirty()
+        self.__refresh_if_dirty()
 
-        FFT.fft(self.__rr_intervals[:,1])
-
+        self.hr_filtered = self.filter_hr()
+        # FFT.fft(self.__rr_intervals[:, 1])
+        #
+        # Wave.analyze(self.__rr_intervals)
         self.print_data()
 
-        # print(self.__hr[:,1])
-        # print(len(self.__hr[:,1]))
-        # print(len(self.__hr[:,0]))
-        #
-        # print("intervals")
-        #
-        # print(self.__rr_intervals[:,1])
-        # print(len(self.__rr_intervals))
+        self.on_data_updated()
+
+    def detect_and_remove_artifacts(self, signal, sampling_rate=130, window_size=5, threshold_multiplier=2):
+
+        times = signal[:,0]
+        values = signal[:,1]
+
+        # Długość okna w próbkach
+        window_samples = int(window_size * sampling_rate)
+        # Obliczenie średniej wartości sygnału
+        global_mean = np.mean(np.abs(values))
+
+        # Przechowywanie przetworzonego sygnału
+        cleaned_signal = values.copy()
+
+        # Iteracja przez okna
+        for i in range(0, len(values), window_samples):
+            window = values[i:i + window_samples]
+            window_mean = np.mean(np.abs(window))
+
+            # Detekcja artefaktów
+            if window_mean > threshold_multiplier * global_mean:
+                cleaned_signal[i:i + window_samples] = 0  # Lub np.nan
 
 
-        #self.hr_filtered = self.filter_hr()
-
-
+        return np.column_stack((times, cleaned_signal))
 
     def print_data(self):
         mean_rr = round(self.mean_rr * 1e3, 2) if self.mean_rr is not None else None
@@ -228,7 +262,7 @@ class EcgData:
 
         print(f"rsa index wynosi: {self.calculate_rsa_index(self.__hr[:,1])}")
 
-        print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
+       # print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
 
         print(f"mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diff()}")
 
@@ -236,7 +270,7 @@ class EcgData:
 
         print(f"RR rsa index wynosi: {self.calculate_rsa_index(self.__rr_intervals[:,1])}")
 
-        print(f"RR rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_RR()}")
+#        print(f"RR rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_RR()}")
 
         print(f"RR mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diffRR()}")
 
@@ -248,6 +282,8 @@ class EcgData:
         # print("ECG hr---------------")
         # print (self.hr)
         # print("\n*********************\n")
+        print (len(self.__rr_intervals))
+
         if mean_rr is not None:
            print(f"Mean RR: {mean_rr} ms")
         if sdnn is not None:
@@ -256,7 +292,13 @@ class EcgData:
             print(f"RMSSD: {rmssd}")
         if pnn50 is not None:
             print(f"PNN50: {pnn50}%")
+
+
+        print (len(self.wdechy))
+        print (len(self.wydechy))
         return
+
+
 
     # def push_raw_data(self, x, y):
     #     if isinstance(x, list) and isinstance(y, list):
@@ -367,6 +409,17 @@ class EcgData:
         self.__find_new_r_peaks_filtered()
         self.__find_r_peaks_piotr()
         self.__calc_rr_intervals()
+
+        # median_rr = np.median(self.__rr_intervals[:,1])
+        # anomalies = np.abs(self.__rr_intervals[:,1] - median_rr) > 0.10 * median_rr
+        #
+        # # Interpolacja odstających RR
+        # corrected_rr = self.__rr_intervals[:,1].copy()
+        # corrected_rr[anomalies] = np.mean(self.__rr_intervals[:,1][~anomalies])  # Zastępuje anomalie średnią
+        #
+        #
+        # self.__rr_intervals[:,1] = corrected_rr
+
         self.__calc_mean_rr()
         self.__calc_sdnn()
         self.__calc_rmssd()
@@ -565,6 +618,26 @@ class EcgData:
 
     @staticmethod
     def calc_rr_intervals(r_peaks: np.ndarray) -> np.ndarray:
+        # size = len(r_peaks)
+        # # Dane testowe (RR w sekundach)
+        # t_long = np.linspace(0, 80, 100)  # 150 RR intervals
+        # intervals = 0.8 + 0.4 * np.sin(2 * np.pi * 0.25 * t_long)
+        #
+        # # Parameters for the sine wave
+        # frequency = 0.2  # Frequency in Hz
+        # sampling_rate = 1  # Sampling rate in Hz
+        # duration = 80  # Duration of the signal in seconds
+        #
+        # # Time vector
+        # t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+        #
+        # # Sine wave
+        # sine_wave = 1.01 + np.sin(2 * np.pi * frequency * t)
+        # minter = np.column_stack((t, sine_wave))
+        #
+        # inter = np.column_stack((t_long, intervals))
+        # return inter
+
         if len(r_peaks) < 2:
             return np.empty(0)
 
@@ -593,23 +666,19 @@ class EcgData:
         return np.std(rr_intervals) * 1e3 if len(rr_intervals) > 0 else None
 
     def __calc_hr(self):
-        self.__hr = self.calc_hr(self.__r_peaks)
+        self.__hr = self.calc_hr(self.__rr_intervals)
         return self.__hr
 
     @staticmethod
-    def calc_hr(r_peaks: np.ndarray) -> np.ndarray:
-        # Sprawdź, czy mamy wystarczającą liczbę pików do obliczenia odstępów RR
-        if len(r_peaks) < 2:
-            return np.array([])  # Zwróć pustą tablicę, jeśli brak wystarczającej liczby pików
-
-        # Oblicz odstępy RR na podstawie różnic czasowych między kolejnymi pikami
-        rr_intervals = np.diff(r_peaks[:, 0])
+    def calc_hr(rr_intervals: np.ndarray) -> np.ndarray:
 
         # Czas znacznika przypisany do heart_rate to czas końca każdego odstępu RR
-        timestamps = r_peaks[1:, 0]
+        timestamps = rr_intervals[:, 0]
+
+
 
         # Oblicz wartości tętna jako 60 / RR
-        heart_rates = 60 / rr_intervals
+        heart_rates = 60 / rr_intervals[:,1]
 
         # Połącz znaczniki czasowe i wartości tętna w kolumny
         result = np.column_stack((timestamps, heart_rates))

@@ -24,9 +24,9 @@ NORMALIZED_TEST_DATA_TIME = False
 
 ### Automatyczne mapowanie SIZE, LOW, i HIGH
 breath_length_to_params = {
-   #  2: {"SIZE": 2, "LOW": 20, "HIGH": 35},
-    2: {"SIZE": 2, "LOW": 35, "HIGH": 50},
-  #  2: {"SIZE": 2, "LOW": 16, "HIGH": 45},
+     2: {"SIZE": 2, "LOW": 20, "HIGH": 35},
+  #  2: {"SIZE": 2, "LOW": 35, "HIGH": 50},
+  #  2: {"SIZE": 1, "LOW": 16, "HIGH": 50},
     3: {"SIZE": 4, "LOW": 14, "HIGH": 33},
     4: {"SIZE": 6, "LOW": 10, "HIGH": 30},
     5: {"SIZE": 8, "LOW": 8, "HIGH": 25},
@@ -51,10 +51,11 @@ SIZE = params["SIZE"]
 LOW = params["LOW"]
 HIGH = params["HIGH"]
 
-#CSV_PATH = f"data/0lezedlugie_dane_rsa{BREATH_LENGTH}.csv"  # Dynamiczna ścieżka do pliku
-#CSV_PATH = f"data/nowe_danemecz1.csv"  # Dynamiczna ścieżka do pliku
-#CSV_PATH = f"data/4csgo.csv"  # Dynamiczna ścieżka do pliku
-CSV_PATH = f"data/dodpoczynek.csv"  # Dynamiczna ścieżka do pliku
+#CSV_PATH = f"data/MECZ1.csv"  # Dynamiczna ścieżka do pliku
+#CSV_PATH = f"data/01leze.csv"  # Dynamiczna ścieżka do pliku
+#CSV_PATH = f"data/nowe_arkusz_rsa5.csv"  # Dynamiczna ścieżka do pliku
+CSV_PATH = f"data/sen_merged.csv"  # Dynamiczna ścieżka do pliku
+#CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
-SECONDS_TO_PLOT = 1000
+SECONDS_TO_PLOT = 30000
