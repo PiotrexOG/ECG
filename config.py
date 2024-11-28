@@ -13,24 +13,25 @@ VALUES_IN_PACKET_COUNT = 73  # int(SAMPLING_RATE / 2)  # send packet twice a sec
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
-SLEEP_MULTIPLIER = 20
+SLEEP_MULTIPLIER = 1
 csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
     3: "poranek_merged.csv",
-    4: "ecg_data1.csv",
-    5: "nowe_arkusz_rsa5.csv",
-    6: "nowe_arkusz_rsa7.csv",
+    4: "popoludnie_merged1.csv",
+    5: "ecg_data1.csv",
+    6: "nowe_arkusz_rsa5.csv",
+    7: "nowe_arkusz_rsa7.csv",
     7: "nowe_arkusz_rsa10.csv",
-    8: "arkusz2.csv",
-    9: "arkusz3.csv",
-    10: "nowe_danemecz1.csv",
-    11: "luz0lezedlugie_dane_rsa.csv",
-    12: "nowe_danemecz1.csv",
-    13: "dlugie_dane_rsa5.csv",
+    9: "arkusz2.csv",
+    10: "arkusz3.csv",
+    11: "nowe_danemecz1.csv",
+    12: "luz0lezedlugie_dane_rsa.csv",
+    13: "nowe_danemecz1.csv",
+    14: "dlugie_dane_rsa5.csv",
 }
 
-CSV_PATH = "data\\" + csvs[2]
+CSV_PATH = "data\\" + csvs[5]
 #CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034415.csv"
 
 
@@ -47,7 +48,7 @@ class AppModeEnum(Enum):
     LOAD_QT = 4
 
 
-APP_MODE = AppModeEnum.LOAD_CSV
+APP_MODE = AppModeEnum.SIMULATION
 TIME_SCALE_FACTOR = 1e9
 LOOP_DATA = False
 NORMALIZED_TEST_DATA_TIME = False
@@ -96,7 +97,7 @@ HIGH = params["HIGH"]
 # CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
-SECONDS_TO_PLOT = 6000000000
+SECONDS_TO_PLOT = 4
 
 ###
 
