@@ -723,30 +723,30 @@ class EcgData:
         self.__find_r_peaks_piotr()
         self.__calc_rr_intervals()
 
-        # Pobierz tylko interwały RR
-        rr_values = self.__rr_intervals[:, 1] * 1000
+        # # Pobierz tylko interwały RR
+        # rr_values = self.__rr_intervals[:, 1] * 1000
 
-        window_size = 1000
-        # Oblicz liczbę okien
-        num_windows = len(rr_values) // window_size
+        # window_size = 1000
+        # # Oblicz liczbę okien
+        # num_windows = len(rr_values) // window_size
 
-        # Lista na SDNN dla każdego okna
-        sdnn_values = []
+        # # Lista na SDNN dla każdego okna
+        # sdnn_values = []
 
-        # Iteracja przez każde okno i obliczanie SDNN
-        for i in range(num_windows):
-            window = rr_values[i * window_size:(i + 1) * window_size]
-            sdnn = np.std(window, ddof=0)  # Odchylenie standardowe (ddof=1 to standardowe odchylenie)
-            sdnn_values.append(sdnn)
+        # # Iteracja przez każde okno i obliczanie SDNN
+        # for i in range(num_windows):
+        #     window = rr_values[i * window_size:(i + 1) * window_size]
+        #     sdnn = np.std(window, ddof=0)  # Odchylenie standardowe (ddof=1 to standardowe odchylenie)
+        #     sdnn_values.append(sdnn)
 
-        # Rysowanie wykresu
-        plt.figure(figsize=(10, 6))
-        plt.plot(sdnn_values, marker='o')
-        plt.title('SDNN dla każdego okna z 300 interwałami')
-        plt.xlabel('Numer okna')
-        plt.ylabel('SDNN (ms)')
-        plt.grid(True)
-        plt.show()
+        # # Rysowanie wykresu
+        # plt.figure(figsize=(10, 6))
+        # plt.plot(sdnn_values, marker='o')
+        # plt.title('SDNN dla każdego okna z 300 interwałami')
+        # plt.xlabel('Numer okna')
+        # plt.ylabel('SDNN (ms)')
+        # plt.grid(True)
+        # plt.show()
 
         # median_rr = np.median(self.__rr_intervals[:,1])
         # anomalies = np.abs(self.__rr_intervals[:,1] - median_rr) > 0.10 * median_rr
@@ -1228,12 +1228,13 @@ class EcgData:
 
         return X_train, y_train
 
-    def extract_hrv_windows_with_detected_peaks(self, window_size):
+    def extract_hrv_windows_with_detected_peaks(self, window_size, metrics: list = ["SDNN", "RMSSD"]):
+        metrics = [s.lower() for s in metrics]
         win_count = int(len(self.__rr_intervals) / window_size)
 
         X_train = np.zeros((win_count, window_size), dtype=np.float64)
         # y_train = np.zeros((win_count, 3))
-        y_train = np.zeros((win_count, 4))
+        y_train = np.zeros((win_count, len(metrics)))
 
         for i in range(win_count):
             win_start = i * window_size
@@ -1241,8 +1242,28 @@ class EcgData:
             # X_train[i] = self.rr_intervals[win_start:win_end]
             X_train[i] = self.__rr_intervals[win_start:win_end, 1]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
-            lf, hf = FFT.calc_lf_hf(X_train[i])
-            y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
+            
+            if "sdnn" in metrics:
+                y_train[i, metrics.index("sdnn")] = EcgData.calc_sdnn(X_train[i])
+                
+            if "rmssd" in metrics:
+                y_train[i, metrics.index("rmssd")] =  EcgData.calc_rmssd(X_train[i])
+                
+            if "lf" in metrics or "hf" in metrics or "lf/hf" in metrics:
+                lf, hf = FFT.calc_lf_hf(X_train[i])
+                if "lf" in metrics:
+                    y_train[i, metrics.index("lf")] =  lf
+                if "hf" in metrics:
+                    y_train[i, metrics.index("hf")] =  hf
+                if "lf/hf" in metrics:
+                    y_train[i, metrics.index("lf/hf")] =  lf/hf
+                    
+            
+            
+            
+            
+            
+            # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
                 
 
         return X_train, y_train
@@ -1291,7 +1312,7 @@ class EcgData:
         for val in result_indexes:
             closest_peak = min(self.loaded_r_peak_ind, key=lambda a1: abs(val - a1))
             distances.append(abs(val - closest_peak))
-            print(distances[-1])
+            # print(distances[-1])
         
         # Compute average distance
         average_distance = np.mean(distances) if distances else 0
