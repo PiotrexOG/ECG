@@ -145,166 +145,167 @@ def create_scatter_line_plots(
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         plt.savefig(file_path, format="png", dpi=300)
 
+if __name__ == "__main__":
 
-# METRICS = ["SDNN", "RMSSD", "LF", "HF"]
-# METRICS = ["SDNN", "RMSSD", "LF/HF"]
-METRICS = ["SDNN", "RMSSD"]
-input_length = 300  # Długość sekwencji interwałów RR
-# finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
-# finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
-finder = PanTompkinsFinder()
-model = create_hrv_model(input_length)
+    # METRICS = ["SDNN", "RMSSD", "LF", "HF"]
+    # METRICS = ["SDNN", "RMSSD", "LF/HF"]
+    METRICS = ["SDNN", "RMSSD"]
+    input_length = 300  # Długość sekwencji interwałów RR
+    # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
+    # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
+    finder = PanTompkinsFinder()
+    model = create_hrv_model(input_length)
 
-model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse", metrics=["mae"]
-)
-
-# model.summary()
-
-# data1 = EcgData(SAMPLING_RATE, finder)
-# # data.load_csv_data(CSV_PATH)
-# data1.load_data_from_mitbih("data\\mit-bih\\108")
-# data1.check_detected_peaks()
-# EcgPlotter("112", data1)
-# plt.show()
-# exit()
-
-# X_train, y_train = get_patients_data_mithbih(
-#     "data\\mit-bih",
-#     ["100", "101", "102", "103"],
-#     # ["200", "201", "202"],
-# )
-
-# X_train, y_train = get_patient_data_csv(CSV_PATH)
-X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]])
-
-# X_train, y_train = data.extract_hrv_windows(input_length)
-# X_train1, y_train1 = data1.extract_hrv_windows(input_length)
-# X_train = np.vstack((X_train, X_train1))
-# y_train = np.vstack((y_train, y_train1))
-# X_train, y_train = shuffle(X_train, y_train, random_state=42)
-# X_train, X_val, y_train, y_val = train_test_split(
-#     X_train, y_train, test_size=0.15, random_state=42
-# )
-
-
-# X_train, y_train = shuffle(X_train, y_train)
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=42)
-
-# model_path = "models\\test.keras"
-model_path = f"models\\{"_".join(METRICS).replace("\\","").replace("/", "")}.keras"
-
-
-checkpoint = tf.keras.callbacks.ModelCheckpoint(
-    model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
-)
-callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=50)
-
-history = model.fit(
-    X_train,
-    y_train,
-    # validation_data=(X_val, y_val),
-    epochs=500,
-    batch_size=32,
-    verbose=1,
-    shuffle=True,
-    callbacks=[checkpoint, callback],
-)
-
-# x, y = get_patient_data_mitbih("data\\mit-bih\\112")
-# x, y = get_patient_data_csv(CSV_PATH)#"data\\sen_merged.csv")
-X_test = X_val
-y_test = y_val
-# data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
-# data.load_csv_data(CSV_PATH)
-# x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
-
-model.load_weights(model_path)
-pred_result = model.predict(X_test)
-
-mae = mean_absolute_error(y_test, pred_result)
-
-mse = mean_squared_error(y_test, pred_result)
-
-rmse = np.sqrt(mse)
-
-r2 = r2_score(y_test, pred_result)
-
-print(f"MAE: {mae:.2f}")
-print(f"MSE: {mse:.2f}")
-print(f"RMSE: {rmse:.2f}")
-print(f"R^2: {r2:.2f}")
-
-save_path = "plots\\" + "_".join(METRICS).replace("\\", "").replace("/", "")
-
-for metric in METRICS:
-    create_scatter_line_plots(
-        metric, y_test[:, METRICS.index(metric)], pred_result[:, METRICS.index(metric)], save_path
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mse", metrics=["mae"]
     )
 
-# create_scatter_line_plots(
-#     "LF/HF", y_test[:, METRICS.index("LF")] / y_test[:, METRICS.index("HF")], pred_result[:, METRICS.index("LF")] / pred_result[:, METRICS.index("HF")]
-# )
+    # model.summary()
 
-# create_scatter_line_plots("SDNN", y_test[:, 0], pred_result[:, 0])
-# create_scatter_line_plots("RMSSD", y_test[:, 1], pred_result[:, 1])
-# create_scatter_line_plots("LF", y_test[:, 2], pred_result[:, 2])
-# create_scatter_line_plots("HF", y_test[:, 3], pred_result[:, 3])
-# create_scatter_line_plots(
-#     "LF/HF", y_test[:, 2] / y_test[:, 3], pred_result[:, 2] / pred_result[:, 3]
-# )
+    # data1 = EcgData(SAMPLING_RATE, finder)
+    # # data.load_csv_data(CSV_PATH)
+    # data1.load_data_from_mitbih("data\\mit-bih\\108")
+    # data1.check_detected_peaks()
+    # EcgPlotter("112", data1)
+    # plt.show()
+    # exit()
 
-# plt.tight_layout()
-# plt.show()
+    # X_train, y_train = get_patients_data_mithbih(
+    #     "data\\mit-bih",
+    #     ["100", "101", "102", "103"],
+    #     # ["200", "201", "202"],
+    # )
 
+    # X_train, y_train = get_patient_data_csv(CSV_PATH)
+    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]])
 
-pass
-
-
-# fig_sdnn, axs_sdnn = plt.subplots(2, 1, figsize=(10, 12))
-
-# create_scatter_plot(axs_sdnn[0], "SDNN", y_test, pred_result)
-# create_line_plot(axs_sdnn[1], "SDNN", y_test, pred_result)
-
-
-# fig_rmssd, axs_rmssd = plt.subplots(2, 1, figsize=(10, 12))
-# axs_rmssd[0].scatter(y_test[:, 1], pred_result[:, 1], alpha=0.5)
-# axs_rmssd[0].plot([min(y_test[:, 1]), max(y_test[:, 1])], [min(y_test[:, 1]), max(y_test[:, 1])], "r--")
-# axs_rmssd[0].xlabel("Rzeczywiste RMSSD")
-# axs_rmssd[0].ylabel("Przewidywane RMSSD")
-# axs_rmssd[0].title("Porównanie rzeczywistych i przewidywanych wartości RMSSD")
-# # plt.show()
-
-# axs_rmssd[1].plot(y_test[:, 1], label="Rzeczywiste RMSSD")
-# axs_rmssd[1].plot(pred_result[:, 1], label="Przewidywane RMSSD", linestyle="--")
-# axs_rmssd[1].legend()
-# axs_rmssd[1].title("Przebieg czasowy RMSSD")
-# plt.show()
+    # X_train, y_train = data.extract_hrv_windows(input_length)
+    # X_train1, y_train1 = data1.extract_hrv_windows(input_length)
+    # X_train = np.vstack((X_train, X_train1))
+    # y_train = np.vstack((y_train, y_train1))
+    # X_train, y_train = shuffle(X_train, y_train, random_state=42)
+    # X_train, X_val, y_train, y_val = train_test_split(
+    #     X_train, y_train, test_size=0.15, random_state=42
+    # )
 
 
-# plt.scatter(y[:, 2], result[:, 2], alpha=0.5)
-# plt.plot([min(y[:, 2]), max(y[:, 2])], [min(y[:, 2]), max(y[:, 2])], "r--")
-# plt.xlabel("Rzeczywiste LF")
-# plt.ylabel("Przewidywane LF")
-# plt.title("Porównanie rzeczywistych i przewidywanych wartości LF")
-# plt.show()
+    # X_train, y_train = shuffle(X_train, y_train)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=42)
 
-# plt.scatter(y[:, 3], result[:, 3], alpha=0.5)
-# plt.plot([min(y[:, 3]), max(y[:, 3])], [min(y[:, 3]), max(y[:, 3])], "r--")
-# plt.xlabel("Rzeczywiste HF")
-# plt.ylabel("Przewidywane HF")
-# plt.title("Porównanie rzeczywistych i przewidywanych wartości HF")
-# plt.show()
+    # model_path = "models\\test.keras"
+    model_path = f"models\\{"_".join(METRICS).replace("\\","").replace("/", "")}.keras"
 
-# plt.scatter(y[:, 2]/y[:, 3], result[:, 2]/ result[:, 3], alpha=0.5)
-# plt.plot([min(y[:, 2]/y[:, 3]), max(y[:, 2]/y[:, 3])], [min(y[:, 2]/y[:, 3]), max(y[:, 2]/y[:, 3])], "r--")
-# plt.xlabel("Rzeczywiste HF")
-# plt.ylabel("Przewidywane HF")
-# plt.title("Porównanie rzeczywistych i przewidywanych wartości LF/HF")
-# plt.show()
 
-# plt.plot(y[:, 2]/y[:, 3], label="Rzeczywiste LF/HF")
-# plt.plot(result[:, 2]/ result[:, 3], label="Rzeczywiste LF/HF", linestyle="--")
-# plt.legend()
-# plt.title("Rzeczywiste LF/HF")
-# plt.show()
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(
+        model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
+    )
+    callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=50)
+
+    # history = model.fit(
+    #     X_train,
+    #     y_train,
+    #     # validation_data=(X_val, y_val),
+    #     epochs=500,
+    #     batch_size=32,
+    #     verbose=1,
+    #     shuffle=True,
+    #     callbacks=[checkpoint, callback],
+    # )
+
+    # x, y = get_patient_data_mitbih("data\\mit-bih\\112")
+    # x, y = get_patient_data_csv(CSV_PATH)#"data\\sen_merged.csv")
+    X_test = X_val
+    y_test = y_val
+    # data = EcgData(SAMPLING_RATE, UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}.keras", WINDOW_SIZE))
+    # data.load_csv_data(CSV_PATH)
+    # x, y = data.extract_hrv_windows_with_detected_peaks(input_length)
+
+    model.load_weights(model_path)
+    pred_result = model.predict(X_test)
+
+    mae = mean_absolute_error(y_test, pred_result)
+
+    mse = mean_squared_error(y_test, pred_result)
+
+    rmse = np.sqrt(mse)
+
+    r2 = r2_score(y_test, pred_result)
+
+    print(f"MAE: {mae:.2f}")
+    print(f"MSE: {mse:.2f}")
+    print(f"RMSE: {rmse:.2f}")
+    print(f"R^2: {r2:.2f}")
+
+    save_path = "plots\\" + "_".join(METRICS).replace("\\", "").replace("/", "")
+
+    for metric in METRICS:
+        create_scatter_line_plots(
+            metric, y_test[:, METRICS.index(metric)], pred_result[:, METRICS.index(metric)], save_path
+        )
+
+    # create_scatter_line_plots(
+    #     "LF/HF", y_test[:, METRICS.index("LF")] / y_test[:, METRICS.index("HF")], pred_result[:, METRICS.index("LF")] / pred_result[:, METRICS.index("HF")]
+    # )
+
+    # create_scatter_line_plots("SDNN", y_test[:, 0], pred_result[:, 0])
+    # create_scatter_line_plots("RMSSD", y_test[:, 1], pred_result[:, 1])
+    # create_scatter_line_plots("LF", y_test[:, 2], pred_result[:, 2])
+    # create_scatter_line_plots("HF", y_test[:, 3], pred_result[:, 3])
+    # create_scatter_line_plots(
+    #     "LF/HF", y_test[:, 2] / y_test[:, 3], pred_result[:, 2] / pred_result[:, 3]
+    # )
+
+    # plt.tight_layout()
+    # plt.show()
+
+
+    pass
+
+
+    # fig_sdnn, axs_sdnn = plt.subplots(2, 1, figsize=(10, 12))
+
+    # create_scatter_plot(axs_sdnn[0], "SDNN", y_test, pred_result)
+    # create_line_plot(axs_sdnn[1], "SDNN", y_test, pred_result)
+
+
+    # fig_rmssd, axs_rmssd = plt.subplots(2, 1, figsize=(10, 12))
+    # axs_rmssd[0].scatter(y_test[:, 1], pred_result[:, 1], alpha=0.5)
+    # axs_rmssd[0].plot([min(y_test[:, 1]), max(y_test[:, 1])], [min(y_test[:, 1]), max(y_test[:, 1])], "r--")
+    # axs_rmssd[0].xlabel("Rzeczywiste RMSSD")
+    # axs_rmssd[0].ylabel("Przewidywane RMSSD")
+    # axs_rmssd[0].title("Porównanie rzeczywistych i przewidywanych wartości RMSSD")
+    # # plt.show()
+
+    # axs_rmssd[1].plot(y_test[:, 1], label="Rzeczywiste RMSSD")
+    # axs_rmssd[1].plot(pred_result[:, 1], label="Przewidywane RMSSD", linestyle="--")
+    # axs_rmssd[1].legend()
+    # axs_rmssd[1].title("Przebieg czasowy RMSSD")
+    # plt.show()
+
+
+    # plt.scatter(y[:, 2], result[:, 2], alpha=0.5)
+    # plt.plot([min(y[:, 2]), max(y[:, 2])], [min(y[:, 2]), max(y[:, 2])], "r--")
+    # plt.xlabel("Rzeczywiste LF")
+    # plt.ylabel("Przewidywane LF")
+    # plt.title("Porównanie rzeczywistych i przewidywanych wartości LF")
+    # plt.show()
+
+    # plt.scatter(y[:, 3], result[:, 3], alpha=0.5)
+    # plt.plot([min(y[:, 3]), max(y[:, 3])], [min(y[:, 3]), max(y[:, 3])], "r--")
+    # plt.xlabel("Rzeczywiste HF")
+    # plt.ylabel("Przewidywane HF")
+    # plt.title("Porównanie rzeczywistych i przewidywanych wartości HF")
+    # plt.show()
+
+    # plt.scatter(y[:, 2]/y[:, 3], result[:, 2]/ result[:, 3], alpha=0.5)
+    # plt.plot([min(y[:, 2]/y[:, 3]), max(y[:, 2]/y[:, 3])], [min(y[:, 2]/y[:, 3]), max(y[:, 2]/y[:, 3])], "r--")
+    # plt.xlabel("Rzeczywiste HF")
+    # plt.ylabel("Przewidywane HF")
+    # plt.title("Porównanie rzeczywistych i przewidywanych wartości LF/HF")
+    # plt.show()
+
+    # plt.plot(y[:, 2]/y[:, 3], label="Rzeczywiste LF/HF")
+    # plt.plot(result[:, 2]/ result[:, 3], label="Rzeczywiste LF/HF", linestyle="--")
+    # plt.legend()
+    # plt.title("Rzeczywiste LF/HF")
+    # plt.show()
