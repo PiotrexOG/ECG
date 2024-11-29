@@ -15,6 +15,7 @@ import threading
 from scipy.interpolate import interp1d
 from filterpy.kalman import KalmanFilter
 from scipy.signal import butter, filtfilt, detrend
+from Finders.PanTompkinsFinder import PanTompkinsFinder
 
 from functools import partial
 from wfdb import processing
@@ -216,7 +217,7 @@ class EcgData:
 
     def on_data_updated(self):
         for callback in self.__callbacks:
-                callback()  # Wywołuje update_plot, który obsługuje przekierowanie do głównego wątku
+            callback()  # Wywołuje update_plot, który obsługuje przekierowanie do głównego wątku
 
     @staticmethod
     def highpass_filter(data, cutoff, fs, order=4):
@@ -225,7 +226,6 @@ class EcgData:
         b, a = butter(order, cutoff_normalized, btype="high")
         y = filtfilt(b, a, data)
         return y
-
 
     def update_and_filter(self, new_data):
         # Aktualizacja bufora danych
@@ -326,6 +326,11 @@ class EcgData:
         # self.__is_dirty = True
         self.__refresh_data()
 
+        # if self.__r_peaks_finder.__class__.__name__ == PanTompkinsFinder.__name__:
+        #     np.save(f"{path}.rpeaks", self.__r_peaks_ind)
+        # else:
+        #     self.__loaded_r_peaks_ind = np.load(f"{path}.rpeaks.npy")
+
         # self.on_data_updated()
 
         #  filtered_signal = signal.filtfilt(self.b, self.a, csv_data[:, 1])
@@ -344,14 +349,15 @@ class EcgData:
 
         # self.__set_dirty()
         # self.__refresh_if_dirty()
-        
-        
 
-        self.hr_filtered = self.filter_hr()
+        try:
+            self.hr_filtered = self.filter_hr()
+        except:
+            pass
         # FFT.fft(self.__rr_intervals[:, 1])
 
         # Wave.analyze(self.__rr_intervals)
-        self.print_data()
+        # self.print_data()
 
         self.on_data_updated()
 
@@ -537,7 +543,9 @@ class EcgData:
 
             # print(f"rsa index wzgledny wynosi: {self.calculate_relative_rsa_index_()}")
 
-            print(f"mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diff()}")
+            print(
+                f"mean heart rate diff wynosi: {self.calculate_mean_heart_rate_diff()}"
+            )
 
             print("rr")
 
@@ -1206,16 +1214,16 @@ class EcgData:
 
         return win_idx, data_windows
 
-    def extract_hrv_windows_with_loaded_peaks(self, window_size):
+    def extract_hrv_windows_with_loaded_peaks(
+        self, window_size, metrics: list = ["SDNN", "RMSSD"]
+    ):
+        metrics = [s.lower() for s in metrics]
         win_count = int(len(self.__rr_intervals) / window_size)
         r_peaks = self.raw_data[self.__loaded_r_peaks_ind]
         rr_intervals = np.diff([peak[0] for peak in r_peaks])
-        
-        
-
         X_train = np.zeros((win_count, window_size), dtype=np.float64)
         # y_train = np.zeros((win_count, 3))
-        y_train = np.zeros((win_count, 1))
+        y_train = np.zeros((win_count, len(metrics)))
 
         for i in range(win_count):
             win_start = i * window_size
@@ -1223,12 +1231,52 @@ class EcgData:
             # X_train[i] = self.rr_intervals[win_start:win_end]
             X_train[i] = rr_intervals[win_start:win_end]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
-            # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
-            y_train[i] = EcgData.calc_sdnn(X_train[i])
+
+            if "sdnn" in metrics:
+                y_train[i, metrics.index("sdnn")] = EcgData.calc_sdnn(X_train[i])
+
+            if "rmssd" in metrics:
+                y_train[i, metrics.index("rmssd")] = EcgData.calc_rmssd(X_train[i])
+
+            if "lf" in metrics or "hf" in metrics or "lf/hf" in metrics:
+                lf, hf = FFT.calc_lf_hf(X_train[i])
+                if "lf" in metrics:
+                    y_train[i, metrics.index("lf")] = lf
+                if "hf" in metrics:
+                    y_train[i, metrics.index("hf")] = hf
+                if "lf/hf" in metrics:
+                    y_train[i, metrics.index("lf/hf")] = lf / hf
+
+            # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
 
         return X_train, y_train
 
-    def extract_hrv_windows_with_detected_peaks(self, window_size, metrics: list = ["SDNN", "RMSSD"]):
+        """
+        # win_count = int(len(self.__rr_intervals) / window_size)
+        # r_peaks = self.raw_data[self.__loaded_r_peaks_ind]
+        # rr_intervals = np.diff([peak[0] for peak in r_peaks])
+        
+        
+
+        # X_train = np.zeros((win_count, window_size), dtype=np.float64)
+        # # y_train = np.zeros((win_count, 3))
+        # y_train = np.zeros((win_count, 1))
+
+        # for i in range(win_count):
+        #     win_start = i * window_size
+        #     win_end = win_start + window_size
+        #     # X_train[i] = self.rr_intervals[win_start:win_end]
+        #     X_train[i] = rr_intervals[win_start:win_end]
+        #     # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
+        #     # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
+        #     y_train[i] = EcgData.calc_sdnn(X_train[i])
+
+        # return X_train, y_train
+        """
+
+    def extract_hrv_windows_with_detected_peaks(
+        self, window_size, metrics: list = ["SDNN", "RMSSD"]
+    ):
         metrics = [s.lower() for s in metrics]
         win_count = int(len(self.__rr_intervals) / window_size)
 
@@ -1242,29 +1290,23 @@ class EcgData:
             # X_train[i] = self.rr_intervals[win_start:win_end]
             X_train[i] = self.__rr_intervals[win_start:win_end, 1]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
-            
+
             if "sdnn" in metrics:
                 y_train[i, metrics.index("sdnn")] = EcgData.calc_sdnn(X_train[i])
-                
+
             if "rmssd" in metrics:
-                y_train[i, metrics.index("rmssd")] =  EcgData.calc_rmssd(X_train[i])
-                
+                y_train[i, metrics.index("rmssd")] = EcgData.calc_rmssd(X_train[i])
+
             if "lf" in metrics or "hf" in metrics or "lf/hf" in metrics:
                 lf, hf = FFT.calc_lf_hf(X_train[i])
                 if "lf" in metrics:
-                    y_train[i, metrics.index("lf")] =  lf
+                    y_train[i, metrics.index("lf")] = lf
                 if "hf" in metrics:
-                    y_train[i, metrics.index("hf")] =  hf
+                    y_train[i, metrics.index("hf")] = hf
                 if "lf/hf" in metrics:
-                    y_train[i, metrics.index("lf/hf")] =  lf/hf
-                    
-            
-            
-            
-            
-            
+                    y_train[i, metrics.index("lf/hf")] = lf / hf
+
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
-                
 
         return X_train, y_train
 
@@ -1296,29 +1338,27 @@ class EcgData:
     def refined_loaded_peaks_ind(self):
         max_distance = int(0.05 * self.frequency)
         distances = []
-        
+
         # Refine R peaks indices
         result_indexes = np.array(
             [
                 val
                 for idx, val in enumerate(self.__r_peaks_ind)
-                if any(
-                    abs(val - a1) <= max_distance for a1 in self.loaded_r_peak_ind
-                )
+                if any(abs(val - a1) <= max_distance for a1 in self.loaded_r_peak_ind)
             ]
         )
-        
+
         # Calculate distances
         for val in result_indexes:
             closest_peak = min(self.loaded_r_peak_ind, key=lambda a1: abs(val - a1))
             distances.append(abs(val - closest_peak))
             # print(distances[-1])
-        
+
         # Compute average distance
         average_distance = np.mean(distances) if distances else 0
-        print(average_distance/self.frequency*1000)
-        
-        return result_indexes#, average_distance
+        # print(average_distance/self.frequency*1000)
+
+        return result_indexes  # , average_distance
         # return PanTompkins.refine_peak_positions(
         #     self.raw_data[:, 1], self.__loaded_r_peaks_ind, 25
         # )
