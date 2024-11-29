@@ -192,7 +192,21 @@ def create_scatter_line_plots(
     mse = mean_squared_error(real, pred)
     rmse = np.sqrt(mse)
     r2 = r2_score(real, pred)
-    metrics_text = f"MAE: {mae:.2f}\nMSE: {mse:.2f}\nRMSE: {rmse:.2f}\nR²: {r2:.2f}"
+    real_mean = np.mean(real)
+    pred_mean = np.mean(pred)
+    std_dev = np.std(real)
+    std_dev_pred = np.std(pred)
+    z_scores = (real - real_mean) / std_dev
+    z_scores_pred = (pred- pred_mean)/  std_dev_pred
+    threshold = 3
+    filtered_data = real[np.abs(z_scores) <= threshold]
+    filtered_predicts =  pred[np.abs(z_scores_pred) <= threshold]
+    filt_real_pred = real[np.abs(z_scores_pred) <= threshold]
+    real_mean_without_outliers = np.mean(filtered_data)
+    r2_without_outliers = r2_score(filt_real_pred, filtered_predicts)
+    
+    mse_without_outliers = mean_squared_error(filt_real_pred, filtered_predicts)
+    metrics_text = f"Real mean value: {real_mean:.2f}\nReal mean without outliers: {real_mean_without_outliers:.2f}\nMAE: {mae:.2f}\nMSE: {mse:.2f}\nRMSE: {rmse:.2f}\nR²: {r2:.2f}\nR² without outliers: {r2_without_outliers:.2f}\nMSE without outliers {mse_without_outliers:.2f}"
     axs[0].text(
         0.05,
         0.95,
@@ -217,7 +231,7 @@ if __name__ == "__main__":
 
     # METRICS = ["SDNN", "RMSSD", "LF", "HF"]
     # METRICS = ["SDNN", "RMSSD", "LF/HF"]
-    METRICS = ["RMSSD"]#, "RMSSD"]
+    METRICS = ["SDNN", "RMSSD"]#, "LF", "HF"]#, "RMSSD"]
     input_length = 5*60*130  # Długość sekwencji interwałów RR
     # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
     # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
@@ -243,7 +257,7 @@ if __name__ == "__main__":
     
     random_seed = 42
 
-    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]], finder, int(0.8*input_length))
+    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]], finder)#, int(0.8*input_length))
 
     X_train, X_val, y_train, y_val = train_test_split(
         X, y, test_size=0.3, random_state=random_seed
@@ -257,11 +271,13 @@ if __name__ == "__main__":
     )
     callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=50)
 
+    epochs= 100
+
     history = model.fit(
         X_train,
         y_train,
         # validation_data=(X_val, y_val),
-        epochs=100,
+        epochs=epochs,
         batch_size=16,
         verbose=1,
         shuffle=True,
@@ -340,7 +356,6 @@ if __name__ == "__main__":
     plt.show()
 
     pass
-
 
 
 
