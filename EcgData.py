@@ -1147,6 +1147,13 @@ class EcgData:
 
         return X_train, y_train, R_per_w
 
+    def extract_piotr(self, window_size):
+        X, _, y = self.extract_windows(window_size)
+        intervals = [np.diff(row)/130 for row in y]
+        result_y = [[self.calc_sdnn(row), self.calc_rmssd(row)] for row in intervals]
+        result_y = np.array(result_y)
+        return X, result_y
+
     def extract_windows_loaded_peaks(self, window_size):
         win_count = int(len(self.__raw_data) / window_size)
 

@@ -12,37 +12,15 @@ from tensorflow.keras.layers import (
 from EcgData import EcgData
 from config import *
 from Finders.PanTompkinsFinder import PanTompkinsFinder
-from Finders.UNetFinder import UNetFinder
+# from Finders.UNetFinder import UNetFinder
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-from EcgPlotter import EcgPlotter
-from Finders.CnnFinder import CnnFinder
+# from EcgPlotter import EcgPlotter
+# from Finders.CnnFinder import CnnFinder
 import os
-
-
-def create_hrv_model(input_length, output_len):
-    inputs = Input(shape=(input_length, 1))
-
-    x = Conv1D(filters=32, kernel_size=3, activation="relu", padding="same")(inputs)
-    x = MaxPooling1D(pool_size=2)(x)
-    x = BatchNormalization()(x)
-
-    x = Conv1D(filters=64, kernel_size=3, activation="relu", padding="same")(x)
-    x = MaxPooling1D(pool_size=2)(x)
-    x = BatchNormalization()(x)
-
-    x = LSTM(64, return_sequences=False)(x)
-
-    x = Dense(128, activation="relu")(x)
-    x = Dropout(0.3)(x)
-
-    outputs = Dense(output_len, activation="linear")(x)
-    model = Model(inputs, outputs)
-
-    return model
 
 
 def get_patient_data_mitbih(path, loaded=True):
@@ -61,8 +39,8 @@ def get_patient_data_mitbih(path, loaded=True):
 def get_patient_data_csv(path, finder):
     data = EcgData(SAMPLING_RATE, finder)
     data.load_csv_data(path)
-    X_train, y_train = data.extract_hrv_windows_with_detected_peaks(
-        input_length, METRICS
+    X_train, y_train = data.extract_piotr(
+        input_length
     )
     return X_train, y_train
 
@@ -145,22 +123,20 @@ def create_scatter_line_plots(
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         plt.savefig(file_path, format="png", dpi=300)
 
+from models import test_model
+
 
 if __name__ == "__main__":
 
-    # METRICS = ["SDNN", "RMSSD", "LF", "HF"]
-    # METRICS = ["SDNN", "RMSSD", "LF/HF"]
     METRICS = ["SDNN", "RMSSD"]
-    input_length = 300  # Długość sekwencji interwałów RR
-    finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
-    # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
-    # finder = PanTompkinsFinder()
-    model = create_hrv_model(input_length, len(METRICS))
+    input_length = (130 * 60 )%64 * 64
+    finder = PanTompkinsFinder()
+    model = test_model(input_length)
 
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
         loss="mse",
-        metrics=["mae"],
+        metrics=["mae", "mse"],
     )
 
     # model.summary()
@@ -178,39 +154,39 @@ if __name__ == "__main__":
     )
 
     # model_path = "models\\test.keras"
-    model_path = f"models\\{"_".join(METRICS).replace("\\","").replace("/", "")}_{finder.__class__.__name__}.keras"
+    model_path = f"models\\end.keras"
 
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
         model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
     )
     callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=50)
 
-    # history = model.fit(
-    #     X_train,
-    #     y_train,
-    #     # validation_data=(X_val, y_val),
-    #     epochs=500,
-    #     batch_size=32,
-    #     verbose=1,
-    #     shuffle=True,
-    #     callbacks=[checkpoint, callback],
-    # )
+    history = model.fit(
+        X_train,
+        y_train,
+        # validation_data=(X_val, y_val),
+        epochs=5,
+        batch_size=32,
+        verbose=1,
+        shuffle=True,
+        callbacks=[checkpoint, callback],
+    )
 
     X_test = X_val
     y_test = y_val
 
-    X1, y1 = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]], PanTompkinsFinder())
+    # X1, y1 = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]], PanTompkinsFinder())
     
-    X_train, X_val, X1, y1 = train_test_split(
-        X1, y1, test_size=0.3, random_state=42
-    )
+    # X_train, X_val, X1, y1 = train_test_split(
+    #     X1, y1, test_size=0.3, random_state=42
+    # )
     # X1_train, X_val, y_train, y_val = train_test_split(
     #     X, y, test_size=0.3, random_state=42
     # )
 
     model.load_weights(model_path)
     pred_result = model.predict(X_test)
-    pred_result2 = model.predict(X1)
+    # pred_result2 = model.predict(X1)
 
     mae = mean_absolute_error(y_test, pred_result)
 
@@ -225,13 +201,13 @@ if __name__ == "__main__":
     print(f"RMSE: {rmse:.2f}")
     print(f"R^2: {r2:.2f}")
     
-    mae = mean_absolute_error(y1, pred_result2)
+    # mae = mean_absolute_error(y1, pred_result2)
 
-    mse = mean_squared_error(y1, pred_result2)
+    # mse = mean_squared_error(y1, pred_result2)
 
-    rmse = np.sqrt(mse)
+    # rmse = np.sqrt(mse)
 
-    r2 = r2_score(y1, pred_result2)
+    # r2 = r2_score(y1, pred_result2)
 
     print(f"MAE: {mae:.2f}")
     print(f"MSE: {mse:.2f}")
@@ -252,13 +228,13 @@ if __name__ == "__main__":
         
         
         
-    for metric in METRICS:
-        create_scatter_line_plots(
-            metric,
-            y1[:, METRICS.index(metric)],
-            pred_result2[:, METRICS.index(metric)],
-            save_path,
-        )
+    # for metric in METRICS:
+    #     create_scatter_line_plots(
+    #         metric,
+    #         y1[:, METRICS.index(metric)],
+    #         pred_result2[:, METRICS.index(metric)],
+    #         save_path,
+    #     )
 
 
     # create_scatter_line_plots(

@@ -145,8 +145,46 @@ if __name__ == "__main__":
 
 
 
+from nnHelpers import *
 
 
+def get_peaks(predictions, signal, ecg_signal):
+    padded_indices = np.asanyarray(list(range(predictions.size)))
+    win_size = predictions.shape[1]
+    stride =  int(6 / 8 * win_size)
+    predictions = mean_preds(
+            win_idx=padded_indices,
+            preds=predictions,
+            orig_len=ecg_signal.shape[0],
+            win_size=predictions.shape[1],
+            stride=stride,
+        )
+    filtered_peaks, filtered_proba = filter_predictions(
+        signal=ecg_signal, preds=predictions, threshold=0.5
+    )
+    
+    filtered_peaks, _ = verifier(ecg_signal, filtered_peaks, filtered_proba, ver_wind = (80/400)*130)
+
+from hrvPredictModel import create_hrv_model
+
+def test_model(win_size, channel = 1):
+    unet_model = sig2sig_unet(win_size, channel)
+
+    # HRV Model
+    hrv_model = create_hrv_model(win_size, 2)
+
+    # Wejście dla całego modelu
+    inputs = Input(shape=(win_size, channel))
+
+    # U-Net Output
+    unet_output = unet_model(inputs)
+
+    hrv_output = hrv_model(unet_output)
+
+    # Połączony model
+    model = Model(inputs=inputs, outputs=hrv_output)
+
+    return model
 
 
     
