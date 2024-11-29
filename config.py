@@ -13,7 +13,7 @@ VALUES_IN_PACKET_COUNT = 73  # int(SAMPLING_RATE / 2)  # send packet twice a sec
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
-SLEEP_MULTIPLIER = 1
+SLEEP_MULTIPLIER = 20
 csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
@@ -31,8 +31,9 @@ csvs = {
     14: "dlugie_dane_rsa5.csv",
 }
 
-CSV_PATH = "data\\" + csvs[5]
+CSV_PATH = "data\\" + csvs[2]
 #CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034415.csv"
+#CSV_PATH = "C:\\Users\\User\\Desktop\\popoludnie\\popoludnie_merged1.csv"
 
 
 PRINT_ECG_DATA = True
