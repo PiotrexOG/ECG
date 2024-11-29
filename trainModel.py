@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # data.load_csv_data(CSV_PATH)
     # # data.load_data_from_mitbih("data\\mit-bih\\100")
     # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
-    csvs = ["sen_merged.csv", "poranek_merged.csv", "popoludnie_merged1.csv"]
+    csvs = ["sen_merged.csv", "poranek_merged.csv", "popoludnie_merged2.csv"]
     X_train, y_train, R_p_w = get_patients_data("data", csvs, get_patient_data_csv)
 
     # X_train, y_train = shuffle(X_train, y_train)
