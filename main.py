@@ -9,7 +9,7 @@ from EcgPlotterFILTERED import *
 from HRPlotter import HRPlotter
 from config import *
 from dataSenderEmulator import run_emulator_thread
-from nnHelpers import *
+# from nnHelpers import *
 from Finders.PanTompkinsFinder import PanTompkinsFinder
 from Finders.UNetFinder import UNetFinder
 from Finders.CnnFinder import CnnFinder

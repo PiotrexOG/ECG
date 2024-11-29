@@ -17,12 +17,13 @@ def find_and_merge_files(directory):
     # Połącz wszystkie DataFrame w jeden
     if merged_dataframes:
         final_dataframe = pd.concat(merged_dataframes, ignore_index=True)
-        output_file = os.path.join(directory, "merged.csv")
+        output_file = os.path.join(directory, "popoludnie.csv")
         final_dataframe.to_csv(output_file, index=False, header=False)
         print(f"Połączony plik został zapisany jako: {output_file}")
     else:
         print("Nie znaleziono plików do połączenia.")
 
 # Użycie funkcji
-directory = "data\\24h"  # Zmień na właściwą ścieżkę
+# directory = "data\\24h"  # Zmień na właściwą ścieżkę
+directory = "data\\popoludnie"  # Zmień na właściwą ścieżkę
 find_and_merge_files(directory)
