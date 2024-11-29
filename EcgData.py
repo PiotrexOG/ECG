@@ -1112,7 +1112,41 @@ class EcgData:
             else None
         )
 
-    def extract_windows(self, window_size):
+    def extract_windows(self, window_size, stride = None):
+        if stride is None:
+            stride = window_size
+        win_count = int((len(self.__raw_data) - window_size) / stride) + 1
+
+        X_train = np.zeros((win_count, window_size), dtype=np.float64)
+        y_train = np.zeros((win_count, window_size))
+        R_per_w = []
+
+        normalize = partial(processing.normalize_bound, lb=-1, ub=1)
+
+        for i in range(win_count):
+            win_start = i * stride
+            end = win_start + window_size
+            r_peaks_ind = np.where(
+                (self.__r_peaks_ind >= win_start) & (self.__r_peaks_ind < end)
+            )
+            R_per_w.append(self.__r_peaks_ind[r_peaks_ind] - win_start)
+
+            for j in self.__r_peaks_ind[r_peaks_ind]:
+                r = int(j) - win_start
+                y_train[i, r - 2 : r + 3] = 1
+
+            if self.__raw_data[win_start:end][1].any():
+                X_train[i, :] = np.squeeze(
+                    np.apply_along_axis(normalize, 0, self.__raw_data[win_start:end, 1])
+                )
+            else:
+                X_train[i, :] = self.__raw_data[win_start:end, 1].T
+
+        X_train = np.expand_dims(X_train, axis=2)
+        y_train = np.expand_dims(y_train, axis=2)
+
+        return X_train, y_train, R_per_w
+        '''
         win_count = int(len(self.__raw_data) / window_size)
 
         X_train = np.zeros((win_count, window_size), dtype=np.float64)
@@ -1146,12 +1180,28 @@ class EcgData:
         y_train = np.expand_dims(y_train, axis=2)
 
         return X_train, y_train, R_per_w
+        '''
 
-    def extract_piotr(self, window_size):
-        X, _, y = self.extract_windows(window_size)
+    def extract_piotr(self, window_size, metrics: list = ["SDNN"], stride:int = None):
+        metrics = [s.lower() for s in metrics]
+        X, _, y = self.extract_windows(window_size, stride)
         intervals = [np.diff(row)/130 for row in y]
-        result_y = [[self.calc_sdnn(row), self.calc_rmssd(row)] for row in intervals]
-        result_y = np.array(result_y)
+        result_y = None
+        if "sdnn" in metrics:
+            sdnn = np.array([self.calc_sdnn(row) for row in intervals])
+            if result_y is None:
+                result_y = sdnn[:, None]  # Convert sdnn to a 2D column array
+            else:
+                result_y = np.column_stack((result_y, sdnn))
+        if "rmssd" in metrics:
+            rmssd = np.array([self.calc_rmssd(row) for row in intervals])
+            if result_y is None:
+                result_y = rmssd[:, None]  # Convert rmssd to a 2D column array
+            else:
+                result_y = np.column_stack((result_y, rmssd))
+
+        # result_y = [[self.calc_sdnn(row), self.calc_rmssd(row)] for row in intervals]
+        # result_y = np.array(result_y)
         return X, result_y
 
     def extract_windows_loaded_peaks(self, window_size):
@@ -1295,7 +1345,7 @@ class EcgData:
             win_start = i * window_size
             win_end = win_start + window_size
             # X_train[i] = self.rr_intervals[win_start:win_end]
-            X_train[i] = self.__rr_intervals[win_start:win_end, 1]
+            X_train[i] = self.__r_peaks[win_start:win_end, 1]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
 
             if "sdnn" in metrics:

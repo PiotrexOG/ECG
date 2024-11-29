@@ -1,9 +1,9 @@
 from Finders.RPeaksFinder import RPeaksFinder
-from models import *
+from models import sig2sig_unet
 from functools import partial
 from wfdb import processing
 import numpy as np
-from nnHelpers import *
+from nnHelpers import mean_preds, verifier, filter_predictions
 
 
 class UNetFinder(RPeaksFinder):

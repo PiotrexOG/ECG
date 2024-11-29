@@ -18,7 +18,7 @@ csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
     3: "poranek_merged.csv",
-    4: "popoludnie_merged2.csv",
+    4: "popoludnie.csv",
     5: "ecg_data1.csv",
     6: "nowe_arkusz_rsa5.csv",
     7: "nowe_arkusz_rsa7.csv",
@@ -27,11 +27,11 @@ csvs = {
     10: "arkusz3.csv",
     11: "nowe_danemecz1.csv",
     12: "luz0lezedlugie_dane_rsa.csv",
-    13: "nowe_danemecz1.csv",
-    14: "dlugie_dane_rsa5.csv",
+    13: "dlugie_dane_rsa5.csv",
+    14: "popoludnie.csv"
 }
 
-CSV_PATH = "data\\" + csvs[2]
+CSV_PATH = "data\\" + csvs[6]
 #CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034415.csv"
 #CSV_PATH = "C:\\Users\\User\\Desktop\\popoludnie\\popoludnie_merged1.csv"
 
@@ -49,7 +49,7 @@ class AppModeEnum(Enum):
     LOAD_QT = 4
 
 
-APP_MODE = AppModeEnum.SIMULATION
+APP_MODE = AppModeEnum.LOAD_CSV
 TIME_SCALE_FACTOR = 1e9
 LOOP_DATA = False
 NORMALIZED_TEST_DATA_TIME = False
@@ -98,11 +98,12 @@ HIGH = params["HIGH"]
 # CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
-SECONDS_TO_PLOT = 4
+SECONDS_TO_PLOT = 600000
 
 ###
 
 ### NN Settings
-WINDOW_SIZE = 256 * 2
+WINDOW_SIZE = (130 * 60 )%64 * 64
+# WINDOW_SIZE = 256 * 2
 EPOCHS = 30
 ###
