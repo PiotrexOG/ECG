@@ -18,7 +18,7 @@ csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
     3: "poranek_merged.csv",
-    4: "popoludnie.csv",
+    4: "popoludnie_merged2.csv",
     5: "ecg_data1.csv",
     6: "nowe_arkusz_rsa5.csv",
     7: "nowe_arkusz_rsa7.csv",
@@ -28,7 +28,7 @@ csvs = {
     11: "nowe_danemecz1.csv",
     12: "luz0lezedlugie_dane_rsa.csv",
     13: "dlugie_dane_rsa5.csv",
-    14: "popoludnie.csv"
+    14: "popoludnie_merged2.csv"
 }
 
 CSV_PATH = "data\\" + csvs[6]
