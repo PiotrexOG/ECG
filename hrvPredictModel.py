@@ -328,7 +328,7 @@ if __name__ == "__main__":
 
     random_seed = 42
 
-    X, y = get_patients_data_csv("data", [csvs[2],csvs[3],csvs[4]], finder)#, int(0.8*input_length))
+    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]], finder)#, int(0.8*input_length))
 
     X_train, X_val, y_train, y_val = train_test_split(
         X, y, test_size=0.3, random_state=random_seed
@@ -348,25 +348,26 @@ if __name__ == "__main__":
     )
 
     # model_path = "models\\test.keras"
-    model_path = f"models\\{"_".join(METRICS).replace("\\","").replace("/", "")}_{input_length}_{random_seed}_{finder.__class__.__name__}.keras"
+    #model_path = f"models\\{"_".join(METRICS).replace("\\","").replace("/", "")}_{input_length}_{random_seed}_{finder.__class__.__name__}.keras"
+    model_path = f"models\\siemka.keras"
 
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
         model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
     )
-    callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=40)
+    callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=50)
 
-    epochs= 150
+    epochs= 250
 
-    history = model.fit(
-        X_train,
-        y_train,
-        validation_data=(X_val, y_val),
-        epochs=epochs,
-        batch_size=16,
-        verbose=1,
-        shuffle=True,
-        callbacks=[checkpoint, callback],
-    )
+    # history = model.fit(
+    #     X_train,
+    #     y_train,
+    #     validation_data=(X_val, y_val),
+    #     epochs=epochs,
+    #     batch_size=16,
+    #     verbose=1,
+    #     shuffle=True,
+    #     callbacks=[checkpoint, callback],
+    # )
 
     # X_test = X_val
     # y_test = y_val

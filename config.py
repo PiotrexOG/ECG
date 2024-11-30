@@ -14,6 +14,7 @@ VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
 SLEEP_MULTIPLIER = 20
+
 csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
@@ -28,10 +29,11 @@ csvs = {
     11: "nowe_danemecz1.csv",
     12: "luz0lezedlugie_dane_rsa.csv",
     13: "dlugie_dane_rsa5.csv",
-    14: "popoludnie_merged2.csv"
+    14: "popoludnie_merged2.csv",
+    15: "nowszy_wieczor.csv"
 }
 
-CSV_PATH = "data\\" + csvs[6]
+CSV_PATH = "data\\" + csvs[15]
 #CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034415.csv"
 #CSV_PATH = "C:\\Users\\User\\Desktop\\popoludnie\\popoludnie_merged1.csv"
 
