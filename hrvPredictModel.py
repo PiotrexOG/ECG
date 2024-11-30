@@ -66,23 +66,23 @@ def se_block(input_tensor, ratio=16):
 def new_model(input_length):
     input_signal = tf.keras.Input(shape=(input_length, 1))
 
-    # Shared convolutional layers
+
     x = tf.keras.layers.Conv1D(filters=32, kernel_size=15, activation='relu', padding='same')(input_signal)
     x = tf.keras.layers.BatchNormalization()(x)
     x = se_block(x)
-    x = tf.keras.layers.MaxPooling1D(pool_size=30)(x)
+    x = tf.keras.layers.MaxPooling1D(pool_size=25)(x)
 
     x = tf.keras.layers.Conv1D(filters=64, kernel_size=11, activation='relu', padding='same')(x)
     x = tf.keras.layers.BatchNormalization()(x)
     x = se_block(x)
-    x = tf.keras.layers.MaxPooling1D(pool_size=20)(x)
+    x = tf.keras.layers.MaxPooling1D(pool_size=15)(x)
 
     # Separate branches for SDNN
     sdnn_branch = tf.keras.layers.Conv1D(filters=128, kernel_size=7, activation='relu', padding='same')(x)
     sdnn_branch = tf.keras.layers.BatchNormalization()(sdnn_branch)
     sdnn_branch = tf.keras.layers.GlobalAveragePooling1D()(sdnn_branch)
     sdnn_branch = tf.keras.layers.Dense(64, activation='relu')(sdnn_branch)
-    sdnn_branch = tf.keras.layers.Dropout(0.3)(sdnn_branch)
+    sdnn_branch = tf.keras.layers.Dropout(0.2)(sdnn_branch)
     sdnn_output = tf.keras.layers.Dense(1, activation='linear', name='sdnn')(sdnn_branch)
 
     # Separate branches for RMSSD
@@ -90,7 +90,7 @@ def new_model(input_length):
     rmssd_branch = tf.keras.layers.BatchNormalization()(rmssd_branch)
     rmssd_branch = tf.keras.layers.GlobalAveragePooling1D()(rmssd_branch)
     rmssd_branch = tf.keras.layers.Dense(64, activation='relu')(rmssd_branch)
-    rmssd_branch = tf.keras.layers.Dropout(0.3)(rmssd_branch)
+    rmssd_branch = tf.keras.layers.Dropout(0.2)(rmssd_branch)
     rmssd_output = tf.keras.layers.Dense(1, activation='linear', name='rmssd')(rmssd_branch)
 
     # Model
@@ -342,7 +342,7 @@ if __name__ == "__main__":
     input_length = X.shape[1]
     model = new_model(input_length)
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.015),
         loss={'sdnn': 'mse', 'rmssd': 'mse'},
         metrics={'sdnn': 'mae', 'rmssd': 'mae'}
     )
@@ -353,7 +353,7 @@ if __name__ == "__main__":
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
         model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
     )
-    callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=20)
+    callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=40)
 
     epochs= 150
 
