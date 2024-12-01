@@ -297,7 +297,7 @@ class EcgData:
             csv_data[:, 0] -= csv_data[0, 0]
         if NEGATE_INCOMING_DATA:
             csv_data[:, 1] *= -1
-        csv_data[:, 0] /= TIME_SCALE_FACTOR
+        csv_data[:, 0] /= TIMESTAMP_SCALE_FACTOR
 
         # filtered_signal = PanTompkins.bandpass_filter(csv_data[:, 1], self.frequency, 0.5, 40)
         # baseline_corrected_signal = EcgData.highpass_filter(filtered_signal, cutoff=0.5, fs=self.frequency)
@@ -1237,6 +1237,45 @@ class EcgData:
                     else:
                         result_y = np.column_stack((result_y, hfn))
             
+
+
+        # result_y = [[self.calc_sdnn(row), self.calc_rmssd(row)] for row in intervals]
+        # result_y = np.array(result_y)
+        return X, result_y
+    
+    def extract_piotr_loaded_peaks(self, window_size, metrics: list = ["SDNN"], stride:int = None):
+        metrics = [s.lower() for s in metrics]
+        X, _, y = self.extract_windows_loaded_peaks(window_size)
+        intervals = [np.diff(row)/self.frequency for row in y]
+        result_y = None
+        if "sdnn" in metrics:
+            sdnn = np.array([self.calc_sdnn(row) for row in intervals])
+            if result_y is None:
+                result_y = sdnn[:, None] 
+            else:
+                result_y = np.column_stack((result_y, sdnn))
+        if "rmssd" in metrics:
+            rmssd = np.array([self.calc_rmssd(row) for row in intervals])
+            if result_y is None:
+                result_y = rmssd[:, None]
+            else:
+                result_y = np.column_stack((result_y, rmssd))
+        if "lf" in metrics or "hf" in metrics or "lf/hf" in metrics:
+                lf, hf = zip(*[FFT.calc_lf_hf(row) for row in intervals])
+                if "lf" in metrics:
+                    if result_y is None:
+                        result_y = lf[:, None] 
+                    result_y = np.column_stack((result_y, lf))
+                if "hf" in metrics:
+                    if result_y is None:
+                        result_y = hf[:, None] 
+                    result_y = np.column_stack((result_y, hf))
+                if "lf/hf" in metrics:
+                    if result_y is None:
+                        result_y = lf[:, None]  
+                    lfhf = np.divide(lf, hf, out=np.zeros_like(lf, dtype=float), where=hf != 0)
+                    
+                    result_y = np.column_stack((result_y, lfhf))
 
 
         # result_y = [[self.calc_sdnn(row), self.calc_rmssd(row)] for row in intervals]

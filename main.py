@@ -55,7 +55,7 @@ def process_packet(raw_data):
                 + SINGLE_ENTRY_SIZE
             ],
         )[0]
-        / TIME_SCALE_FACTOR
+        / TIMESTAMP_SCALE_FACTOR
         for i in range(VALUES_IN_PACKET_COUNT)
     ]
     if NEGATE_INCOMING_DATA:

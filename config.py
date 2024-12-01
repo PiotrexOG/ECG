@@ -19,7 +19,7 @@ csvs = {
     1: "24h\\merged.csv",
     2: "sen_merged.csv",
     3: "poranek_merged.csv",
-    4: "popoludnie_merged2.csv",
+    4: "popoludnie.csv",
     5: "ecg_data1.csv",
     6: "nowe_arkusz_rsa5.csv",
     7: "nowe_arkusz_rsa7.csv",
@@ -49,12 +49,33 @@ class AppModeEnum(Enum):
     LOAD_CSV = 2
     LOAD_MITBIH = 3
     LOAD_QT = 4
+    
+class RPeakDetectionAlgorithm(Enum):
+    PAN_TOMKINS = 0
+    UNET = 1
+    CNN = 2
 
 
 APP_MODE = AppModeEnum.LOAD_CSV
-TIME_SCALE_FACTOR = 1e9
+
+# Scale factor for converting incoming data timestamps to seconds.
+TIMESTAMP_SCALE_FACTOR  = 1e9
+
+### Simulation settings
 LOOP_DATA = False
 NORMALIZED_TEST_DATA_TIME = False
+###
+
+R_PEAK_DETECTION_METHOD = RPeakDetectionAlgorithm.PAN_TOMKINS
+
+### NN detection settings
+WINDOW_SIZE = (130 * 60 )%64 * 64
+# WINDOW_SIZE = 256 * 2
+EPOCHS = 30
+###
+
+
+
 MITBIH_PATH = "data\\mit-bih"
 MITBIH_PATIENT = "207"
 MITBIH_PATIENTS = load_all_patient_indexes(f"{MITBIH_PATH}\\RECORDS")
@@ -93,19 +114,9 @@ SIZE = params["SIZE"]
 LOW = params["LOW"]
 HIGH = params["HIGH"]
 
-# CSV_PATH = f"data/MECZ1.csv"  # Dynamiczna ścieżka do pliku
-# CSV_PATH = f"data/01leze.csv"  # Dynamiczna ścieżka do pliku
-# CSV_PATH = f"data/nowe_arkusz_rsa5.csv"  # Dynamiczna ścieżka do pliku
-# CSV_PATH = f"data/sen_merged.csv"  # Dynamiczna ścieżka do pliku
-# CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
 SECONDS_TO_PLOT = 600000
 
 ###
 
-### NN Settings
-WINDOW_SIZE = (130 * 60 )%64 * 64
-# WINDOW_SIZE = 256 * 2
-EPOCHS = 30
-###
