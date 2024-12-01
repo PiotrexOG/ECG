@@ -1257,6 +1257,7 @@ class EcgData:
 
         return X_train, y_train, R_per_w
 
+    # zwrca okna testowe z indeksami peakow
     def extract_test_windows(self, win_size, stride):
         normalize = partial(processing.normalize_bound, lb=-1, ub=1)
 
@@ -1347,7 +1348,7 @@ class EcgData:
 
         # return X_train, y_train
         """
-
+    #eksportuje okna traningowe z obliczonymi wartoscami parametrow takich sdnn czy rmssd
     def extract_hrv_windows_with_detected_peaks(
         self, window_size, metrics: list = ["SDNN", "RMSSD"]
     ):
@@ -1384,6 +1385,7 @@ class EcgData:
 
         return X_train, y_train
 
+    #liczy cuzlosc precyzje i f1 score chceck detected peaks
     def check_detected_peaks(self):
         intersection1 = np.intersect1d(self.__r_peaks_ind, self.__loaded_r_peaks_ind)
         test = PanTompkins.refine_peak_positions(
@@ -1407,7 +1409,7 @@ class EcgData:
         # print(f"Precision {prec}")
         print(f"F1-score {f1}")
         pass
-
+    #zwraca liste zaladoweanych peakow ktroe sa w odlegosci maksymalnie 50ms nieuzwyana
     @property
     def refined_loaded_peaks_ind(self):
         max_distance = int(0.05 * self.frequency)

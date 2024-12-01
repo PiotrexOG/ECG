@@ -13,6 +13,9 @@ from dataSenderEmulator import run_emulator_thread
 from Finders.PanTompkinsFinder import PanTompkinsFinder
 from Finders.UNetFinder import UNetFinder
 from Finders.CnnFinder import CnnFinder
+from FFTPlotter import FFTPlotter
+from HRPlotter import HRPlotter
+from WaveletPlotter import WaveletPlotter
 
 
 import tensorflow as tf
@@ -156,6 +159,8 @@ if __name__ == "__main__":
     ecg_plotter = EcgPlotter("ECG", data)
     #ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
     hr_plotter = HRPlotter("HR", data)
+    fft_plotter = FFTPlotter("FFT", data)
+    wavelet_plotter = WaveletPlotter("FFT", data)
 
     if APP_MODE == AppModeEnum.NORMAL:
         run_normal_mode()
