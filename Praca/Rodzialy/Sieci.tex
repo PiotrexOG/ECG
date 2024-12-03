@@ -113,7 +113,118 @@ podobna do tej generowanej przez model oparty na LSTM, przedstawiony wczeœniej.
 Po odpowiednim przetworzeniu wyjœcia, model osi¹ga³ wyniki F1 na poziomie
 przekraczaj¹cym 0.99, przewy¿szaj¹c inne metody porównane w badaniu.
 
+\subsection{Przewidywanie poziomu elektrolitów we krwi}
+Analiza sygna³u EKG dostarcza informacji nie tylko o pracy serca, ale tak¿e o
+ogólnym stanie zdrowia pacjenta, w tym o poziomach elektrolitów i innych
+substancji we krwi. Nowoczesne metody oparte na uczeniu maszynowym, zw³aszcza
+g³êbokie sieci neuronowe (DNN), umo¿liwiaj¹ przewidywanie stê¿eñ elektrolitów,
+takich jak potas, wapñ czy sód, oraz biomarkerów, takich jak kreatynina, na
+podstawie danych EKG.
+
+Temat ten by³ przedmiotem szczegó³owych badañ opisanych w pracy
+\cite{Bachmann-electrolyte_prediction}, gdzie autorzy wykorzystali DNN oparty
+na architekturze ResNet. Model regresji bezpoœredniej wytrenowano na ponad 290
+000 nagraniach EKG powi¹zanych z wynikami badañ krwi, zebranych w szwedzkich
+szpitalach. DNN osi¹gn¹³ lepsze wyniki ni¿ klasyczne metody uczenia
+maszynowego, takie jak Random Forest czy Gradient Boost. Najlepsze wyniki
+uzyskano dla potasu, z korelacj¹ Pearsona 0,58–0,60, natomiast dla wapnia i
+sodu skutecznoœæ by³a ni¿sza, co mo¿e wynikaæ z subtelniejszych zmian w EKG i
+wê¿szego zakresu wartoœci tych parametrów.
+
+Mimo przewagi nad tradycyjnymi metodami uczenia maszynowego, model nie osi¹gn¹³
+dok³adnoœci pozwalaj¹cej zast¹piæ badania laboratoryjne. Autorzy widz¹ jednak
+potencja³ zastosowania w telemedycynie, szczególnie w karetkach lub odleg³ych
+lokalizacjach bez dostêpu do analiz krwi.
+
+% Analiza sygna³u EKG mo¿e dostarczyæ informacji nie tylko o pracy serca, ale
+% równie¿ o ogólnym stanie zdrowia pacjenta, w tym o poziomie elektrolitów we
+% krwi. Nowoczesne metody oparte na uczeniu maszynowym, w szczególnoœci g³êbokie
+% sieci neuronowe, umo¿liwiaj¹ przewidywanie stê¿eñ takich elektrolitów jak
+% potas, wapñ czy sód na podstawie danych EKG.
+
+% Przyk³adem miar, które mog¹ byæ przewidywane na podstawie analizy wykresu EKG,
+% jest stê¿enie elektrolitów we krwi, takich jak potas, wapñ czy sód, a tak¿e
+% stê¿enie kreatyniny. Temat ten by³ przedmiotem szczegó³owych badañ opisanych w
+% pracy \cite{Bachmann-electrolyte_prediction}, gdzie autorzy wykorzystali
+% g³êbokie sieci neuronowe (DNN), opieraj¹c swoje rozwi¹zanie na architekturze
+% ResNet.
+
+% Model regresji bezpoœredniej wytrenowano na ponad 290 000 nagraniach EKG
+% powi¹zanych z wynikami badañ krwi, zebranych w szwedzkich szpitalach. DNN
+% osi¹gn¹³ lepsze wyniki ni¿ klasyczne metody uczenia maszynowego, takie jak
+% Random Forest czy Gradient Boost. Najlepsze okaza³y sie wyniki dla potasu, z
+% korelacj¹ Pearsona 0,58–0,60, niestety w przypadku innych elektrolitów, takich
+% jak wapñ czy sód, skutecznoœæ by³a ni¿sza, co mo¿e wynikaæ z subtelniejszych
+% zmian w EKG i wê¿szego zakresu wartoœci tych parametrów.
+
+% Mimo przewagi nad tradycyjnymi metodami uczenia maszynowego, model nie osi¹gn¹³
+% dok³adnoœci pozwalaj¹cej zast¹piæ badania laboratoryjne. Autorzy widz¹ jednak
+% potencja³ zastosowania w telemedycynie, szczególnie w karetkach lub odleg³ych
+% lokalizacjach bez dostêpu do analiz krwi.
+
+\subsection{Wykrywanie COVID-19}
+Pandemia COVID-19 wywo³a³a globalne wyzwania w diagnostyce i zarz¹dzaniu
+zdrowiem publicznym. Tradycyjne metody diagnostyczne, takie jak testy PCR, choæ
+dok³adne, s¹ czasoch³onne i wymagaj¹ dostêpu do zaawansowanej infrastruktury. W
+odpowiedzi na te ograniczenia coraz wiêksze zainteresowanie budzi zastosowanie
+metod uczenia maszynowego, które pozwalaj¹ na szybk¹ i skuteczn¹ analizê du¿ych
+zbiorów danych medycznych.
+
+Temat zastosowania uczenia maszynowego do diagnozy COVID-19 poruszyli autorzy
+publikacji \cite{Irungu-EcgCovid}. Zastosowali oni takie algorytmy jak KNN
+(K-Nearest Neighbors), SVM (Support Vector Machine) oraz las losowy (Random
+Forest) do budowy modeli klasyfikacyjnych. Zastosowanie tych algorytmów
+wymaga³o wczeœniejszego usuniêcia zak³óceñ z sygna³u i wyodrebnienia cech w
+domenach takich jak czasowa, czestotliwosciowa czy czasowo-czestotliwosciowa.
+
+Modele wykaza³y siê wysok¹ skutecznoœci¹ w wykrywaniu COVID-19, osi¹gaj¹c
+dok³adnoœæ klasyfikacji na poziomie: 97.09\% dla Random Forest, 96.51\% dla SVM
+oraz 95.34\% dla algorytmu KNN. Autorzy podkreœlili potencja³ wykorzystania
+takich rozwi¹zañ w diagnostyce COVID-19 poza œrodowiskiem klinicznym,
+szczególnie przy u¿yciu jednoodprowadzeniowych urz¹dzeñ noszonych do
+monitorowania pracy serca.
+
+Rozwi¹zanie typu end-to-end, niewymagaj¹ce wczeœniejszego wyodrebniania cech z
+sygna³u EKG przedstawiono w pracy \cite{SAKR2023324}. Autorzy opracowali trzy
+ró¿ne modele oparte na konwolucyjnych sieciach neuronowych (CNN) w celu oceny
+ich wydajnoœci w klasyfikacji sygna³ów EKG i wybrali najbardziej obiecuj¹cy z
+nich. Modele te pracowa³y w trybie end-to-end, co oznacza³o, ¿e obrazy EKG by³y
+bezpoœrednio podawane do sieci bez koniecznoœci stosowania dodatkowych etapów
+przetwarzania wstêpnego. Aby zapewniæ spójnoœæ danych wejœciowych, ka¿dy obraz
+by³ przeskalowywany do rozmiaru 180x180 pikseli przed wprowadzeniem do sieci.
+
+Pierwszy model sk³ada³ siê z czterech warstw splotowych, z których ka¿da by³a
+zakoñczona operacj¹ max pooling. Po warstwach splotowych zastosowano warstwê
+flatten, która przekszta³ca dane do jednowymiarowego wektora, oraz dwie warstwy
+gêste, które realizowa³y klasyfikacjê. Drugi model zawiera³ szeœæ warstw
+splotowych, przy czym pierwsza warstwa splotowa nie by³a po³¹czona z operacj¹
+max pooling. W trzecim modelu równie¿ zastosowano szeœæ warstw splotowych,
+jednak operacja max pooling by³a wykonywana dopiero od trzeciej warstwy.
+Dodatkowo, po warstwie flatten zastosowano warstwê dropout, aby ograniczyæ
+ryzyko nadmiernego dopasowania.
+
+Najlepsze wyniki osi¹gn¹³ drugi model, uzyskuj¹c dok³adnoœæ, precyzjê, czu³oœæ
+i wynik F1 na poziomie równym 98,81\% dla ka¿dej z wymienionych miar. Model ten
+zosta³ oceniony równie¿ przy u¿yciu walidacji krzy¿owej na zbiorze
+zniekszta³conym przez szum gaussowski, osi¹gaj¹c œredni¹ dok³adnoœæ 98,49\% w
+5-fold cross-validation i 94,91\% w 10-fold cross-validation, co wskazuje na
+niewielki wp³yw szumu na skutecznoœæ. Dziêki wysokiej efektywnoœci i odpornoœci
+na zak³ócenia, drugi model zosta³ uznany za najbardziej obiecuj¹ce narzêdzie do
+analizy sygna³ów EKG w diagnostyce COVID-19.
+
 \subsection{Uczenie maszynowe w kontekscie HRV}
+Miary HRV (Heart Rate Variability) stanowi¹ skuteczne narzêdzie do oceny pracy serca, poziomu stresu oraz ogólnego stanu zdrowia badanej osoby. Obliczane s¹ na podstawie uprzednio wyznaczonych odstêpów RR, z wykorzystaniem metod analizy czasowej oraz przekszta³ceñ z zakresu analizy czêstotliwoœciowej. Przegl¹d literatury wskazuje, ¿e trudno znaleŸæ dobrze udokumentowane badania, które precyzyjnie przewiduj¹ wartoœci miar HRV bezpoœrednio na podstawie sygna³u EKG przy u¿yciu algorytmów uczenia maszynowego, poniewa¿ podejœcie to wci¹¿ jest rzadko stosowane. Klasyczne metody obliczeniowe s¹ natomiast zdecydowanie dok³adne i niemal wy³¹cznie one znajduj¹ zastosowanie w analizie HRV.
+
+Istniej¹ jednak prace, które w kontekœcie metod opartych na sztucznej inteligencji skutecznie wyznaczaj¹ miary HRV z innych sygna³ów, takich jak PPG (fotopletyzmografia), lub analizuj¹ zmiennoœæ rytmu serca na podstawie obrazów twarzy w podczerwieni. HRV, wyznaczane przewa¿nie za pomoc¹ klasycznych metod, odgrywa kluczow¹ rolê jako cecha wejœciowa w bardziej zaawansowanych analizach, takich jak diagnozowanie chorób serca czy ocena poziomu stresu. W takich zastosowaniach algorytmy uczenia maszynowego znajduj¹ szerokie zastosowanie, co podkreœla istotn¹ rolê HRV w interdyscyplinarnych badaniach oraz praktyce klinicznej.
+
+Przytoczony wczeœniej przyk³ad, dotycz¹cy analizy obrazów w podczerwieni, zaczerpniêto z \cite{andrea-termo}. W badaniu zastosowano algorytm regresji wektorów noœnych (SVR) do przewidywania parametrów HRV na podstawie danych termowizyjnych twarzy. Analizie poddano zmiany temperatury skóry w kluczowych obszarach twarzy, takich jak glabella (obszar miêdzy brwiami), czubek nosa i nozdrza. Na podstawie tych danych wyodrêbniono cechy, takie jak entropia próbkowa (SampEn), odchylenie standardowe oraz gêstoœæ mocy widmowej (PSD) w ró¿nych zakresach czêstotliwoœci.
+
+Algorytm umo¿liwi³ oszacowanie wa¿nych miar HRV, takich jak RMSSD, SDNN, pNN50, LF/HF, odstêpy RR oraz œrednie têtno (HR). Wyniki pokaza³y, ¿e model dobrze przewidywa³ parametry HR, RR, TINN i pNN50, osi¹gaj¹c wysok¹ zgodnoœæ z rzeczywistymi wartoœciami (korelacje r > 0,7). Dla miar takich jak RMSSD, SDNN i LF/HF uzyskano umiarkowan¹ dok³adnoœæ (r miêdzy 0,44 a 0,58).
+
+Badanie wykaza³o, ¿e uczenie maszynowe mo¿e skutecznie analizowaæ niektóre metryki HRV na podstawie danych termowizyjnych. Jego zastosowanie mo¿e byæ szczególnie przydatne w warunkach, gdzie tradycyjne metody pomiaru s¹ trudne do zastosowania, takich jak s³abe oœwietlenie.
+
+
+
 
 \subsection{Uczenie maszynowe w kontekscie RSA}
 
