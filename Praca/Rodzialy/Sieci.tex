@@ -1,346 +1,119 @@
-% \chapter{Sieci neuronowe}
-% Lorem ipsum
 
-\section{Sieci neuronowe}
-Sieci neuronowe, zwane rÛwnieø sztucznymi sieciami neuronowymi (ang. Artificial
-Neural Networks, ANN), to grupa algorytmÛw uczenia maszynowego inspirowanych
-sposobem przetwarzania informacji przez ludzki mÛzg. WyrÛøniajπ siÍ zdolnoúciπ
-do adaptacji do rÛønych problemÛw dziÍki procesowi uczenia. DziÍki warstwowej
-strukturze i zastosowaniu nieliniowych funkcji aktywacji sπ w stanie modelowaÊ
-z≥oøone zaleønoúci w danych i rozwiπzywaÊ problemy, z ktÛrymi nie radzπ sobie
-bardziej tradycyjne metody. Ich uniwersalnoúÊ sprawia, øe znajdujπ zastosowanie
-w rÛønorodnych dziedzinach, takich jak rozpoznawanie obrazÛw, przetwarzanie
-jÍzyka naturalnego czy analiza szeregÛw czasowych.
+\section{Metody uczenia maszynowego do analizy EKG}
 
-\subsection{Budowa neuronu}
+\subsection{Rozpoznawanie arytmii}
+ZROBI∆ JAKIS WST P, ABY NIE DENERWOWAC PIOTRA.
 
-Podstawowym elementem budowy sieci neuronowej jest sztuczny neuron, ktÛry
-naúladuje funkcjonowanie biologicznego neuronu. Zadaniem sztucznego neuronu
-jest przetwarzanie wartoúci wejúciowych w pojedynczπ wartoúÊ wyjúciowπ. Neuron
-ten sk≥ada siÍ z kilku kluczowych elementÛw:
-% (zob. Rys. \ref{fig/neuron})
+Do rozpoznawania arytmii wykorzystuje siÍ szeroki zakres metod uczenia
+maszynowego, obejmujπcych zarÛwno klasyczne podejúcia uczenia nadzorowanego,
+jak i techniki uczenia nienadzorowanego. WúrÛd klasycznych algorytmÛw
+nadzorowanych popularne sπ SVM (Support Vector Machines), KNN (K-Nearest
+Neighbors), klasyfikatory Bayesowskie, drzewa decyzyjne oraz lasy losowe.
+Metody uczenia nienadzorowanego rÛwnieø odgrywajπ istotnπ rolÍ, wspierajπc
+proces eksploracji danych i inøynierii cech, co moøe znaczπco poprawiÊ
+skutecznoúÊ modeli klasyfikacyjnych. W tym zakresie stosuje siÍ algorytmy takie
+jak K-means, fuzzy c-means clustering, grupowanie hierarchiczne oraz Gaussian
+Mixture Models. Ponadto coraz czÍúciej wykorzystuje siÍ g≥Íbokie sieci
+neuronowe, niewymagajπce w tym splotowe sieci neuronowe (CNN) oraz sieci LSTM
+(Long Short-Term Memory) \cite{Kavya-shockableArthytmiaDetection}.
 
-\begin{itemize}
-    \item Wejúcia (inputs) - kaødy neuron odbiera dane wejúciowe, ktÛre mogπ byÊ
-          wartoúciami liczbowymi pochodzπcymi z danych lub wynikami dzia≥ania innych
-          neuronÛw z poprzedniej warstwy. Kaødemu wejúciu przypisana jest waga (weight),
-          ktÛra okreúla znaczenie danego wejúcia dla obliczeÒ neuronu.
+Ribeiro i wspÛ≥autorzy \cite{ribeiro2020automatic} opracowali g≥Íbokπ sieÊ
+neuronowπ (DNN) do automatycznej klasyfikacji nieprawid≥owoúci w krÛtkotrwa≥ych
+(7-10 s), 12-odprowadzeniowych zapisach EKG. Algorytm zosta≥ wytrenowany na
+zbiorze danych obejmujπcym ponad 2,3 miliona zapisÛw EKG. Architektura DNN
+opiera≥a siÍ na sieci rezydualnej przystosowanej do analizy sygna≥Ûw
+jednowymiarowych, z warstwami konwolucyjnymi i po≥πczeniami skip dla
+zwiÍkszenia efektywnoúci treningu.
 
-    \item Blok sumujπcy - neuron oblicza sumÍ waøonπ wejúÊ, dodajπc rÛwnieø wartoúÊ biasu
-          (bias). Bias jest dodatkowym parametrem, ktÛry umoøliwia przesuniÍcie funkcji
-          aktywacji i lepsze dopasowanie modelu. Wyraøenie matematyczne opisujπce tÍ
-          operacjÍ to:
-          \[
-              z = \sum_{i=1}^n w_i x_i + b
-          \]
-          gdzie:
-          \begin{itemize}
-              \item \(w_i\) to wagi wejúÊ,
-              \item \(x_i\) to wartoúci wejúciowe,
-              \item \(b\) to bias,
-              \item \(z\) to wynik sumy waøonej.
-          \end{itemize}
+DNN zosta≥a wytrenowana do wykrywania szeúciu nieprawid≥owoúci: bloku
+przedsionkowo-komorowego I stopnia, bloku prawej odnogi pÍczka Hisa, bloku
+lewej odnogi pÍczka Hisa, bradykardii zatokowej, migotania przedsionkÛw oraz
+tachykardii zatokowej. Model osiπgnπ≥ wysokie wyniki F1 (powyøej 80\%) oraz
+specyficznoúÊ (>99\%) dla kaødej z klas, dorÛwnujπc lub przewyøszajπc wydajnoúÊ
+rezydentÛw kardiologii i studentÛw medycyny.
 
-    \item Funkcja aktywacji (activation function) - wynik \(z\) przechodzi przez funkcjÍ
-          aktywacji, ktÛra wprowadza nieliniowoúÊ do modelu, pozwalajπc sieci neuronowej
-          uczyÊ siÍ skomplikowanych zaleønoúci. Popularne funkcje aktywacji to:
-          \begin{itemize}
-              \item ReLU (Rectified Linear Unit): \(\text{ReLU}(z) = \max(0, z)\),
-              \item Sigmoidalna: \(\text{sigmoid}(z) = \frac{1}{1 + e^{-z}}\),
-              \item Tangens hiperboliczny: \(\text{tanh}(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}\).
-          \end{itemize}
-\end{itemize}
+Praca pokazuje potencja≥ DNN do nauki end-to-end, gdzie klasyfikacja odbywa siÍ
+bezpoúrednio na podstawie surowych sygna≥Ûw EKG, bez koniecznoúci rÍcznego
+wyodrÍbniania cech. Podkreúlono rÛwnieø znaczenie duøych, odpowiednio
+oznaczonych zbiorÛw danych dla trenowania modeli oraz korzyúci wynikajπce z
+zastosowania g≥Íbokiego uczenia w dok≥adnej i skalowalnej interpretacji EKG w
+praktyce klinicznej, zw≥aszcza na obszarach z ograniczonym dostÍpem do
+specjalistÛw. \\
 
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[scale=0.6]{Rysunki/neuron-structure.jpg}
-%     \caption{Budowa sztucznego neuronu}
-%     \caption*{èrÛd≥o: \url{https://naadispeaks.blog/2017/11/08/artificial-neural-networks-with-net-in-azure-ml-studio/} [Data uzyskania dostÍpu 25.11.2024]}
-%     \label{fig/neuron_jpg}
-% \end{figure}
+MetodÍ klasyfikacji, nie opartπ o sieci neuronowe przedstawiono w publikacji
+\cite{Morteza-RandomForest}. Autorzy zaproponowali hybrydowy algorytm,
+umoøliwiajπcy przypisanie sygna≥u do jednej z czterech klas: migotania
+przedsionkÛw (AF), normalnego rytmu zatokowego, innych rytmÛw lub sygna≥Ûw zbyt
+zak≥Ûconych do analizy. Proces ten opiera≥ siÍ na wykorzystaniu klasyfikatora
+opartego o las losowy (Random Forest) zarÛwno do selekcji cech, jak i do
+finalnej klasyfikacji, co pozwoli≥o na efektywne przetwarzanie i analizÍ duøej
+liczby parametrÛw.
 
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}[
-            init/.style={
-                    draw,
-                    circle,
-                    inner sep=2pt,
-                    font=\Huge,
-                    join = by -latex
-                },
-            squa/.style={
-                    draw,
-                    inner sep=2pt,
-                    font=\Large,
-                    join = by -latex
-                },
-            start chain=2,node distance=13mm
-        ]
-        \node[on chain=2]
-        (x2) {$x_2$};
-        \node[on chain=2,join=by o-latex]
-        {$w_2$};
-        \node[on chain=2,init] (sigma)
-        {$\displaystyle\Sigma$};
-        \node[on chain=2,squa,label=above:{\parbox{2cm}{\centering Activate \\ function}}]
-        {$f$};
-        \node[on chain=2,label=above:Output,join=by -latex]
-        {$y$};
-        \begin{scope}[start chain=1]
-            \node[on chain=1] at (0,1.5cm)
-            (x1) {$x_1$};
-            \node[on chain=1,join=by o-latex]
-            (w1) {$w_1$};
-        \end{scope}
-        \begin{scope}[start chain=3]
-            \node[on chain=3] at (0,-1.5cm)
-            (x3) {$x_3$};
-            \node[on chain=3,label=below:Weights,join=by o-latex]
-            (w3) {$w_3$};
-        \end{scope}
-        \node[label=above:\parbox{2cm}{\centering Bias \\ $b$}] at (sigma|-w1) (b) {};
+W poczπtkowej fazie sygna≥ EKG by≥ poddawany wstÍpnemu przetworzeniu,
+obejmujπcego odszumianie i usuniÍcie przesuniÍcia bazowego. NastÍpnie
+wyodrÍbniono 491 cech opisujπcych w≥aúciwoúci sygna≥u w domenach czasowej,
+czÍstotliwoúciowej, czasowo-czÍstotliwoúciowej oraz przestrzeni fazowej.
+Kolejnym etapem by≥o wy≥onienie najistotniejszych cech, ktÛrÍ zosta≥o
+przeprowadzone za pomocπ Random Forest, na podstawie oceny ich wp≥ywu na
+zmniejszanie entropii w modelu. W ten sposÛb uzyskano zbiÛr 150 najbardziej
+znaczπcych cech.
 
-        \draw[-latex] (w1) -- (sigma);
-        \draw[-latex] (w3) -- (sigma);
-        \draw[o-latex] (b) -- (sigma);
+Ostateczna klasyfikacja odbywa≥a siÍ rÛwnieø za pomocπ Random Forest z 500
+drzewami decyzyjnymi, z wykorzystaniem techniki baggingu oraz losowego wyboru
+cech w wÍz≥ach, co zwiÍksza≥o odpornoúÊ na przeuczenie i poprawia≥o stabilnoúÊ
+predykcji. Algorytm osiπgnπ≥ skutecznoúÊ 82,6\% na niezaleønym zbiorze
+testowym, co zapewni≥o mu ex aequo pierwsze miejsce w PhysioNet/Computing in
+Cardiology Challenge 2017
+\cite{Morteza-RandomForest}\cite{PhysioNet-Challange2017}.
 
-        \draw[decorate,decoration={brace,mirror}] (x1.north west) -- node[left=10pt] {Inputs} (x3.south west);
-    \end{tikzpicture}
-    \caption{Budowa sztucznego neuronu}
-    \caption*{èrÛd≥o: \url{https://tex.stackexchange.com/questions/132444/diagram-of-an-artificial-neural-network} [Data uzyskania dostÍpu 25.11.2024]}
-    %     \caption*{èrÛd≥o: \url{https://naadispeaks.blog/2017/11/08/artificial-neural-networks-with-net-in-azure-ml-studio/}
-    \label{fig/neuron}
-\end{figure}
+\subsection{Wykrywanie sczytÛw R}
+Wykrywanie szczytÛw R w sygnale EKG to kluczowy etap analizy, na podstawie
+ktÛrego obliczane sπ istotne parametry pracy serca. Tradycyjne metody, takie
+jak algorytm Pan-Tompkins, mimo swojej popularnoúci, czÍsto okazujπ siÍ podatne
+na szumy i zak≥Ûcenia w sygnale, co ogranicza ich skutecznoúÊ w trudnych
+warunkach. W odpowiedzi na te wyzwania coraz czÍúciej stosuje siÍ metody
+uczenia maszynowego, takie jak splotowe sieci neuronowe (CNN) czy sieci LSTM
+(Long Short-Term Memory), ktÛre sπ bardziej odporne na zak≥Ûcenia i lepiej
+radzπ sobie z analizπ z≥oøonych wzorcÛw sygna≥u.
 
-\subsection{Klasyczna budowa sieci neuronowej}
+Przyk≥ad zastosowania sieci LSTM w detekcji szczytÛw R przedstawiono w pracy
+\cite{JUHO-LSTM}. Zaprezentowany model sk≥ada≥ siÍ z dwÛch warstw
+dwukierunkowych LSTM, ktÛre wykorzystywa≥y tangens hiperboliczny jako funkcje
+aktywacji oraz warstwy gÍstej z funkcjπ sigmoid, generujπcπ prawdopodobieÒstwo,
+øe dany punkt w czasie to szczyt R. Do trenowania wykorzystano zbiÛr danych
+MIT-BIH Arrhythmia Database oraz MIT-BIH Noise Stress Test Database,
+rozszerzajπc zbiÛr danych poprzez dodawanie realistycznych zak≥ÛceÒ, takich jak
+dryf linii bazowej czy artefakty miÍúniowe. Model by≥ trenowany z uøyciem
+optymalizatora Adam i funkcji strat binarnej entropii krzyøowej, na ponad 1,5
+miliona przyk≥adÛw.
 
-Struktura sieci neuronowej sk≥ada siÍ z grup sztucznych neuronÛw, zwanych
-warstwami. SieÊ sk≥ada siÍ z trzech g≥Ûwnych typÛw warstw: warstwy wejúciowej,
-jednej lub wiÍcej warstw ukrytych oraz warstwy wyjúciowej. Kaøda z tych warstw
-pe≥ni okreúlonπ funkcjÍ w przetwarzaniu danych, a ich odpowiednie po≥πczenie
-umoøliwia rozwiπzywanie z≥oøonych problemÛw z zakresu klasyfikacji, regresji
-czy analizy danych.
+Po odpowiednim odfiltrowaniu punktÛw o niskim prawdopodobieÒswie, podejúcie
+LSTM osiπgnÍ≥o wysokie wyniki, osiπgajπc wyniik F1 na poziomie znacznie powyøej
+0.90, nawet przy niskim stosunku sygna≥u do szumu (SNR 0.1). Zaproponowane
+rozwiπzanie wykaza≥o sie lepszymi rezultatami niø tradycyjne metody nie
+korzystajπce z dorobku uczenia maszynowego (Hamilton, Christov, Engzee,
+Pan-Tomkins). Autorzy wskazali plany na rozwiniÍcie owej architektury do modelu
+end-to-end.
 
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}[
-            plain/.style={
-                    draw=none,
-                    fill=none,
-                },
-            net/.style={
-                    matrix of nodes,
-                    nodes={
-                            draw,
-                            circle,
-                            inner sep=10pt
-                        },
-                    nodes in empty cells,
-                    column sep=2cm,
-                    row sep=-9pt
-                },
-            >=latex
-        ]
-        \matrix[net] (mat)
-        {
-        |[plain]| \parbox{1.3cm}{\centering Input\\layer} & |[plain]| \parbox{1.3cm}{\centering Hidden\\layer} & |[plain]| \parbox{1.3cm}{\centering Output\\layer} \\
-        & |[plain]| \\
-        |[plain]| & \\
-        & |[plain]| \\
-        |[plain]| & |[plain]| \\
-        & & \\
-        |[plain]| & |[plain]| \\
-        & |[plain]| \\
-        |[plain]| & \\
-        & |[plain]| \\    };
-        \foreach \ai [count=\mi ]in {2,4,...,10}
-        \draw[<-] (mat-\ai-1) -- node[above] {Input \mi} +(-2cm,0);
-        \foreach \ai in {2,4,...,10}
-            {\foreach \aii in {3,6,9}
-                \draw[->] (mat-\ai-1) -- (mat-\aii-2);
-            }
-        \foreach \ai in {3,6,9}
-        \draw[->] (mat-\ai-2) -- (mat-6-3);
-        \draw[->] (mat-6-3) -- node[above] {Ouput} +(2cm,0);
-    \end{tikzpicture}
-    \caption{UogÛlniona budowa sieci neuronowej}
-    \caption*{èrÛd≥o: \url{https://tex.stackexchange.com/questions/132444/diagram-of-an-artificial-neural-network} [Data uzyskania dostÍpu 25.11.2024]}
-    %     \caption*{èrÛd≥o: \url{https://naadispeaks.blog/2017/11/08/artificial-neural-networks-with-net-in-azure-ml-studio/}
-    \label{fig/neural_network_basic_scheme}
-\end{figure}
+W pracy \cite{MUzairZahid-UNET} autorzy przedstawili model wykorzystujπcy
+jednowymiarowe sieci splotowe, o architekturze UNet. Rozwiπzanie bazowa≥o na
+strukturze kodera-dekodera z po≥πczeniami typu skip connections. Model sk≥ada≥
+siÍ z szeúciu warstw kodera, odpowiedzialnych za ekstrakcjÍ cech sygna≥u EKG za
+pomocπ konwolucji i downsamplingu, oraz szeúciu warstw dekodera, ktÛre
+rekonstruowa≥y cechy przy uøyciu odwrotnej konwolucji i upsamplingu. Po≥πczenia
+skip miÍdzy odpowiadajπcymi sobie warstwami kodera i dekodera pozwala≥y na
+efektywne przenoszenie informacji pomiÍdzy warstwami. Do trenowania sieci uøyto
+takich zbiorÛw danych jak MIT-BIH oraz China Physiological Signal Challenge
+2020 database (CPSC-DB), ktÛre rÛwnieø celowo zaszumiano, dodajπc do nich dryf
+linii bazowej oraz zak≥Ûcenia ruchowe z bazy Noise Stress Test Database
+(NST-DB).
 
-\subsubsection{Warstwa wejúciowa}
-Warstwa wejúciowa to pierwsza czÍúÊ sieci neuronowej, ktÛrej g≥Ûwnym zadaniem
-jest odbiÛr danych wejúciowych. Kaødy neuron w tej warstwie reprezentuje jednπ
-cechÍ z danych wejúciowych, co oznacza, øe liczba neuronÛw w warstwie
-wejúciowej jest rÛwna liczbie zmiennych lub parametrÛw w analizowanym zbiorze
-danych. Na przyk≥ad w przypadku analizy sygna≥u EKG, kaødy neuron w warstwie
-wejúciowej moøe odpowiadaÊ pojedynczej prÛbce sygna≥u lub cechom wyodrÍbnionym
-z tego sygna≥u, takim jak wartoúÊ amplitudy w danym momencie.
+KoÒcowym wynikiem dzia≥ania modelu by≥a jednowymiarowa mapa prawdopodobieÒstwa,
+podobna do tej generowanej przez model oparty na LSTM, przedstawiony wczeúniej.
+Po odpowiednim przetworzeniu wyjúcia, model osiπga≥ wyniki F1 na poziomie
+przekraczajπcym 0.99, przewyøszajπc inne metody porÛwnane w badaniu.
 
-Neurony w warstwie wejúciowej nie wykonujπ øadnych operacji matematycznych. Ich
-rola ogranicza siÍ do przekazania otrzymanych danych do nastÍpnych warstw w
-sieci. Dane te sπ nastÍpnie przekszta≥cane i analizowane w warstwach ukrytych.
+\subsection{Uczenie maszynowe w kontekscie HRV}
 
-\subsubsection{Warstwy ukryte}
-Warstwy ukryte stanowiπ centralnπ czÍúÊ sieci neuronowej, gdzie odbywa siÍ
-wiÍkszoúÊ przetwarzania danych. W warstwach tych neurony sπ po≥πczone z
-neuronami z poprzedniej i nastÍpnej warstwy, a kaøde po≥πczenie ma przypisanπ
-wagÍ. Wagi te sπ kluczowe, poniewaø okreúlajπ, jak silny wp≥yw ma dany neuron
-na aktywacjÍ innych neuronÛw.
-
-Kaødy neuron w warstwie ukrytej wykonuje typowe operacje dla sztucznego
-neuronu: oblicza sumÍ waøonπ swoich wejúÊ, dodaje wartoúÊ biasu, a nastÍpnie
-przekszta≥ca wynik za pomocπ funkcji aktywacji. Funkcja aktywacji wprowadza
-nieliniowoúÊ, co pozwala sieci neuronowej uczyÊ siÍ bardziej z≥oøonych wzorcÛw
-w danych. SzczegÛ≥y dotyczπce tych operacji zosta≥y opisane w podrozdziale
-dotyczπcym budowy neuronu.
-
-Liczba warstw ukrytych oraz liczba neuronÛw w kaødej warstwie jest parametrem
-sieci, ktÛry dobiera siÍ w zaleønoúci od z≥oøonoúci problemu. G≥Íbokie sieci
-neuronowe, ktÛre posiadajπ wiele warstw ukrytych, sπ zdolne do automatycznego
-wyodrÍbniania i przetwarzania z≥oøonych cech danych, co czyni je efektywnymi w
-takich zadaniach jak rozpoznawanie wzorcÛw w sygnale EKG czy przewidywanie
-wartoúci zmiennych opisujπcych HRV i RSA.
-
-Warto jednak zaznaczyÊ, øe wiÍksza liczba warstw ukrytych lub neuronÛw w sieci
-nie zawsze oznacza lepsze rezultaty. ZwiÍkszanie liczby warstw lub neuronÛw
-moøe prowadziÊ do problemÛw, takich jak przeuczenie (ang. overfitting), gdzie
-sieÊ zbyt dok≥adnie dopasowuje siÍ do danych treningowych kosztem generalizacji
-na nowych danych. Ponadto, wiÍksza liczba warstw oznacza wyøsze wymagania
-obliczeniowe i wiÍkszπ z≥oøonoúÊ optymalizacji.
-
-\subsubsection{Warstwa wyjúciowa}
-Warstwa wyjúciowa jest ostatniπ warstwπ sieci neuronowej. Jej zadaniem jest
-przekszta≥cenie wynikÛw przetwarzania uzyskanych w warstwach ukrytych na postaÊ
-wynikowπ, zgodnπ z celem analizy. Liczba neuronÛw w warstwie wyjúciowej zaleøy
-od rodzaju problemu. Na przyk≥ad w zadaniach klasyfikacyjnych liczba neuronÛw
-odpowiada liczbie klas, natomiast w zadaniach regresji warstwa wyjúciowa sk≥ada
-siÍ z jednego neuronu, ktÛry przewiduje wartoúÊ liczbowπ.
-
-Wartoúci w warstwie wyjúciowej sπ czÍsto poddawane dodatkowym przekszta≥ceniom,
-takim jak funkcja softmax w przypadku klasyfikacji wieloklasowej lub funkcja
-liniowa w zadaniach regresyjnych. Ostateczne wyniki sπ nastÍpnie porÛwnywane z
-oczekiwanymi wynikami (danymi referencyjnymi), co umoøliwia obliczenie b≥Ídu i
-optymalizacjÍ wag w sieci.
-
-\subsubsection{£πczenie warstw i propagacja danych}
-Sieci neuronowe dzia≥ajπ na zasadzie przep≥ywu informacji pomiÍdzy warstwami.
-Dane wejúciowe przechodzπ przez warstwÍ wejúciowπ do warstw ukrytych, gdzie sπ
-przetwarzane przez neurony. Wyniki tego przetwarzania trafiajπ do warstwy
-wyjúciowej, ktÛra generuje koÒcowy wynik. Proces ten nazywa siÍ propagacjπ w
-przÛd (ang. forward propagation).
-
-Podczas treningu sieci neuronowej stosuje siÍ algorytm wstecznej propagacji
-b≥Ídu (ang. backpropagation), ktÛry umoøliwia aktualizacjÍ wag po≥πczeÒ miÍdzy
-neuronami na podstawie rÛønicy miÍdzy wynikiem przewidzianym przez sieÊ a
-oczekiwanym wynikiem. DziÍki temu sieÊ uczy siÍ dostosowywaÊ swoje parametry,
-aby lepiej modelowaÊ zaleønoúci w danych.
-
-\subsection{Sieci konwolucyjne}
-
-Sieci konwolucyjne (ang. Convolutional Neural Networks, CNN) to szczegÛlny
-rodzaj sieci neuronowych, zaprojektowany do analizy danych o strukturze
-przestrzennej, takich jak obrazy, sygna≥y czasowe czy dane
-przestrzenno-czasowe. W odrÛønieniu od klasycznych sieci neuronowych, CNN
-wykorzystujπ operacje konwolucji, ktÛre umoøliwiajπ ekstrakcjÍ lokalnych cech
-danych, jednoczeúnie redukujπc liczbÍ parametrÛw i zachowujπc istotne
-informacje.
-
-Budowa sieci konwolucyjnych rÛøni siÍ od klasycznych sieci neuronowych poprzez
-wprowadzenie nowych typÛw warstw: warstw konwolucyjnych, warstw spajajπcych
-(ang. pooling layers) oraz warstw w pe≥ni po≥πczonych (ang. fully connected
-layers). Te elementy pozwalajπ sieci konwolucyjnej efektywnie analizowaÊ dane
-przestrzenne.
-
-\subsubsection{Warstwa konwolucyjna}
-Warstwa konwolucyjna jest kluczowym elementem CNN. Jej zadaniem jest wykrywanie
-lokalnych wzorcÛw w danych wejúciowych poprzez operacjÍ konwolucji. W warstwie
-tej stosuje siÍ filtry (zwane rÛwnieø jπdrami lub kernelami), ktÛre sπ
-macierzami o niewielkich rozmiarach (np. 3x3, 5x5, 3x1, 5x1). Kaødy filtr
-przesuwa siÍ po danych wejúciowych (np. obrazie lub sygnale), obliczajπc
-iloczyn skalarny wartoúci w filtrze i fragmentu danych wejúciowych. Wynikiem
-jest mapa cech (ang. feature map), ktÛra reprezentuje wykryte wzorce. Wyraøenie
-matematyczne opisujπce konwolucjÍ dla danych 2-wymiarowych moøna zapisaÊ jako:
-\begin{equation}
-    S(i, j) = \sum_{m=1}^M \sum_{n=1}^N I(m, n)K(i-m, j-n)
-\end{equation}
-gdzie:
-\begin{itemize}
-    \item \(I(m, n)\) to dane wejúciowe,
-    \item \(K(i, j)\) to wartoúci filtra,
-    \item \(S(i, j)\) to wynik konwolucji w danym miejscu.
-    \item \(M\) i \(N\) to wymiary filtra
-\end{itemize}
-Splot jest operacjπ przemiennπ, wiÍc moøna to rÛwnanie zapisaÊ w postaci
-\begin{equation}
-    S(i, j) = \sum_{m=1}^M \sum_{n=1}^N I(i-m, j-n)K(m, n)
-\end{equation}
-Warstwa konwolucyjna w sieciach neuronowych zwykle implementuje operacjÍ korelacji krzyøowej (ang. cross-correlation), ktÛra matematycznie jest bardzo zbliøona do klasycznej konwolucji, ale nie odwraca filtra (jπdra) przed obliczeniami \cite{Goodfellow-DeepLearning}.
-Wyraøenie opisujπce korelacjÍ krzyøowπ to:
-\begin{equation}
-    S(i, j) = \sum_{m=1}^M \sum_{n=1}^N I(i+m, j+n)K(m, n)
-\end{equation}
-Analogicznie, operacje korelacji krzyøowej na danych 1-wymiarowych opisuje rÛwnanie:
-\begin{equation}
-    S(i) = \sum_{m=1}^M I(i+m)K(m)
-\end{equation}
-Operacja splotu w warstwie konwolucyjnej jest odpowiednikiem obliczenia sumy waøonej w bloku sumujπcym klasycznego sztucznego neuronu. Wynik tej operacji, podobnie jak w klasycznym neuronie, jest przekazywany do funkcji aktywacji w celu wprowadzenia nieliniowoúci.\\
-
-Dzia≥anie warstwy konwolucyjnej moøna dostosowaÊ poprzez odpowiedniπ
-konfiguracjÍ jej hiperparametrÛw. Do najwaøniejszych z nich naleøπ m.in.
-\begin{itemize}
-    \item PrzesuniÍcie filtru (stride) - okreúla liczbÍ pozycji, o jakie filtr przesuwa
-          siÍ w danych wejúciowych. ZwiÍkszenie wartoúci tego parametru zmniejsza rozmiar
-          map cech, co obniøa koszt obliczeniowy, jednak moøe skutkowaÊ utratπ drobnych
-          informacji.
-    \item Dope≥nianie zerami (padding) - umoøliwia zachowanie informacji na krawÍdziach
-          danych wejúciowych. Bez dope≥niania mapa cech ulega naturalnemu zmniejszeniu.
-    \item Rozmiar filtra (kernel size) - okreúla wymiary filtra. Mniejsze filtry
-          wykrywajπ drobniejsze wzorce, wiÍksze analizujπ szerszy kontekst danych.
-    \item Liczba filtrÛw - decyduje o liczbie generowanych map cech, co zwiÍksza zdolnoúÊ
-          sieci do wykrywania rÛønych wzorcÛw.
-\end{itemize}
-
-\subsubsection{Warstwa spajajπca (pooling layer)}
-Warstwa spajajπca (ang. pooling layer) zmniejsza wymiary danych wejúciowych,
-zachowujπc kluczowe informacje. Redukuje liczbÍ parametrÛw modelu, co zapobiega
-przeuczeniu i zwiÍksza wydajnoúÊ obliczeÒ. NajczÍúciej stosowane operacje to:
-\begin{itemize}
-    \item \textit{Max pooling} ñ wybiera maksymalnπ wartoúÊ z fragmentu danych wejúciowych, wykrywajπc najbardziej znaczπce cechy.
-    \item \textit{Average pooling} ñ oblicza úredniπ wartoúÊ w analizowanym fragmencie, zachowujπc informacje o ogÛlnym kontekúcie danych.
-\end{itemize}
-Warstwa ta u≥atwia modelowi analizÍ wzorcÛw, zmniejszajπc jednoczeúnie wraøliwoúÊ na drobne przesuniÍcia w danych.
-
-\subsubsection{Warstwa w pe≥ni po≥πczona (fully connected layer)}
-Ostateczna analiza przetworzonych cech odbywa siÍ w warstwach w pe≥ni
-po≥πczonych. Wyniki uzyskane z warstw konwolucyjnych i spajajπcych sπ
-przekszta≥cane w jeden wymiar, a nastÍpnie przechodzπ przez standardowe neurony
-w celu uzyskania finalnych wynikÛw, takich jak klasyfikacja czy predykcja
-wartoúci liczbowych.
-
-\subsubsection{RÛønice w warstwie wejúciowej CNN w porÛwnaniu z klasycznymi sieciami neuronowymi}
-Warstwa wejúciowa w sieciach konwolucyjnych rÛøni siÍ istotnie od warstwy
-wejúciowej opisanej w podrodziale dotyczπcym klasycznej budowy sieci
-neuronowej. Roønice wystÍpujπ g≥Ûwnie pod wzglÍdem sposobu przetwarzania i
-reprezentacji danych. W klasycznych sieciach neuronowych dane wejúciowe sπ
-przekszta≥cane w jednowymiarowy wektor, niezaleønie od pierwotnej struktury
-danych. Przyk≥adowo obraz o wymiarach 100x100 jest zamieniany w wektor o
-dlugosci 10000 elementÛw. Taka reprezentacja prowadzi do utraty informacji o
-przestrzennych zaleønoúciach pomiÍdzy poszczegÛlnymi elementami danych.
-
-W CNN warstwa wejúciowa zachowuje przestrzennπ strukturÍ danych, co pozwala na
-analizÍ lokalnych wzorcÛw w ich oryginalnym kontekúcie. Na przyk≥ad, ten sam
-obraz 100x100 pozostaje macierzπ o tych samych wymiarach, a w przypadku obrazÛw
-kolorowych uwzglÍdniany jest dodatkowy wymiar g≥Íbokoúci, np. 3 kana≥y
-dla RGB. DziÍki temu konwolucje wykonywane przez kolejne warstwy sieci mogπ
-wykrywaÊ lokalne cechy, takie jak krawÍdzie, tekstury czy inne bardziej z≥oøone
-wzorce.
-
-Ponadto, CNN wprowadza mechanizm wspÛ≥dzielenia wag w warstwach konwolucyjnych,
-co dodatkowo redukuje liczbÍ parametrÛw, zwiÍkszajπc efektywnoúÊ i zdolnoúÊ
-uogÛlniania modelu. W klasycznych sieciach kaøda cecha wejúciowa ma swojπ
-unikalnπ wagÍ, co przy duøej liczbie danych wejúciowych prowadzi do znaczπcego
-wzrostu liczby parametrÛw.
+\subsection{Uczenie maszynowe w kontekscie RSA}
 
