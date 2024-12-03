@@ -2,7 +2,10 @@
 \section{Metody uczenia maszynowego do analizy EKG}
 
 \subsection{Rozpoznawanie arytmii}
-ZROBIÆ JAKIS WSTÊP, ABY NIE DENERWOWAC PIOTRA.
+Wspó³czesna diagnostyka serca coraz czêœciej korzysta z nowoczesnych metod
+analizy sygna³ów EKG, aby szybko i dok³adnie wykrywaæ arytmie oraz inne
+problemy z rytmem serca. Wa¿n¹ rolê w tym procesie odgrywaj¹ techniki uczenia
+maszynowego, które automatyzuj¹ analizê i zwiêkszaj¹ jej skutecznoœæ
 
 Do rozpoznawania arytmii wykorzystuje siê szeroki zakres metod uczenia
 maszynowego, obejmuj¹cych zarówno klasyczne podejœcia uczenia nadzorowanego,
@@ -213,18 +216,74 @@ na zak³ócenia, drugi model zosta³ uznany za najbardziej obiecuj¹ce narzêdzie do
 analizy sygna³ów EKG w diagnostyce COVID-19.
 
 \subsection{Uczenie maszynowe w kontekscie HRV}
-Miary HRV (Heart Rate Variability) stanowi¹ skuteczne narzêdzie do oceny pracy serca, poziomu stresu oraz ogólnego stanu zdrowia badanej osoby. Obliczane s¹ na podstawie uprzednio wyznaczonych odstêpów RR, z wykorzystaniem metod analizy czasowej oraz przekszta³ceñ z zakresu analizy czêstotliwoœciowej. Przegl¹d literatury wskazuje, ¿e trudno znaleŸæ dobrze udokumentowane badania, które precyzyjnie przewiduj¹ wartoœci miar HRV bezpoœrednio na podstawie sygna³u EKG przy u¿yciu algorytmów uczenia maszynowego, poniewa¿ podejœcie to wci¹¿ jest rzadko stosowane. Klasyczne metody obliczeniowe s¹ natomiast zdecydowanie dok³adne i niemal wy³¹cznie one znajduj¹ zastosowanie w analizie HRV.
+Miary HRV (Heart Rate Variability) stanowi¹ skuteczne narzêdzie do oceny pracy
+serca, poziomu stresu oraz ogólnego stanu zdrowia badanej osoby. Obliczane s¹
+na podstawie uprzednio wyznaczonych odstêpów RR, z wykorzystaniem metod analizy
+czasowej oraz przekszta³ceñ z zakresu analizy czêstotliwoœciowej. Przegl¹d
+literatury wskazuje, ¿e trudno znaleŸæ dobrze udokumentowane badania, które
+precyzyjnie przewiduj¹ wartoœci miar HRV bezpoœrednio na podstawie sygna³u EKG
+przy u¿yciu algorytmów uczenia maszynowego.
 
-Istniej¹ jednak prace, które w kontekœcie metod opartych na sztucznej inteligencji skutecznie wyznaczaj¹ miary HRV z innych sygna³ów, takich jak PPG (fotopletyzmografia), lub analizuj¹ zmiennoœæ rytmu serca na podstawie obrazów twarzy w podczerwieni. HRV, wyznaczane przewa¿nie za pomoc¹ klasycznych metod, odgrywa kluczow¹ rolê jako cecha wejœciowa w bardziej zaawansowanych analizach, takich jak diagnozowanie chorób serca czy ocena poziomu stresu. W takich zastosowaniach algorytmy uczenia maszynowego znajduj¹ szerokie zastosowanie, co podkreœla istotn¹ rolê HRV w interdyscyplinarnych badaniach oraz praktyce klinicznej.
+EKG, HRV i uczenie maszynowe wspó³dzia³aj¹ w sposób poœredni. Algorytmy uczenia
+maszynowego mog¹ byæ stosowane do wykrywania szczytów w sygnale EKG, co stanowi
+pierwszy krok w procesie obliczania wskaŸników HRV klasycznymi metodami. Z
+kolei HRV, wyznaczane w ten sposób, pe³ni istotn¹ rolê jako kluczowa cecha
+wejœciowa w zaawansowanych analizach, takich jak diagnozowanie chorób serca czy
+ocena stresu. Dziêki temu uczenie maszynowe znajduje szerokie zastosowanie w
+analizach opartych na HRV, co podkreœla jego znaczenie w interdyscyplinarnych
+badaniach i zastosowaniach klinicznych.
 
-Przytoczony wczeœniej przyk³ad, dotycz¹cy analizy obrazów w podczerwieni, zaczerpniêto z \cite{andrea-termo}. W badaniu zastosowano algorytm regresji wektorów noœnych (SVR) do przewidywania parametrów HRV na podstawie danych termowizyjnych twarzy. Analizie poddano zmiany temperatury skóry w kluczowych obszarach twarzy, takich jak glabella (obszar miêdzy brwiami), czubek nosa i nozdrza. Na podstawie tych danych wyodrêbniono cechy, takie jak entropia próbkowa (SampEn), odchylenie standardowe oraz gêstoœæ mocy widmowej (PSD) w ró¿nych zakresach czêstotliwoœci.
+Model klasyfikujacy poziom stresu, lêku i depresji na podstawie metryk HRV
+zaprezentowano w \cite{Coutts-HRV}. W pracy zaproponowano sieci LSTM do
+rozwi¹zania tego problemu. Modele sklada³y siê z warstwy LSTM, wartstwy w pe³ni
+po³¹czonej oraz funkcji aktywacji sigmoid. Wykorzystano trzy podejœcia:
+standardowe trenowanie modelu, pretrenowanie na po³¹czeniu danych dziennych i
+nocnych oraz metodê "hot-spot", usuwaj¹c dane z nisk¹ dok³adnoœci¹.
 
-Algorytm umo¿liwi³ oszacowanie wa¿nych miar HRV, takich jak RMSSD, SDNN, pNN50, LF/HF, odstêpy RR oraz œrednie têtno (HR). Wyniki pokaza³y, ¿e model dobrze przewidywa³ parametry HR, RR, TINN i pNN50, osi¹gaj¹c wysok¹ zgodnoœæ z rzeczywistymi wartoœciami (korelacje r > 0,7). Dla miar takich jak RMSSD, SDNN i LF/HF uzyskano umiarkowan¹ dok³adnoœæ (r miêdzy 0,44 a 0,58).
+Dane nocne osi¹ga³y wy¿sz¹ dok³adnoœæ klasyfikacji (do 85\%) ni¿ dzienne,
+dziêki mniejszemu wp³ywowi aktywnoœci fizycznej. Analiza w dziedzinie
+czêstotliwoœci przewy¿sza³a tê w dziedzinie czasu, co potwierdza korzyœci
+zaawansowanego przetwarzania sygna³ów. Pretrenowanie modeli zwiêkszy³o
+dok³adnoœæ o 6,9\%, a metoda "hot-spot" poprawia³a wyniki w wybranych
+przypadkach. Wyniki dowodz¹, ¿e modele LSTM skutecznie prognozuj¹ stres, lêk i
+depresjê na podstawie HRV, osi¹gaj¹c wyniki porównywalne z wczeœniejszymi
+badaniami, nawet przy krótszych oknach danych.
 
-Badanie wykaza³o, ¿e uczenie maszynowe mo¿e skutecznie analizowaæ niektóre metryki HRV na podstawie danych termowizyjnych. Jego zastosowanie mo¿e byæ szczególnie przydatne w warunkach, gdzie tradycyjne metody pomiaru s¹ trudne do zastosowania, takich jak s³abe oœwietlenie.
+Istniej¹ jednak prace, które w kontekœcie metod opartych na sztucznej
+inteligencji skutecznie wyznaczaj¹ miary HRV z innych sygna³ów, takich jak PPG
+(fotopletyzmografia), lub analizuj¹ zmiennoœæ rytmu serca na podstawie obrazów
+twarzy w podczerwieni.
 
+Przytoczony wy¿ej przyk³ad, zaczerpniêto z \cite{andrea-termo}. W badaniu
+zastosowano algorytm regresji wektorów noœnych (SVR) do przewidywania
+parametrów HRV na podstawie danych termowizyjnych twarzy. Analizie poddano
+zmiany temperatury skóry w kluczowych obszarach twarzy, takich jak glabella
+(obszar miêdzy brwiami), czubek nosa i nozdrza. Na ich podstawie wyodrêbniono
+cechy, takie jak entropia próbkowa (SampEn), odchylenie standardowe oraz
+gêstoœæ mocy widmowej (PSD) w ró¿nych zakresach czêstotliwoœci.
 
+Algorytm umo¿liwi³ oszacowanie wa¿nych miar HRV, takich jak RMSSD, SDNN, pNN50,
+LF/HF, odstêpy RR oraz œrednie têtno (HR). Wyniki pokaza³y, ¿e model dobrze
+przewidywa³ parametry HR, RR, TINN i pNN50, osi¹gaj¹c wysok¹ korelacjê (r >
+0.7) z rzeczywistymi wartoœciami. Dla pozosta³ych miar uzyskano s³absze wyniki
+(r miêdzy 0,44 a 0,58).
 
+Badanie wykaza³o, ¿e uczenie maszynowe mo¿e skutecznie analizowaæ niektóre
+metryki HRV na podstawie danych termowizyjnych. Jego zastosowanie mo¿e byæ
+szczególnie przydatne w warunkach, gdzie tradycyjne metody pomiaru s¹ trudne do
+zastosowania, takich jak s³abe oœwietlenie.
+
+W pracy \cite{Gudny-ppgHRV} opisano wykorzystanie sieci neuronowych LSTM do
+analizy sygna³ów PPG i danych ruchowych w celu przewidywania parametrów HRV
+oraz rozpoznawania aktywnoœci fizycznych. Modele te korzysta³y z danych
+obejmuj¹cych sygna³y fotopletyzmograficzne, akcelerometryczne i ¿yroskopowe,
+które wczeœniej zosta³y przefiltrowane w celu usuniêcia zak³óceñ i szumów.
+
+Najlepszy model osi¹gn¹³ dok³adnoœæ 93,76\% w wykrywaniu szczytów w sygnale
+PPG, co pozwoli³o na dok³adne wyznaczenie miar HRV. Badanie pokaza³o, ¿e metody
+oparte na g³êbokim uczeniu mog¹ skutecznie analizowaæ HRV, szczególnie w
+sytuacjach, gdzie tradycyjne metody, takie jak EKG, s¹ trudne do zastosowania,
+na przyk³ad podczas ruchu.
 
 \subsection{Uczenie maszynowe w kontekscie RSA}
 
