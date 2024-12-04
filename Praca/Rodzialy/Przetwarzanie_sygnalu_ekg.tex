@@ -90,15 +90,13 @@ maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.
 
 
 \subsection{Sieæ UNet}
-W aplikacji wykorzystano metodê wyznaczania szczytów R, zaprezentowana w pracy \cite{MUzairZahid-UNET}.
-Rozwi¹zanie to opiera siê o wykorzystanie g³êbokiej sieci neuronowej (DNN), opart¹ o architekture UNnet, do przetworzenia sygna³u EKG na mapê segmentacji, która nastêpnie poddawana jest dodatkowej obróbce, w celu wy³onienia prawid³owych pozycji za³amków R.
 
 Nastêpn¹ metoda wykorzystana w pracy do wyznaczenia pozycji sczytów R jest sieæ
-neuronowa oparta o architekturê UNet, zaczerpniêta z pracy
-\cite{MUzairZahid-UNET}. Jej budowa przedstawiona jest na Rys. \ref{fig/UNet}
+neuronowa oparta o architekturê 1D UNet, zaczerpniêta z pracy
+\cite{MUzairZahid-UNET}. Jej budowa oraz blok post processingu przedstawiony,  jest na Rys. \ref{fig/UNet}
 pochodz¹cym z tej samej publikacji. Sieæ dzia³a w oparciu o model koder-dekoder, wyró¿niaj¹c w ten sposób dwa kluczowe jej elementy: œciezkê koduj¹c¹ oraz œcie¿kê dekoduj¹c¹. 
 
-Œcie¿ka koduj¹ca odpowiada za ekstrakcje istotnych cech sygna³u. Na ka¿da warstwê tej œcie¿ki sk³ada siê warstwa splotowa, która dokonuje operacji splotu i dwukrotnego zmniejszenia wektora danych poprzez wartoœæ przesuniêcia filtru równego 2, oraz funkcja aktywacji LeakyReLU 
+Œcie¿ka koduj¹ca odpowiada za ekstrakcje istotnych cech sygna³u. Na ka¿da warstwê tej œcie¿ki sk³ada siê warstwa splotowa, która dokonuje jednoczeœnie operacji splotu i dwukrotnej redukcji wektora wejœciowego. 
 
 \begin{figure}[ht]
     \centering

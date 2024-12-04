@@ -216,13 +216,15 @@ na zak³ócenia, drugi model zosta³ uznany za najbardziej obiecuj¹ce narzêdzie do
 analizy sygna³ów EKG w diagnostyce COVID-19.
 
 \subsection{Uczenie maszynowe w kontekscie HRV}
-Miary HRV (Heart Rate Variability) stanowi¹ skuteczne narzêdzie do oceny pracy
-serca, poziomu stresu oraz ogólnego stanu zdrowia badanej osoby. Obliczane s¹
-na podstawie uprzednio wyznaczonych odstêpów RR, z wykorzystaniem metod analizy
-czasowej oraz przekszta³ceñ z zakresu analizy czêstotliwoœciowej. Przegl¹d
-literatury wskazuje, ¿e trudno znaleŸæ dobrze udokumentowane badania, które
-precyzyjnie przewiduj¹ wartoœci miar HRV bezpoœrednio na podstawie sygna³u EKG
-przy u¿yciu algorytmów uczenia maszynowego.
+Miary HRV stanowi¹ skuteczne narzêdzie do oceny pracy serca, poziomu stresu
+oraz ogólnego stanu zdrowia badanej osoby. Obliczane s¹ na podstawie uprzednio
+wyznaczonych odstêpów RR, z wykorzystaniem metod analizy czasowej oraz
+przekszta³ceñ z zakresu analizy czêstotliwoœciowej. Przegl¹d literatury
+wskazuje, ¿e trudno znaleŸæ dobrze udokumentowane badania, które precyzyjnie
+przewiduj¹ wartoœci miar HRV bezpoœrednio na podstawie sygna³u EKG przy u¿yciu
+algorytmów uczenia maszynowego, poniewa¿ podejœcie to wci¹¿ jest rzadko
+stosowane. Klasyczne metody obliczeniowe s¹ natomiast zdecydowanie dok³adne i
+niemal wy³¹cznie one znajduj¹ zastosowanie w analizie HRV.
 
 EKG, HRV i uczenie maszynowe wspó³dzia³aj¹ w sposób poœredni. Algorytmy uczenia
 maszynowego mog¹ byæ stosowane do wykrywania szczytów w sygnale EKG, co stanowi
@@ -233,12 +235,13 @@ ocena stresu. Dziêki temu uczenie maszynowe znajduje szerokie zastosowanie w
 analizach opartych na HRV, co podkreœla jego znaczenie w interdyscyplinarnych
 badaniach i zastosowaniach klinicznych.
 
-Model klasyfikujacy poziom stresu, lêku i depresji na podstawie metryk HRV
-zaprezentowano w \cite{Coutts-HRV}. W pracy zaproponowano sieci LSTM do
-rozwi¹zania tego problemu. Modele sklada³y siê z warstwy LSTM, wartstwy w pe³ni
-po³¹czonej oraz funkcji aktywacji sigmoid. Wykorzystano trzy podejœcia:
-standardowe trenowanie modelu, pretrenowanie na po³¹czeniu danych dziennych i
-nocnych oraz metodê "hot-spot", usuwaj¹c dane z nisk¹ dok³adnoœci¹.
+Jednym z takich przyk³adów, gdzie metryki HRV s³u¿¹ jako parametry wejœciowe
+jest model klasyfikujacy poziom stresu, lêku i depresji zaprezentowany w
+\cite{Coutts-HRV}. W pracy zaproponowano sieci neuronowe do rozwi¹zania tego
+problemu. Modele sklada³y siê z warstwy LSTM, wartstwy w pe³ni po³¹czonej oraz
+funkcji aktywacji sigmoid. Wykorzystano trzy podejœcia: standardowe trenowanie
+modelu, pretrenowanie na po³¹czeniu danych dziennych i nocnych oraz metodê
+"hot-spot", gdzie usuniêto dane z nisk¹ dok³adnoœci¹.
 
 Dane nocne osi¹ga³y wy¿sz¹ dok³adnoœæ klasyfikacji (do 85\%) ni¿ dzienne,
 dziêki mniejszemu wp³ywowi aktywnoœci fizycznej. Analiza w dziedzinie
@@ -251,11 +254,11 @@ badaniami, nawet przy krótszych oknach danych.
 
 Istniej¹ jednak prace, które w kontekœcie metod opartych na sztucznej
 inteligencji skutecznie wyznaczaj¹ miary HRV z innych sygna³ów, takich jak PPG
-(fotopletyzmografia), lub analizuj¹ zmiennoœæ rytmu serca na podstawie obrazów
-twarzy w podczerwieni.
+(fotopletyzmografia)\cite{Gudny-ppgHRV}, lub analizuj¹ zmiennoœæ rytmu serca na
+podstawie obrazów twarzy w podczerwieni.
 
-Przytoczony wy¿ej przyk³ad, zaczerpniêto z \cite{andrea-termo}. W badaniu
-zastosowano algorytm regresji wektorów noœnych (SVR) do przewidywania
+Ostatni z przytoczonych wy¿ej przyk³adów, zaczerpniêto z \cite{andrea-termo}. W
+badaniu zastosowano algorytm regresji wektorów noœnych (SVR) do przewidywania
 parametrów HRV na podstawie danych termowizyjnych twarzy. Analizie poddano
 zmiany temperatury skóry w kluczowych obszarach twarzy, takich jak glabella
 (obszar miêdzy brwiami), czubek nosa i nozdrza. Na ich podstawie wyodrêbniono
@@ -268,10 +271,10 @@ przewidywa³ parametry HR, RR, TINN i pNN50, osi¹gaj¹c wysok¹ korelacjê (r >
 0.7) z rzeczywistymi wartoœciami. Dla pozosta³ych miar uzyskano s³absze wyniki
 (r miêdzy 0,44 a 0,58).
 
-Badanie wykaza³o, ¿e uczenie maszynowe mo¿e skutecznie analizowaæ niektóre
-metryki HRV na podstawie danych termowizyjnych. Jego zastosowanie mo¿e byæ
-szczególnie przydatne w warunkach, gdzie tradycyjne metody pomiaru s¹ trudne do
-zastosowania, takich jak s³abe oœwietlenie.
+Badanie wykaza³o, ¿e algorytmy uczenia maszynowego mog¹ skutecznie analizowaæ
+niektóre metryki HRV na podstawie danych termowizyjnych. Ich zastosowanie mo¿e
+byæ szczególnie przydatne w warunkach, gdzie tradycyjne metody pomiaru s¹
+trudne do zastosowania, takich jak s³abe oœwietlenie.
 
 W pracy \cite{Gudny-ppgHRV} opisano wykorzystanie sieci neuronowych LSTM do
 analizy sygna³ów PPG i danych ruchowych w celu przewidywania parametrów HRV
@@ -286,4 +289,10 @@ sytuacjach, gdzie tradycyjne metody, takie jak EKG, s¹ trudne do zastosowania,
 na przyk³ad podczas ruchu.
 
 \subsection{Uczenie maszynowe w kontekscie RSA}
+Nowoczesne metody analizy, takie jak uczenie maszynowe, mog¹ znacz¹co przyczyniæ siê do lepszego zrozumienia zjawiska RSA, które pomimo wieloletnich badañ wci¹¿ budzi liczne pytania \cite{Morales-RSASVM}. Dziêki ich wykorzystaniu mo¿liwe jest odkrycie nowych wzorców i mechanizmów stoj¹cych za tym zjawiskiem.
 
+Autorzy publikacji \cite{Morales-RSASVM} podjêli próbê zbadania zale¿noœci miêdzy RSA a HRV, wykorzystuj¹c metody uczenia maszynowego. Zastosowali model SVM (Support Vector Machine) do przewidywania przysz³ych wartoœci HRV na podstawie sygna³ów oddechowych, co pozwoli³o na ocenê wp³ywu oddechu na zmiennoœæ rytmu serca. Dziêki zastosowaniu dwóch funkcji j¹dra  – liniowego i radialnego (RBF) – model umo¿liwi³ analizê zarówno prostych (liniowych), jak i bardziej z³o¿onych (nieliniowych) zale¿noœci. Wyniki wykaza³y, ¿e RSA w badanych przypadkach opiera³ siê g³ównie na mechanizmach liniowych, a wp³yw komponentów nieliniowych by³ ma³o znacz¹cy. Oznacza to, ¿e wiêkszoœæ zmian w rytmie serca mo¿na wyjaœniæ bez odwo³ywania siê do bardziej z³o¿onych interakcji miêdzy oddechem a HRV.
+
+Inne podejœcie do analizy RSA z wykorzystaniem metod uczenia maszynowego zosta³o przedstawione w pracy \cite{Lahr-RSA}. Autorzy zastosowali algorytm drzew decyzyjnych CART (Classification and Regression Tree), który umo¿liwi³ hierarchiczne uporz¹dkowanie czynników wp³ywaj¹cych na wystêpowanie RSA oraz okreœlenie ich znaczenia. 
+
+Wyniki analizy wskaza³y, ¿e najistotniejszym czynnikiem determinuj¹cym RSA jest wiek. Kolejnymi wa¿nymi zmiennymi by³y têtno (HR) oraz indeks masy cia³a (BMI). Drzewa decyzyjne pomog³y tak¿e zobrazowaæ, w jaki sposób ró¿ne poziomy tych zmiennych wp³ywaj¹ na wystêpowanie RSA.
