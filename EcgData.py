@@ -620,12 +620,15 @@ class EcgData:
                 filtered_data, self.zi = self.update_and_filter(
                     new_data[:, 1]
                 )  # Filtrowanie z zachowaniem stanu
-                self.filtered_data = np.concatenate(
-                    (
-                        self.filtered_data,
-                        np.column_stack((new_data[:, 0], filtered_data)),
+                try:
+                    self.filtered_data = np.concatenate(
+                        (
+                            self.filtered_data,
+                            np.column_stack((new_data[:, 0], filtered_data)),
+                        )
                     )
-                )
+                except: 
+                    pass
 
                 self.__raw_data = np.concatenate((self.__raw_data, new_data))
             else:
@@ -727,7 +730,10 @@ class EcgData:
         # self.__find_r_peaks()
 
         self.__find_new_r_peaks()
-        self.__find_new_r_peaks_filtered()
+        try:
+            self.__find_new_r_peaks_filtered()
+        except:
+            pass
         self.__find_r_peaks_piotr()
         self.__calc_rr_intervals()
 

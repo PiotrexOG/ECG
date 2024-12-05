@@ -8,6 +8,7 @@ from tensorflow.keras.layers import (
     Dense,
     Dropout,
     BatchNormalization,
+    Normalization
 )
 
 from EcgData import EcgData
@@ -30,6 +31,22 @@ from tensorflow.keras.regularizers import l2
 
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from wfdb import processing
+from functools import partial
+
+def normalize_bound(data, lb=-1, ub=1):
+    min_val = tf.reduce_min(data, axis=-1, keepdims=True)
+    max_val = tf.reduce_max(data, axis=-1, keepdims=True)
+    return lb + (data - min_val) * (ub - lb) / (max_val - min_val + 1e-7)
+
+class NormalizeLayer(tf.keras.layers.Layer):
+    def __init__(self, lb=-1, ub=1, **kwargs):
+        super(NormalizeLayer, self).__init__(**kwargs)
+        self.lb = lb
+        self.ub = ub
+
+    def call(self, inputs):
+        return normalize_bound(inputs, lb=self.lb, ub=self.ub)
 
 def create_hrv_model(input_length, output_len):
     input_signal = Input(shape=(input_length, 1))
@@ -70,6 +87,12 @@ def se_block(input_tensor, ratio=16):
 def new_model(input_length, output_len):
    input_signal = Input(shape=(input_length, 1))  # 1300 próbek, 1 kanał
 
+    # CustomNormalization
+    # normalized_signal = Normalization()(input_signal)
+    # normalized_signal = NormalizeLayer()(input_signal)
+    # x = Conv1D(filters=8, kernel_size=11, activation='relu', padding='same')(input_signal)
+    # x = BatchNormalization()(x)
+    # x = MaxPooling1D(pool_size=10)(x)  # 15000 → 3750
 
    # x = Conv1D(filters=8, kernel_size=11, activation='relu', padding='same')(input_signal)
    # x = BatchNormalization()(x)
