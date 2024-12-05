@@ -1,5 +1,5 @@
-\chapter{Implementacja algorytmów do analizy EKG}
-Lorem ipsum
+% \chapter{Implementacja algorytmów do analizy EKG}
+% Lorem ipsum
 \section{Identyfikacja szczytów R}
 Identyfikacja szczytów R by³a kluczowym etapem w przygotowaniu danych
 treningowych wykorzystywanych w pracy. Dane pochodz¹ce z dostêpnych baz, takich
@@ -17,6 +17,16 @@ kwadratowanie, okno ca³kuj¹ce, ustalenie progów i detekcja szczytów R
 do rzeczywistych najwy¿szych wartoœci sygna³u, wprowadzono dodatkowy krok,
 polegaj¹cy na sprawdzaniu otoczenia wykrytego szczytu.
 
+\subsection{Pan-Tompkins}
+Algorytm Pan-Tomkins jest powszechnie uznawanym narzêdziem do wykrywania
+za³amków R w sygna³ach EKG, zapewniaj¹c przy tym wysok¹ precyzjê. Algorytm
+sk³ada sie z kilku kluczowych etapów przetwarzania sygna³u: filtracja
+œrodkowoprzepustowa, ró¿niczkowanie, kwadratowanie, okno ca³kuj¹ce, ustalenie
+progów i detekcja szczytów R \cite{Fariha-PanTompkins}. Dodatkowo, aby
+dok³adnie dopasowaæ wykryte szczyty do rzeczywistych najwy¿szych wartoœci
+sygna³u, wprowadzono dodatkowy krok, polegaj¹cy na sprawdzaniu otoczenia
+wykrytego szczytu.
+
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.5]{Rysunki/Pan-Tomkins-scheme.png}
@@ -24,31 +34,57 @@ polegaj¹cy na sprawdzaniu otoczenia wykrytego szczytu.
     \label{fig/PanTompkinsFlowChart}
 \end{figure}
 
-\subsection{Filtracja œrodkowoprzepustowa}
+% \subsection{Filtracja œrodkowoprzepustowa}
 Filtracja œrodkowoprzepustowa ma na celu usuniêcie zak³óceñ wystêpuj¹cych w
 sygnale, co za tym idzie zwiêkszenie stosunku sygna³u do szumu
-\cite{Fariha-PanTompkins}. W niniejszej pracy w znacznej czêœci zebranych
-danych zdecydowano sie na przefiltrowanie sygna³u w zakresie od 5 do 18 Hz.
-Przedzia³ ten zosta³ dobrany empirycznie, na bazie przeprowadzonych testów.
+\cite{Fariha-PanTompkins}. Algorytm Pan-Tompkins standardowo wykorzystuje filtracjê w paœmie 5–15 Hz \cite{Fariha-PanTompkins}. Jednak na wczesnym etapie realizacji projektu zaobserwowano, ¿e zastosowanie szerszego pasma filtracji 5-18 Hz, zaproponowanego w pracy \cite{Khan-PanTompkins++}, prowadzi³o do nieco lepszych rezultatów.
 
-\subsection{Ró¿niczkowanie}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/Pan Tompkins_raw.png}
+    \caption{Fragment surowego sygna³u EKG z czujnika Polar H10}
+    \label{fig/PanTompkinsRaw}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_5_15.png}
+    \caption{Fragment przefiltrowanego sygna³u EKG z czujnika Polar H10}
+    \label{fig/PanTompkinsFiltered}
+\end{figure}
+
+% \subsection{Ró¿niczkowanie}
 Po wstêpnym przefiltrowaniu sygna³ EKG jest poddawany ró¿niczkowaniu, co ma na
 celu uwypuklenie szybkoœci zmian w sygnale, co pozwala na lepsze wyró¿nienie
 charakterystycznych punktów, takich jak szczyty R. W procesie wyznaczania
 pochodnej nisko-czêstotliwoœciowe sk³adowe sygna³u s¹ t³umione, a
 gwa³towniejsze zmiany uwypuklane, skutkuje to m. in. st³umieniem fal P i T oraz
 wzmocnieniem bardziej stromych zbocz w kompleksie QRS
-\cite{Fariha-PanTompkins}.
+\cite{Fariha-PanTompkins}.\\
 
-\subsection{Kwadratowanie}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/PanTompkins_derivative.png}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po ró¿niczkowaniu}
+    \label{fig/PanTompkinsDerivative}
+\end{figure}
+
+% \subsection{Kwadratowanie}
 Kwadratowanie jest kolejnym etapem, w którym sygna³ uzyskany w poprzednim kroku
 zostaje podniesiony do kwadratu. Dziêki temu wszystkie wartoœci sygna³u staj¹
 siê dodatnie, a fragmenty odpowiadaj¹ce kompleksowi QRS staj¹ siê bardziej
 widoczne. Dodatkowo, proces kwadratowania wyraŸniej uwypukla ró¿nicê miêdzy
 kompleksem QRS a fal¹ T, co pozwala na ich lepsze rozró¿nienie i redukuje
-ryzyko fa³szywych wykryæ szczytów R \cite{Fariha-PanTompkins}.
+ryzyko fa³szywych wykryæ szczytów R \cite{Fariha-PanTompkins}. \\
 
-\subsection{Okno ca³kuj¹ce}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_squared.png}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po ró¿niczkowaniu}
+    \label{fig/PanTompkinsSquared}
+\end{figure}
+
+% \subsection{Okno ca³kuj¹ce}
 Okno ca³kuj¹ce ma na celu wyg³adzenie i uœrednienie sygna³u w okreœlonym
 przedziale, oknie czasowym. Proces ten polega na obliczaniu sumy wartoœci
 próbek sygna³u w ramach przesuwaj¹cego sie okna, co prowadzi do uzyskania
@@ -62,14 +98,21 @@ elementów sygna³u. Dla danych pochodz¹cych z czujnika Polar H10 zastosowano
 okno o szerokoœci 50 ms, co przek³ada³o siê na oko³o 6 próbek, bior¹c pod uwagê
 czêstotliwoœæ próbkowania czujnika: 130 Hz.
 
-\subsection{Ustalenie progu i detekcja szczytów R}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_integrated.png}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po oknie ca³kuj¹cym}
+    \label{fig/Pan_tomkins_MWI}
+\end{figure}
+
+% \subsection{Ustalenie progu i detekcja szczytów R}
 Ustalenie progu ma na celu detekcjê szczytów R, przy jednoczesnej minimalizacji
 fa³szywych wykryæ. W tym celu ustalany jest próg na bazie którego podejmowana
 jest decyzja. Próg ten mo¿e byæ wartoœci¹ sta³¹ lub byæ dynamicznie
 dostosowywany, aby uwzglêdniæ zmiany amplitudy w ró¿nych odcinkach sygna³u.
 Podczas oznaczania danych pochodz¹cych z czujnika Polar H10 zastosowano próg
 obliczany jako œrednia wartoœæ sygna³u ca³kowanego powiêkszona o 0,6-krotnoœæ
-odchylenia standardowego tego sygna³u.
+odchylenia standardowego tego sygna³u.\\
 
 Podczas procesu detekcji wartoœci sygna³u porównywane s¹ z ustalonym progiem.
 Gdy sygna³ przekroczy wartoœæ progu, wstêpnie identyfikowany jest jako
@@ -78,29 +121,132 @@ dodatkowe regu³y, takie jak minimalny odstêp czasowy pomiêdzy wykrytymi
 szczytami. Podczas analizy danych pochodz¹cych z czujnika Polar H10 zastosowano
 odstêp wynosz¹cy 400 ms.
 
-\subsection{Doprecyzowanie pozycji szczytów}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/Pan Tomkins without refining.png}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po wykryciu szczytów}
+    \label{fig/Pan_tomkins_peaks}
+\end{figure}
+
+% \subsection{Doprecyzowanie pozycji szczytów}
 W dodatkowym kroku przeanalizowano otoczenie wykrytych szczytów w pierwotnym
 sygnale EKG w celu zwiêkszenia precyzji detekcji. Bez tej dodatkowej analizy
 wykryte za³amki czêsto by³y lekko przesuniête wzglêdem faktycznego maksimum
 sygna³u. Dlatego dla ka¿dego wykrytego punktu zbadano jego otoczenie i jako
 szczyt oznaczono wartoœæ maksymaln¹ w tym zakresie. W przypadku danych
 pochodz¹cych z czujnika Polar H10 rozmiar okna, w którym poszukiwano wartoœci
-maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.
-
-
-
-\subsection{Sieæ UNet}
-
-Nastêpn¹ metoda wykorzystana w pracy do wyznaczenia pozycji sczytów R jest sieæ
-neuronowa oparta o architekturê 1D UNet, zaczerpniêta z pracy
-\cite{MUzairZahid-UNET}. Jej budowa oraz blok post processingu przedstawiony,  jest na Rys. \ref{fig/UNet}
-pochodz¹cym z tej samej publikacji. Sieæ dzia³a w oparciu o model koder-dekoder, wyró¿niaj¹c w ten sposób dwa kluczowe jej elementy: œciezkê koduj¹c¹ oraz œcie¿kê dekoduj¹c¹. 
-
-Œcie¿ka koduj¹ca odpowiada za ekstrakcje istotnych cech sygna³u. Na ka¿da warstwê tej œcie¿ki sk³ada siê warstwa splotowa, która dokonuje jednoczeœnie operacji splotu i dwukrotnej redukcji wektora wejœciowego. 
+maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.\\
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.5]{Rysunki/U-net.png}
+    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_final.png}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po doprecyzowaniu pozycji szczytów}
+    \label{fig/Pan_tomkins_refined_peaks}
+\end{figure}
+
+\subsection{Sieæ UNet}\label{subsec:ml_rsa}
+
+% Nastêpn¹ metoda wykorzystana do wyznaczenia pozycji sczytów R w niniejszej pracy jest sieæ
+% neuronowa oparta o architekturê 1D UNet, zaczerpniêta z pracy
+% \cite{MUzairZahid-UNET}. Schemat budowy sieci, wraz z blokiem postprocessingu i
+% weryfikacji, przedstawiono na Rys. \ref{fig/UNet}, pochodz¹cym z tej samej
+% publikacji. Caloœæ zosta³a zrealizowana przy u¿yciu biblioteki TensorFlow, z
+% wykorzystaniem jej wysokopoziomowego API o nazwie Keras
+% \cite{TensorFlow-Keras}.
+
+Kolejn¹ metod¹ wykorzystan¹ w niniejszej pracy do wyznaczenia pozycji za³amków
+R jest sieæ neuronowa oparta na architekturze 1D U-Net, zaczerpniêta z pracy
+\cite{MUzairZahid-UNET}. Schemat budowy sieci, uwzglêdniaj¹cy blok
+postprocessingu i weryfikacji, przedstawiono na rysunku \ref{fig/UNet}, który
+pochodzi z tej samej publikacji. Sieæ opiera siê na modelu koder-dekoder,
+sk³adaj¹cym siê z dwóch g³ównych elementów: œcie¿ki koduj¹cej i œcie¿ki
+dekoduj¹cej. Implementacja w projekcie in¿ynierskim bazuje na kodzie
+udostêpnionym przez autorów, jednak zosta³a zmodyfikowana i dostosowana do
+potrzeb projektu. Ca³oœæ zrealizowano przy u¿yciu biblioteki TensorFlow oraz
+jej wysokopoziomowego API o nazwie Keras \cite{TensorFlow-Keras}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.4]{Rysunki/U-net.png}
     \caption{Schemat sieci U-Net}
     \label{fig/UNet}
 \end{figure}
+
+% Œcie¿ka koduj¹ca odpowiada za ekstrakcje istotnych cech sygna³u. Œcie¿ke koduj¹c¹ z³o¿ono z 6 warstw. Na ka¿da warstwê tej œcie¿ki sk³ada siê warstwa splotowa i funkcja aktywacji LeakyRELU. Warstwa splotowa dokonuje jednoczeœnie operacji splotu i dwukrotnej redukcji wektora wejœciowego, poprzez parametr stride, definiuj¹cego rozmiar kroku przesuwania filtra. 
+
+Œcie¿ka koduj¹ca w modelu zosta³a zaprojektowana w celu ekstrakcji kluczowych cech sygna³u wejœciowego oraz jego kontrolowanej redukcji. Sk³ada siê z szeœciu warstw, z których ka¿da realizuje przetwarzanie danych poprzez operacje splotu oraz funkcjê aktywacji LeakyReLU.
+
+Ka¿da warstwa wykorzystuje jednowymiarow¹ warstwê splotow¹ (Conv1D), która
+wykonuje operacjê konwolucji na danych wejœciowych, umo¿liwiaj¹c wyodrêbnienie
+istotnych cech sygna³u. Warstwa ta jednoczeœnie zmniejsza d³ugoœæ wektora
+wyjœciowego o po³owê dziêki zastosowaniu parametru stride=2, który definiuje
+krok przesuwania filtra. Aby zachowaæ pe³n¹ informacjê w ca³ym zakresie
+sygna³u, zastosowano parametr padding='same'. Dziêki temu wyjœcie uwzglêdnia
+ca³¹ d³ugoœæ wejœcia, niezale¿nie od rozmiaru filtra, a brakuj¹ce wartoœci s¹
+uzupe³niane zerami. Ostateczny rozmiar wyjœcia jest kontrolowany przez parametr
+stride, który decyduje o stopniu redukcji danych. Liczba filtrów oraz ich
+rozmiar zmieniaj¹ siê co dwie warstwy i wynosz¹ odpowiednio: 16, 32, 64 dla
+liczby filtrów oraz 9, 6, 3 dla rozmiaru filtra.\\
+
+Œcie¿ka dekoduj¹ca odpowiada za rekonstrukcjê sygna³u wyjœciowego na podstawie zakodowanych cech dostarczonych przez œcie¿kê koduj¹c¹. Sk³ada siê z szeœciu warstw transponowanych splotów (Conv1DTranspose), które realizuj¹ operacje odwrotne do warstw koduj¹cych. Warstwy te zwiêkszaj¹ d³ugoœæ wektora wyjœciowego dwukrotnie dziêki zastosowaniu parametru stride=2, co pozwala na stopniowe przywracanie pierwotnego rozmiaru sygna³u wejœciowego. Podobnie jak w œcie¿ce koduj¹cej, zastosowano parametr padding='same', aby zachowaæ zgodnoœæ d³ugoœci wyjœcia na ka¿dym etapie rekonstrukcji. W pierwszej warstwie dekoduj¹cej zastowsowano równie¿ mechanizm dropout z prawdopodobienstwem 0.25, w celu zignorowania pewnej liczby neuronów i poprawy generalizacji sieci. Ka¿da warstwa dekoduj¹ca wykorzystuje funkcjê aktywacji LeakyReLU, z wyj¹tkiem ostatniej, gdzie zastosowano funkcjê sigmoid, co wprowadza nieliniowoœæ do procesu dekodowania. Ostatnia wartstwa wykorzystuje wy³¹cznie jeden filtr, w celu wygenerowania jednego kana³u wyjœciowego.
+Wynikiem przetwarzania fragmentu sygna³u przez model jest jednowymiarowa mapa segmentacji, która przedstawia prawdopodobieñstwo ka¿dej próbki sygna³u bycia szczytem R.
+
+Kazda z warstw modelu, z wyj¹tkiem pierwszej, korzysta równie¿ z normalizacji
+wsadowej (BatchNormalization), co pozwala na stabilizacje oraz przyspieszenie
+procesu uczenia poprzez standaryzacje danych.
+
+W podanym modelu zastosowano po³¹czenia skip connections, które umo¿liwiaj¹
+po³¹czenie wyjœæ z warstw koduj¹cych z danymi przetwarzanymi w œcie¿ce
+dekoduj¹cej. W trakcie przechodzenia sygna³u przez œcie¿kê koduj¹c¹, wyjœcia z
+ka¿dej warstwy koduj¹cej s¹ zapisywane na osobnej liœcie. W œcie¿ce dekoduj¹cej
+te zapisane wyjœcia z warstw koduj¹cych s¹ póŸniej wykorzystywane do po³¹czenia
+z aktualnymi danymi przetwarzanymi w dekoderze. Po³¹czenie to realizowane jest
+za pomoc¹ operacji konkatenacji (Concatenate), która ³¹czy dwa zestawy danych –
+wyjœcie z warstwy dekoduj¹cej oraz odpowiadaj¹ce mu wyjœcie z warstwy koduj¹cej
+– wzd³u¿ osi kana³ów. Powoduje to, ¿e dekoder korzysta z bogatszego zestawu
+informacji, zawieraj¹cego zarówno cechy szczegó³owe, jak i bardziej ogólne. To
+po³¹czenie pozwala na dok³adniejsz¹ rekonstrukcjê sygna³u i unikniêcie utraty
+szczegó³ów w procesie kodowania.\\
+
+Wynik uzyskany z modelu wymaga dodatkowego przetwarzania, aby precyzyjnie
+zidentyfikowaæ rzeczywiste za³amki R. Ca³y proces wykrywania tych szczytów, od
+sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
+\begin{enumerate}
+    \item Podzia³ sygna³u na okna: Sygna³ jest dzielony na nachodz¹ce na siebie okna. W
+          tej pracy zastosowano parametr stride równy 3/4 wielkoœci pojedynczego okna, co
+          zapewnia czêœciowe nak³adanie siê okien.
+    \item Przetwarzanie przez model: Ka¿de okno jest przepuszczane przez model, który
+          generuje mapê prawdopodobieñstw dla próbek w tym oknie.
+    \item Scalanie wyników: Uzyskane wyniki z nak³adaj¹cych siê okien s¹ ³¹czone i
+          uœredniane, co redukuje b³êdy na granicach okien i pozwala uzyskaæ jedn¹,
+          spójn¹ mapê prawdopodobieñstw dla ca³ego sygna³u.
+    \item Selekcja punktów: Na podstawie zdefiniowanego progu (w tym przypadku threshold
+          = 0.5) wybierane s¹ punkty o wysokim prawdopodobieñstwie bycia szczytem R.
+    \item Korekcja punktów: Wybrane punkty s¹ przesuwane w kierunku wartoœci, która jest
+          najbardziej oddalona od œredniej wyg³adzonego sygna³u. Proces ten realizowany
+          jest za pomoc¹ funkcji \emph{correct\textunderscore peaks} z modu³u
+          \emph{wfdb.processing}
+    \item Finalne rozpoznanie szczytów R: Jeœli co najmniej piêæ punktów zostanie
+          podci¹gniête do tego samego miejsca, punkt ten zostaje zaklasyfikowany jako
+          szczyt R.
+\end{enumerate}\
+
+W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
+(autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
+zastosowanie algorytmu w czasie rzeczywistym. Ponadto zmieniono sposób korekty
+za³amków R — w pierwotnej wersji korekta by³a zawsze wykonywana do wartoœci
+najwy¿szej, natomiast wprowadzone zmiany pozwalaj¹ na korektê do wartoœci
+najbardziej oddalonej od œredniej. Udoskonalenie to umo¿liwi³o poprawne
+rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
+z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
+który by³ wspomniany w podsekcji \ref{subsec:ml_rsa}
+
+
+
+
+\subsection{Model end-to-end do wyznaczania miar HRV}
+W ramach pracy opracowano model sieci neuronowej typu end-to-end, której celem by³o przewidywanie parametrów HRV na podstawie surowego sygna³u EKG. Do implementacji sieci wykorzystano wysokopoziomowe API biblioteki {tensorflow} o nazwie Keras \cite{TensorFlow-Keras}.
+
+Model oparto o trzy jednowymiarowe warstwy splotowe (Conv1D), z których po ka¿dej dokonywano nromalizacje wsadow¹ (BatchNormalization) oraz operacje poolingu (MaxPooling1D). Nastêpnie u¿yto 
+
+\subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}

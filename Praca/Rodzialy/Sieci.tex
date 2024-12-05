@@ -289,10 +289,80 @@ sytuacjach, gdzie tradycyjne metody, takie jak EKG, s¹ trudne do zastosowania,
 na przyk³ad podczas ruchu.
 
 \subsection{Uczenie maszynowe w kontekscie RSA}
-Nowoczesne metody analizy, takie jak uczenie maszynowe, mog¹ znacz¹co przyczyniæ siê do lepszego zrozumienia zjawiska RSA, które pomimo wieloletnich badañ wci¹¿ budzi liczne pytania \cite{Morales-RSASVM}. Dziêki ich wykorzystaniu mo¿liwe jest odkrycie nowych wzorców i mechanizmów stoj¹cych za tym zjawiskiem.
+Nowoczesne metody analizy, takie jak uczenie maszynowe, mog¹ znacz¹co
+przyczyniæ siê do lepszego zrozumienia zjawiska RSA, które pomimo wieloletnich
+badañ wci¹¿ budzi liczne pytania \cite{Morales-RSASVM}. Dziêki ich
+wykorzystaniu mo¿liwe jest odkrycie nowych wzorców i mechanizmów stoj¹cych za
+tym zjawiskiem.
 
-Autorzy publikacji \cite{Morales-RSASVM} podjêli próbê zbadania zale¿noœci miêdzy RSA a HRV, wykorzystuj¹c metody uczenia maszynowego. Zastosowali model SVM (Support Vector Machine) do przewidywania przysz³ych wartoœci HRV na podstawie sygna³ów oddechowych, co pozwoli³o na ocenê wp³ywu oddechu na zmiennoœæ rytmu serca. Dziêki zastosowaniu dwóch funkcji j¹dra  – liniowego i radialnego (RBF) – model umo¿liwi³ analizê zarówno prostych (liniowych), jak i bardziej z³o¿onych (nieliniowych) zale¿noœci. Wyniki wykaza³y, ¿e RSA w badanych przypadkach opiera³ siê g³ównie na mechanizmach liniowych, a wp³yw komponentów nieliniowych by³ ma³o znacz¹cy. Oznacza to, ¿e wiêkszoœæ zmian w rytmie serca mo¿na wyjaœniæ bez odwo³ywania siê do bardziej z³o¿onych interakcji miêdzy oddechem a HRV.
+Autorzy publikacji \cite{Morales-RSASVM} podjêli próbê zbadania zale¿noœci
+miêdzy RSA a HRV, wykorzystuj¹c metody uczenia maszynowego. Zastosowali model
+SVM (Support Vector Machine) do przewidywania przysz³ych wartoœci HRV na
+podstawie sygna³ów oddechowych, co pozwoli³o na ocenê wp³ywu oddechu na
+zmiennoœæ rytmu serca. Dziêki zastosowaniu dwóch funkcji j¹dra – liniowego i
+radialnego (RBF) – model umo¿liwi³ analizê zarówno prostych (liniowych), jak i
+bardziej z³o¿onych (nieliniowych) zale¿noœci. Wyniki wykaza³y, ¿e RSA w
+badanych przypadkach opiera³ siê g³ównie na mechanizmach liniowych, a wp³yw
+komponentów nieliniowych by³ ma³o znacz¹cy. Oznacza to, ¿e wiêkszoœæ zmian w
+rytmie serca mo¿na wyjaœniæ bez odwo³ywania siê do bardziej z³o¿onych
+interakcji miêdzy oddechem a HRV.
 
-Inne podejœcie do analizy RSA z wykorzystaniem metod uczenia maszynowego zosta³o przedstawione w pracy \cite{Lahr-RSA}. Autorzy zastosowali algorytm drzew decyzyjnych CART (Classification and Regression Tree), który umo¿liwi³ hierarchiczne uporz¹dkowanie czynników wp³ywaj¹cych na wystêpowanie RSA oraz okreœlenie ich znaczenia. 
+Inne podejœcie do analizy RSA z wykorzystaniem metod uczenia maszynowego
+zosta³o przedstawione w pracy \cite{Lahr-RSA}. Autorzy zastosowali algorytm
+drzew decyzyjnych CART (Classification and Regression Tree), który umo¿liwi³
+hierarchiczne uporz¹dkowanie czynników wp³ywaj¹cych na wystêpowanie RSA oraz
+okreœlenie ich znaczenia.
 
-Wyniki analizy wskaza³y, ¿e najistotniejszym czynnikiem determinuj¹cym RSA jest wiek. Kolejnymi wa¿nymi zmiennymi by³y têtno (HR) oraz indeks masy cia³a (BMI). Drzewa decyzyjne pomog³y tak¿e zobrazowaæ, w jaki sposób ró¿ne poziomy tych zmiennych wp³ywaj¹ na wystêpowanie RSA.
+Wyniki analizy wskaza³y, ¿e najistotniejszym czynnikiem determinuj¹cym RSA jest
+wiek. Kolejnymi wa¿nymi zmiennymi by³y têtno (HR) oraz indeks masy cia³a (BMI).
+Drzewa decyzyjne pomog³y tak¿e zobrazowaæ, w jaki sposób ró¿ne poziomy tych
+zmiennych wp³ywaj¹ na wystêpowanie RSA.
+
+W artykule \cite{Morales_RSASVM_2} uczenie maszynowe wykorzystano do oceny
+ró¿nych metod mierzenia si³y zjawiska RSA, stosuj¹c modele regresji oparte na
+SVM (Support Vector Machines). Modele te trenowano na danych symulacyjnych, w
+których precyzyjnie kontrolowano si³ê sprzê¿enia kardiorespiracyjnego,
+reprezentowan¹ przez przyjêty parametr $\beta_R$. Proces treningu mia³ na celu
+nauczenie modeli zale¿noœci miêdzy wynikami ró¿nych metod pomiaru RSA a
+kontrolowanym parametrem $\beta_R$.
+
+Sygna³y symulacyjne generowano na podstawie wzoru przedstawionego w publikacji,
+gdzie parametr $\beta_R$ kontrolowa³ si³ê sprzê¿enia kardiorespiracyjnego.
+Nastêpnie obliczano wyniki ró¿nych metod analizy RSA na podstawie tych danych,
+co pozwoli³o modelom nauczyæ siê zale¿noœci miêdzy wynikami analiz a
+rzeczywist¹ wartoœci¹ $\beta_R$. W celu zapewnienie wysokiej dok³adnoœci
+przewidywañ oraz unikniêcia przeuczonia, trening przeprowadzno przy u¿yciu
+10-krotnej walidacji krzy¿owej. Skutecznoœæ modeli oceniano na podstawie b³êdu
+œredniokwadratowego (MSE), co pozwoli³o na obiektywn¹ ocenê zdolnoœci ró¿nych
+metod do odwzorowania si³y sprzê¿enia RSA.
+
+Tak wytrenowane modele pos³u¿y³y do okreœlenia sprzê¿enia kardiorespiracyjnego
+w danych rzeczywistych, gdzie jego wartoœæ by³a nieznana. Ocenê jakoœci
+przewidywañ oparto na kilku kryteriach. Pierwszym by³y wartoœæi MSE uzyskane w
+symulacjach, gdzie prawdziwe wartoœci sprzê¿enia by³y znane. Drugim by³o
+porównanie wyników z oczekiwanymi trendami w danych rzeczywistych, takimi jak
+zmiany RSA w zale¿noœci od faz snu. Dodatkowo porównywano zbie¿noœæ wyników
+ró¿nych metod, co pozwoli³o zidentyfikowaæ te, które charakteryzowa³y siê
+najwiêksz¹ precyzj¹ i stabilnoœci¹.
+
+Ca³y ten proces by³ niezbêdny, poniewa¿ ró¿ne metody mierzenia RSA pierwotnie
+operowa³y w ró¿nych jednostkach i skalach. Skalowanie ich na wspóln¹ miarê za
+pomoc¹ modeli regresji pozwoli³o na obiektywne porównanie skutecznoœci ka¿dej z
+nich oraz ocenê ich przydatnoœci w rzeczywistym zastosowaniu. Analiza wykaza³a,
+¿e najlepsze wyniki w odzwierciedlaniu si³y RSA uzyska³y metody oparte na
+analizie entropii (Cross Entropy), spójnoœci czasowo-czêstotliwoœciowej
+(Time-Frequency Coherence) oraz projekcjach w podprzestrzeni (Subspace
+Projections), które wykaza³y siê wysok¹ precyzj¹ i odpornoœci¹ na zmiennoœæ
+sygna³ów oddechowych.
+
+% Modele te by³y trenowane przy u¿yciu 10-krotnej walidacji krzy¿owej na dancyh
+% symulacyjnych, w których dok³adnie kontrolowano si³ê sprzê¿enia
+% kardiorespiracyjnego za pomoca przyjêtego parametru., s³u¿y³y do oceny ró¿nych
+% metod i dok³adnoœci przewidywan pod wzglêdem MSE (Mean Squared Error). Pozniej
+% w prawdziwych testach porownano ich zgodnosc ze soba. pierwotnie by³y wyra¿one
+% w ró¿nych jednostkach i skalach. Takie podejœcie by³o niezbêdne do obiektywnego
+% porównania skutecznoœci poszczególnych metod. Analiza wykaza³a, ¿e najlepsze
+% wyniki w odzwierciedlaniu si³y RSA uzyska³y metody oparte na analizie entropii
+% (Cross Entropy), spójnoœci czasowo-czêstotliwoœciowej (Time-Frequency
+% Coherence) oraz projekcjach w podprzestrzeni (Subspace Projections), które
+% wykaza³y siê wysok¹ precyzj¹ i odpornoœci¹ na zmiennoœæ sygna³ów oddechowych.
