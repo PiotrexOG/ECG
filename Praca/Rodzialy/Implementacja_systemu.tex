@@ -14,9 +14,11 @@ W celu identyfikacji tych zmian, sygna³ têtna zosta³ przetworzony za pomoc¹ cyfr
 Filtr Butterwortha w konfiguracji pasmowo-przepustowej przepuszcza³ tylko czêstotliwoœci w zakresie okreœlonym parametrami \textit{low} i \textit{high}, znormalizowanym wzglêdem czêstotliwoœci Nyquista (65 Hz dla czêstotliwoœci próbkowania 130 Hz). 
 
 \subsection{Dobór parametrów filtru}
-Eksperymenty, których wyniki szczegó³owo omówiono w dalszej czêœci pracy, wykaza³y, ¿e najlepsze wyniki uzyskano, gdy filtr przepuszcza³ czêstotliwoœci od 80-krotnoœci do 200-krotnoœci czêstotliwoœci oddechu.
-Przyk³adowo, dla osoby oddychaj¹cej z czêstotliwoœci¹ oko³o 6 oddechów na minutê (0.1 Hz), optymalne pasmo filtru wynosi³o od 8 Hz do 20 Hz. Aby osi¹gn¹æ takie ustawienia, parametry \textit{low} i \textit{high} nale¿y odpowiednio ustawiæ na wartoœci 8 i 20 Hz. Zakres ten zapewnia³ wyraŸne lokalne ekstrema w przefiltrowanym sygnale têtna, umo¿liwiaj¹c dok³adne okreœlenie faz oddechu.
+Na podstawie literatury oraz analizy heurystycznej ustalono, ¿e najlepsze wyniki mo¿na uzyskaæ, stosuj¹c filtr przepuszczaj¹cy czêstotliwoœci w zakresie od po³owy czêstotliwoœci centralnej do dwukrotnoœci tej czêstotliwoœci. Czêstotliwoœæ centraln¹ definiuje siê jako wartoœæ, dla której analizowany sygna³ wykazuje najwiêksz¹ moc.
 
+Przyk³adowo, dla osoby oddychaj¹cej z czêstotliwoœci¹ oko³o 6 oddechów na minutê (co odpowiada 0,1 Hz), optymalne pasmo filtra wynosi od 0,05 Hz do 0,2 Hz. W celu uzyskania takich ustawieñ, parametry filtra \textit{low} i \textit{high} nale¿y ustawiæ odpowiednio na wartoœci 0,05 Hz i 0,2 Hz. Tak dobrany zakres pozwala na uzyskanie wyraŸnych lokalnych ekstremów w przefiltrowanym sygnale têtna, co umo¿liwia precyzyjne okreœlenie faz cyklu oddechowego.
+
+Filtracja dolnych wartoœci (poni¿ej 0,05 Hz) pozwala odfiltrowaæ powolne wahania sygna³u, takie jak wp³yw zmian pozycji cia³a, artefakty ruchowe o niskiej czêstotliwoœci lub d³ugoterminowe trendy w sygnale. Z kolei odciêcie górnych wartoœci (powy¿ej 0,2 Hz) eliminuje zak³ócenia wynikaj¹ce z takich czynników jak szum o wysokiej czêstotliwoœci, szybkie artefakty ruchowe lub sk³adowe zwi¹zane z wysokoczêstotliwoœciowymi procesami fizjologicznymi, które nie s¹ zwi¹zane z oddechem.
 
 Opisywany algorytm wykazywa³ jednak pewne ograniczenia, szczególnie w przypadku szybszych oddechów (o czêstotliwoœci powy¿ej 0,25 Hz). Ponadto, w obecnej implementacji wymaga³ on filtrowania ca³ego sygna³u, co w trybie rzeczywistym lub podczas analizy du¿ych próbek danych, znacz¹co zwiêksza³o obci¹¿enie obliczeniowe.
 

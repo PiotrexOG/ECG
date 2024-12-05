@@ -188,6 +188,42 @@ gdzie:
   \item \(\overline{\Delta RR}\) to œrednia wartoœæ tych ró¿nic \(\Delta RR_i\) w ca³ym zbiorze.
 \end{itemize}
 
+Dane:  
+\[
+RR = [850, 870, 840, 860, 855]
+\]
+
+\textbf{\(\Delta RR_i = RR_{i+1} - RR_i\):}  
+\[
+\Delta RR_1 = 870 - 850 = 20, \quad \text{analogicznie dla pozosta³ych}
+\]
+\[
+\Delta RR = [20, -30, 20, -5]
+\]
+
+\textbf{\(\overline{\Delta RR}\):}  
+\[
+\overline{\Delta RR} = \frac{20 - 30 + 20 - 5}{4} = \frac{5}{4} = 1.25 \, \text{ms}
+\]
+
+\textbf{\((\Delta RR_i - \overline{\Delta RR})^2\):}  
+\[
+(20 - 1.25)^2 = 351.56, \quad \text{analogicznie dla pozosta³ych}
+\]
+\[
+[(\Delta RR - \overline{\Delta RR})^2] = [351.56, 976.56, 351.56, 39.06]
+\]
+
+\textbf{Œrednia kwadratów ró¿nic:}  
+\[
+\text{Œrednia} = \frac{351.56 + 976.56 + 351.56 + 39.06}{4 - 1} = \frac{1718.74}{3} = 572.91
+\]
+
+\textbf{SDSD:}  
+\[
+\text{SDSD} = \sqrt{572.91} \approx 23.94 \, \text{ms}
+\]
+
 \subsection{Analiza w domenie czêstotliwoœciowej}
 
 Analiza czêstotliwoœciowa pozwala przekszta³ciæ sygna³ z dziedziny czasu na dziedzinê czêstotliwoœci, co umo¿liwia ocenê mocy sygna³u w ró¿nych pasmach. Kluczowym narzêdziem tej analizy jest transformacja Fouriera, która identyfikuje obecne w sygnale czêstotliwoœci oraz przypisan¹ im moc. Dok³adna dekompozycja sygna³u jest operacj¹ bardzo z³o¿on¹ obliczeniowo i czasowo, dlatego w praktyce stosuje siê FFT (Fast Fourier Transform), czyli szybk¹ transformacjê Fouriera, która umo¿liwia efektywn¹ analizê mocy widmowej (PSD, Power Spectral Density), nale¿y jednak pamiêtaæ ¿e uzyskany w ten sposób wynik to jedynie oszacowanie rzeczywistej mocy. Analiza ta zak³ada stacjonarnoœæ sygna³u w badanym przedziale czasowym, co mo¿e byæ problematyczne w przypadku sygna³ów biologicznych, takich jak rytm serca czy oddech. Z tego powodu FFT najlepiej sprawdza siê w badaniach, gdzie sygna³y s¹ wzglêdnie stabilne, np. podczas spokojnego oddychania. W sytuacjach, gdy wystêpuj¹ zmiany w rytmie oddechowym i têtnie (np. w wyniku dzia³ania stresora), analiza FFT mo¿e wykazaæ umiarkowan¹ moc w szerokim zakresie czêstotliwoœci, co utrudnia identyfikacjê dominuj¹cych pasm. Dlatego analizy czêstotliwoœciowe s¹ najczêœciej wykonywane na sygna³ach trwaj¹cych oko³o 5 minut.
