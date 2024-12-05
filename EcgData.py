@@ -1201,20 +1201,42 @@ class EcgData:
                 result_y = np.column_stack((result_y, rmssd))
         if "lf" in metrics or "hf" in metrics or "lf/hf" in metrics:
                 lf, hf = zip(*[FFT.calc_lf_hf(row) for row in intervals])
+                lf = np.array(lf)
+                hf = np.array(hf)
                 if "lf" in metrics:
                     if result_y is None:
                         result_y = lf[:, None] 
-                    result_y = np.column_stack((result_y, lf))
+                    else:
+                        result_y = np.column_stack((result_y, lf))
                 if "hf" in metrics:
                     if result_y is None:
-                        result_y = hf[:, None] 
-                    result_y = np.column_stack((result_y, hf))
+                        result_y = hf[:, None]
+                    else: 
+                        result_y = np.column_stack((result_y, hf))
                 if "lf/hf" in metrics:
-                    if result_y is None:
-                        result_y = lf[:, None]  
                     lfhf = np.divide(lf, hf, out=np.zeros_like(lf, dtype=float), where=hf != 0)
-                    
-                    result_y = np.column_stack((result_y, lfhf))
+                    if result_y is None:
+                        result_y = lfhf[:, None]  
+                    else:
+                        result_y = np.column_stack((result_y, lfhf))
+        if "lfn" in metrics or "hfn" in metrics:
+            lf, hf = zip(*[FFT.calc_lf_hf(row) for row in intervals])
+            lf = np.array(lf)
+            hf = np.array(hf)
+            lfhf = lf+hf
+            if "lfn" in metrics:
+                    lfn = lf/lfhf
+                    if result_y is None:
+                        result_y = lfn[:, None] 
+                    else:
+                        result_y = np.column_stack((result_y, lfn))
+            if "hfn" in metrics:
+                    hfn = hf/lfhf
+                    if result_y is None:
+                        result_y = hfn[:, None] 
+                    else:
+                        result_y = np.column_stack((result_y, hfn))
+            
 
 
         # result_y = [[self.calc_sdnn(row), self.calc_rmssd(row)] for row in intervals]
