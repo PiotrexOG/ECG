@@ -164,5 +164,74 @@ Na kolejnym wycinku zaprezentowano te same wykresy, przybli¿one do zakresu od 30
 \end{figure}
 
 
+\section{Implementacja i Wizualizacja Œredniej Krocz¹cej}
+
+Na podstawie poni¿szego wykresu, przedstawiaj¹cego rozk³ad mocy w dziedzinie czasu i czêstotliwoœci, wyznaczonego na podstawie sygna³u EKG za pomoc¹ analizy falkowej dla okresu 3,5 godziny, zostanie opisana implementacja i wizualizacja œredniej krocz¹cej.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{Rysunki/wavePORANEK.png}
+    \caption{Skalogram przedstawiaj¹cy rozk³ad mocy w dziedzinie czasu i czêstotliwoœci dla sygna³u EKG uzyskany za pomoc¹ analizy falkowej.}
+    \label{fig:wavePORANEK}
+\end{figure}
+
+W przypadku analizy mocy w pasmach LF i HF oraz ich stosunku w tak d³ugim przedziale czasowym, wykres tych wartoœci mo¿e byæ ma³o czytelny z uwagi na du¿¹ zmiennoœæ mocy w poszczególnych pasmach. W takich sytuacjach, gdy chcemy zobrazowaæ globalne trendy, warto zastosowaæ metodê statystyczn¹, jak¹ jest œrednia krocz¹ca. Na rysunku poni¿ej przedstawiono moc w paœmie LF dla analizowanego sygna³u.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{Rysunki/lf_avg.png}
+    \caption{Zastosowanie ró¿nych metod œredniej krocz¹cej do wyg³adzania mocy w paœmie LF, przedstawiaj¹ce ich wp³yw na odwzorowanie trendów w d³u¿szej perspektywie czasowej.}
+    \label{fig:lf_avg}
+\end{figure}
+
+Subteln¹, ró¿ow¹ lini¹ zilustrowano wykres mocy w paœmie LF z dok³adnoœci¹ do 0,25 sekundy. Ze wzglêdu na du¿e wahania mocy w krótkich odstêpach czasu, analiza tego wykresu w d³u¿szej perspektywie jest trudna. Dlatego liniami o ró¿nych kolorach zaprezentowano zastosowanie centralnej œredniej krocz¹cej dla okna o rozmiarze 900 sekund (15 minut). Linie przedstawiaj¹:
+\begin{itemize}
+    \item œredni¹ jednorodn¹ (kolor niebieski),
+    \item œredni¹ liniow¹ (kolor zielony),
+    \item œredni¹ gaussowsk¹ (kolor czerwony).
+\end{itemize}
+
+W d³u¿szym przedziale czasowym wszystkie te œrednie wykazuj¹ zbli¿one wartoœci, jednak po zmniejszeniu skali mo¿na zaobserwowaæ subtelne ró¿nice, co ilustruje poni¿szy wykres:
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{Rysunki/lf_compare_avg.png}
+    \caption{Ró¿nice w wyg³adzaniu mocy w paœmie LF dla metod jednorodnej, liniowej i gaussowskiej, przy mniejszej skali czasowej.}
+    \label{fig:lf_compare_avg}
+\end{figure}
+
+W przypadku œredniej jednorodnej (kolor niebieski) lokalne ekstrema s¹ bardziej wyg³adzone ni¿ w przypadku œredniej liniowej i gaussowskiej, których wartoœci niemal siê pokrywaj¹. Filtr gaussowski zapewnia jednak bardziej naturalne wyg³adzenie, szczególnie przy analizie dynamicznych sygna³ów lub krótszych okien czasowych. Na podstawie tego porównania oraz teoretycznych przes³anek opisanych we wczeœniejszym rozdziale, wybrano œredni¹ gaussowsk¹ jako domyœlny sposób prezentowania zmian w czasie, z mo¿liwoœci¹ dostosowania rozmiaru okna przez u¿ytkownika w pliku konfiguracyjnym.
+
+Poni¿szy wykres przedstawia zmiany mocy w pasmach HF i LF w czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa:
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{Rysunki/lf_hf_normal.png}
+    \caption{Wykres zmian mocy w pasmach LF i HF w czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa.}
+    \label{fig:lf_hf_normal}
+\end{figure}
+
+W przypadku poprawnego zobrazowania zmiennoœci stosunku mocy w pasmach LF/HF mo¿liwe jest zastosowanie ró¿nych podejœæ. Na wykresie poni¿ej pokazano zmiany tego stosunku w czasie
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{Rysunki/lf_hf_avg_ratio.png}
+    \caption{Porównanie dwóch podejœæ do prezentacji stosunku mocy w pasmach LF i HF.}
+    \label{fig:lf_hf_avg_ratio}
+\end{figure}
+
+gdzie:
+\begin{itemize}
+    \item Zielon¹ lini¹ zilustrowano iloraz wartoœci uœrednionej mocy w paœmie LF oraz uœrednionej mocy w paœmie HF dla ka¿dego momentu \( t \).
+    \item ¯ó³t¹ lini¹ przedstawiono iloraz rzeczywistej wartoœci mocy w paœmie LF do wartoœci mocy w paœmie HF dla chwili \( t \), a nastêpnie wynikow¹ seriê danych poddano uœrednianiu krocz¹cemu.
+\end{itemize}
+
+Widaæ, ¿e stosunek tych dwóch miar jest silniej zale¿ny od chwilowych du¿ych zmian w wartoœciach w drugim podejœciu, co utrudnia analizê trendów w d³u¿szej perspektywie. Dlatego system domyœlnie wykorzystuje pierwsze podejœcie do prezentacji stosunku LF/HF w czasie.
+
+System umo¿liwia implementacjê centralnej œredniej krocz¹cej wy³¹cznie dla danych wczytanych w ca³oœci, np. z pliku CSV. Taka œrednia mo¿e byæ stosowana jedynie do wykresów opartych na kompletnych danych, gdzie dla ka¿dego analizowanego punktu istnieje odpowiednia liczba próbek zarówno z jego lewej, jak i prawej strony. W przypadku analizy danych w czasie rzeczywistym, gdzie przysz³e wartoœci s¹ nieznane, tego rodzaju uœrednianie w tej implementacji nie jest wspierane. W takiej sytuacji stosuje siê œrednie oparte wy³¹cznie na danych historycznych, co powoduje przesuniêcie (tzw. lag) wzglêdem rzeczywistego sygna³u. W d³u¿szym okresie przesuniêcie to ma jednak niewielki wp³yw na ogóln¹ analizê.
+
+Funkcjonalnoœæ obliczania œredniej krocz¹cej, zarówno centralnej, jak i klasycznej, zosta³a równie¿ zaimplementowana w przypadku wizualizacji trendów pulsu oraz interwa³ów RR, z u¿yciem filtra gaussowskiego.
+
+
 
 % \section{}

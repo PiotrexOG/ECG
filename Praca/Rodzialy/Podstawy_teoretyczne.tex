@@ -406,6 +406,78 @@ Wysokie RSA jest uwa¿ane za istotny marker zdrowia uk³adu sercowo-naczyniowego i
 Efekt RSA jest najbardziej widoczny u m³odych, zdrowych osób, co wynika z wy¿szej aktywnoœci nerwu b³êdnego. Z wiekiem RSA stopniowo maleje, co jest naturalnym procesem zwi¹zanym ze spadkiem zdolnoœci adaptacyjnych uk³adu autonomicznego. WyraŸne ró¿nice w sile RSA mo¿na równie¿ zaobserwowaæ u osób aktywnych fizycznie – silniejsze RSA u takich osób wskazuje na lepsz¹ regulacjê autonomiczn¹ oraz zdolnoœæ organizmu do utrzymania homeostazy.
 W kontekœcie ogólnej zmiennoœci rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, szczególnie u osób o dobrej kondycji fizycznej. Zmiennoœæ rytmu serca wywo³ana oddechem jest jednym z g³ównych parametrów HRV, który umo¿liwia ocenê zdolnoœci adaptacyjnych organizmu oraz wp³ywu czynników zewnêtrznych, takich jak stres czy trening fizyczny.
 
+\section{Metody uœredniania sygna³ów}
 
+Œrednia krocz¹ca to metoda statystyczna wykorzystywana do uœredniania wartoœci próbek sygna³u w czasie, szczególnie przydatna do prezentowania zmiennoœci w d³u¿szej perspektywie czasowej. Istotnym parametrem wp³ywaj¹cym na charakterystykê œredniej krocz¹cej jest d³ugoœæ okna uœredniania, która bezpoœrednio determinuje stopieñ wyg³adzenia sygna³u. Im d³u¿sze okno, tym bardziej uœrednione s¹ dane, ale kosztem szczegó³owoœci w krótkoterminowych zmianach.
+
+Œrednia krocz¹ca mo¿e byæ podzielona na dwa g³ówne typy:
+\begin{itemize}
+    \item \textbf{Œrednia krocz¹ca prosta (historyczna):} uwzglêdnia jedynie dane wczeœniejsze wzglêdem aktualnego punktu. Jest szczególnie przydatna w przypadku analizy danych w czasie rzeczywistym, gdzie przysz³e próbki s¹ nieznane.
+    \item \textbf{Œrednia krocz¹ca centralna:} wykorzystywana do analizy danych w pe³ni dostêpnych (np. po zakoñczeniu akwizycji). Uwzglêdnia dane z obu stron analizowanego punktu, tj. próbki z lewej i prawej strony. Dziêki symetrycznemu uœrednianiu œrednia centralna nie wykazuje efektu przesuniêcia (lagu).
+\end{itemize}
+
+Œrednia krocz¹ca polega na zastosowaniu filtra, który okreœla wagi przypisane poszczególnym próbkach w oknie uœredniania, a nastêpnie na wykonaniu operacji konwolucji sygna³u z tym filtrem. Wybór odpowiednich wag zale¿y od rodzaju zastosowanej œredniej. Najczêœciej stosowane s¹ nastêpuj¹ce typy filtrów:
+
+\subsection{Rodzaje œrednich krocz¹cych}
+\begin{itemize}
+    \item \textbf{Prosta (jednorodna):} Wszystkie próbki w oknie uœredniania maj¹ tê sam¹ wagê. Jeœli d³ugoœæ okna wynosi $n$, ka¿da próbka w oknie ma wagê $1/n$. Jest to podstawowa metoda, odpowiednia do sygna³ów o umiarkowanej zmiennoœci i w przypadku mniej krytycznych zastosowañ.
+    \item \textbf{Liniowa:} Wagi w oknie uœredniania zmniejszaj¹ siê liniowo wraz z odleg³oœci¹ od centralnej próbki. Jest to u¿yteczne w przypadkach, gdy próbki bli¿sze analizowanemu punktowi powinny mieæ wiêkszy wp³yw na wynik.
+    \item \textbf{Gaussowska:} Wagi s¹ obliczane na podstawie rozk³adu normalnego (gaussowskiego). Jest najlepsza w przypadku dynamicznych sygna³ów lub danych, gdzie wa¿ne jest uzyskanie naturalnego wyg³adzenia. Wartoœæ wagi dla próbki $x_i$ zale¿y od odleg³oœci od centralnej próbki $x_c$ i jest wyra¿ona wzorem:
+    \[
+    w_i = \frac{1}{\sqrt{2\pi}\sigma} \cdot e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
+    \]
+    gdzie:
+    \begin{itemize}
+        \item $\sigma$ to odchylenie standardowe okreœlaj¹ce szerokoœæ rozk³adu,
+        \item $x_i$ to odleg³oœæ próbki od œrodka okna.
+    \end{itemize}
+\end{itemize}
+
+W projekcie zdecydowano siê na zastosowanie œredniej gaussowskiej, poniewa¿ najlepiej nadaje siê ona do analizy sygna³ów takich jak EKG, gdzie zmiennoœæ sygna³u ma kluczowe znaczenie, a jednoczeœnie wymagane jest p³ynne odwzorowanie globalnych trendów.
+
+\subsection{Œrednia Gaussowska — Przyk³ad Obliczenia}
+
+W praktycznych implementacjach œredniej Gaussowskiej wspó³czynnik \( \frac{1}{\sqrt{2\pi}\sigma} \) nie jest jawnie uwzglêdniany, poniewa¿ wagi s¹ normalizowane po obliczeniu. Normalizacja sprawia, ¿e suma wag wynosi 1, co osi¹ga ten sam efekt, jaki zapewnia³by ten wspó³czynnik. W efekcie u¿ywamy uproszczonego wzoru:
+\begin{equation}
+w_i' = e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
+\end{equation}
+a nastêpnie normalizujemy wszystkie \( w_i' \), aby uzyskaæ koñcowe wagi.
+
+\subsubsection{Przyk³ad}
+Za³ó¿my:
+\begin{itemize}
+    \item Sygna³: \([3, 5, 8, 6, 4, 7]\)
+    \item D³ugoœæ okna: \(n = 3\)
+    \item Odchylenie standardowe: \(\sigma = n / 4 = 0.75\)
+\end{itemize}
+
+\subsubsection{Krok 1: Obliczenie wag Gaussowskich}
+Dla œrodka okna (\(x_c\)) na pozycji \(i = 1\) (œrodek okna):
+\begin{equation}
+w_0 = e^{-\frac{(0 - 1)^2}{2 \cdot 0.75^2}} = e^{-\frac{1}{1.125}} \approx 0.472
+\end{equation}
+Podobnie obliczamy \(w_1\) i \(w_2\).
+
+Lista wag przed normalizacj¹:
+\begin{equation}
+w = [0.472, 1.0, 0.472]
+\end{equation}
+
+Normalizujemy, dziel¹c przez sumê wag (\(1.944\)):
+\begin{equation}
+w = \left[\frac{0.472}{1.944}, \frac{1.0}{1.944}, \frac{0.472}{1.944}\right] \approx [0.243, 0.514, 0.243]
+\end{equation}
+
+\subsubsection{Krok 2: Konwolucja sygna³u z wagami}
+Dla przyk³adu obliczmy œredni¹ dla punktu \(x_3 = 8\) (okno: \([5, 8, 6]\)):
+\begin{equation}
+y_3 = 5 \cdot 0.243 + 8 \cdot 0.514 + 6 \cdot 0.243 = 1.215 + 4.112 + 1.458 \approx 6.785
+\end{equation}
+
+\subsubsection{Wynik koñcowy}
+Podobnie obliczamy dla wszystkich punktów, stosuj¹c te same wagi, a tak prezentuje siê wynikowy sygna³:  
+\begin{equation}
+\text{Sygna³ uœredniony} \approx [3.299, 5.243, 6.785, 6.0, 5.215, 4.57]
+\end{equation}
 
 \input{Rodzialy/Sieci.tex}
