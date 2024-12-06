@@ -37,7 +37,11 @@ wykrytego szczytu.
 % \subsection{Filtracja œrodkowoprzepustowa}
 Filtracja œrodkowoprzepustowa ma na celu usuniêcie zak³óceñ wystêpuj¹cych w
 sygnale, co za tym idzie zwiêkszenie stosunku sygna³u do szumu
-\cite{Fariha-PanTompkins}. Algorytm Pan-Tompkins standardowo wykorzystuje filtracjê w paœmie 5–15 Hz \cite{Fariha-PanTompkins}. Jednak na wczesnym etapie realizacji projektu zaobserwowano, ¿e zastosowanie szerszego pasma filtracji 5-18 Hz, zaproponowanego w pracy \cite{Khan-PanTompkins++}, prowadzi³o do nieco lepszych rezultatów.
+\cite{Fariha-PanTompkins}. Algorytm Pan-Tompkins standardowo wykorzystuje
+filtracjê w paœmie 5–15 Hz \cite{Fariha-PanTompkins}. Jednak na wczesnym etapie
+realizacji projektu zaobserwowano, ¿e zastosowanie szerszego pasma filtracji
+5-18 Hz, zaproponowanego w pracy \cite{Khan-PanTompkins++}, prowadzi³o do nieco
+lepszych rezultatów.
 
 \begin{figure}[ht]
     \centering
@@ -156,18 +160,21 @@ maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.\\
 
 Kolejn¹ metod¹ wykorzystan¹ w niniejszej pracy do wyznaczenia pozycji za³amków
 R jest sieæ neuronowa oparta na architekturze 1D U-Net, zaczerpniêta z pracy
-\cite{MUzairZahid-UNET}. Schemat budowy sieci, uwzglêdniaj¹cy blok
-postprocessingu i weryfikacji, przedstawiono na rysunku \ref{fig/UNet}, który
-pochodzi z tej samej publikacji. Sieæ opiera siê na modelu koder-dekoder,
-sk³adaj¹cym siê z dwóch g³ównych elementów: œcie¿ki koduj¹cej i œcie¿ki
-dekoduj¹cej. Implementacja w projekcie in¿ynierskim bazuje na kodzie
-udostêpnionym przez autorów, jednak zosta³a zmodyfikowana i dostosowana do
-potrzeb projektu. Ca³oœæ zrealizowano przy u¿yciu biblioteki TensorFlow oraz
-jej wysokopoziomowego API o nazwie Keras \cite{TensorFlow-Keras}.
+\cite{MUzairZahid-UNET}.
+% Schemat budowy sieci, uwzglêdniaj¹cy blok
+% postprocessingu i weryfikacji, przedstawiono na rysunku \ref{fig/UNet}, który
+% pochodzi z tej samej publikacji. 
+Sieæ opiera siê na modelu koder-dekoder, sk³adaj¹cym siê z dwóch g³ównych
+elementów: œcie¿ki koduj¹cej i œcie¿ki dekoduj¹cej. Implementacja w projekcie
+in¿ynierskim bazuje na kodzie udostêpnionym przez autorów, jednak zosta³a
+zmodyfikowana i dostosowana do potrzeb projektu. Ca³oœæ zrealizowano przy
+u¿yciu biblioteki TensorFlow oraz jej wysokopoziomowego API o nazwie Keras
+\cite{TensorFlow-Keras}. Sschemat budowy sieci, pochodz¹cy z tej samej
+publikacji, przedstawiono na Rys \ref{fig/UNet}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{Rysunki/U-net.png}
+    \includegraphics[scale=0.5]{Rysunki/U-net_small.png}
     \caption{Schemat sieci U-Net}
     \label{fig/UNet}
 \end{figure}
@@ -241,12 +248,14 @@ rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
 z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
 który by³ wspomniany w podsekcji \ref{subsec:ml_rsa}
 
-
-
-
 \subsection{Model end-to-end do wyznaczania miar HRV}
-W ramach pracy opracowano model sieci neuronowej typu end-to-end, której celem by³o przewidywanie parametrów HRV na podstawie surowego sygna³u EKG. Do implementacji sieci wykorzystano wysokopoziomowe API biblioteki {tensorflow} o nazwie Keras \cite{TensorFlow-Keras}.
+W ramach pracy opracowano model sieci neuronowej typu end-to-end, której celem
+by³o przewidywanie parametrów HRV na podstawie surowego sygna³u EKG. Do
+implementacji sieci wykorzystano wysokopoziomowe API biblioteki {tensorflow} o
+nazwie Keras \cite{TensorFlow-Keras}.
 
-Model oparto o trzy jednowymiarowe warstwy splotowe (Conv1D), z których po ka¿dej dokonywano nromalizacje wsadow¹ (BatchNormalization) oraz operacje poolingu (MaxPooling1D). Nastêpnie u¿yto 
+Model oparto o trzy jednowymiarowe warstwy splotowe (Conv1D), z których po
+ka¿dej dokonywano nromalizacje wsadow¹ (BatchNormalization) oraz operacje
+poolingu (MaxPooling1D). Nastêpnie u¿yto
 
 \subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}
