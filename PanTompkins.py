@@ -115,15 +115,31 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
     integrated_signal = moving_window_integration(squared_signal, window_size)
     
     #threshold = 0.4 * np.max(integrated_signal)
+    
     clipped_signal = np.clip(integrated_signal, 0, np.percentile(integrated_signal, 99))
     threshold = np.mean(clipped_signal) + 0.6 * np.std(clipped_signal)
+
+    # threshold = np.mean(integrated_signal) + 0.6 * np.std(integrated_signal)  # Mean + 0.6*std
     
     peaks, _ = signal.find_peaks(
         integrated_signal, height=threshold, distance=int(0.3 * frequency) # 400 ms
     )
     
+    
+    
+    
+    
     # refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
-    refined_peaks = refine_peak_positions(ecg_signal, peaks)
+    refined_peaks = refine_peak_positions(ecg_signal, peaks, round(10/130*frequency))
+    
+    # refined_peaks = processing.correct_peaks(
+    #     sig=ecg_signal,
+    #     peak_inds=peaks,
+    #     search_radius=30,
+    #     smooth_window_size=30,
+    #     # peak_dir="up",
+    # )
+    # refined_peaks = peaks
     
     return refined_peaks
 
