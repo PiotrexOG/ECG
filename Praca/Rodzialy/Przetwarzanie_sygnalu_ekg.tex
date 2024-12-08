@@ -196,7 +196,7 @@ rozmiar zmieniaj¹ siê co dwie warstwy i wynosz¹ odpowiednio: 16, 32, 64 dla
 liczby filtrów oraz 9, 6, 3 dla rozmiaru filtra.\\
 
 Œcie¿ka dekoduj¹ca odpowiada za rekonstrukcjê sygna³u wyjœciowego na podstawie zakodowanych cech dostarczonych przez œcie¿kê koduj¹c¹. Sk³ada siê z szeœciu warstw transponowanych splotów (Conv1DTranspose), które realizuj¹ operacje odwrotne do warstw koduj¹cych. Warstwy te zwiêkszaj¹ d³ugoœæ wektora wyjœciowego dwukrotnie dziêki zastosowaniu parametru stride=2, co pozwala na stopniowe przywracanie pierwotnego rozmiaru sygna³u wejœciowego. Podobnie jak w œcie¿ce koduj¹cej, zastosowano parametr padding='same', aby zachowaæ zgodnoœæ d³ugoœci wyjœcia na ka¿dym etapie rekonstrukcji. W pierwszej warstwie dekoduj¹cej zastowsowano równie¿ mechanizm dropout z prawdopodobienstwem 0.25, w celu zignorowania pewnej liczby neuronów i poprawy generalizacji sieci. Ka¿da warstwa dekoduj¹ca wykorzystuje funkcjê aktywacji LeakyReLU, z wyj¹tkiem ostatniej, gdzie zastosowano funkcjê sigmoid, co wprowadza nieliniowoœæ do procesu dekodowania. Ostatnia wartstwa wykorzystuje wy³¹cznie jeden filtr, w celu wygenerowania jednego kana³u wyjœciowego.
-Wynikiem przetwarzania fragmentu sygna³u przez model jest jednowymiarowa mapa segmentacji, która przedstawia prawdopodobieñstwo ka¿dej próbki sygna³u bycia szczytem R.
+Wynikiem przetwarzania fragmentu sygna³u przez model jest jednowymiarowa mapa segmentacji, która przedstawia prawdopodobieñstwo ka¿dej próbki sygna³u na bycie szczytem R.
 
 Kazda z warstw modelu, z wyj¹tkiem pierwszej, korzysta równie¿ z normalizacji
 wsadowej (BatchNormalization), co pozwala na stabilizacje oraz przyspieszenie
@@ -214,6 +214,7 @@ wyjœcie z warstwy dekoduj¹cej oraz odpowiadaj¹ce mu wyjœcie z warstwy koduj¹cej
 informacji, zawieraj¹cego zarówno cechy szczegó³owe, jak i bardziej ogólne. To
 po³¹czenie pozwala na dok³adniejsz¹ rekonstrukcjê sygna³u i unikniêcie utraty
 szczegó³ów w procesie kodowania.\\
+
 
 Wynik uzyskany z modelu wymaga dodatkowego przetwarzania, aby precyzyjnie
 zidentyfikowaæ rzeczywiste za³amki R. Ca³y proces wykrywania tych szczytów, od
@@ -238,6 +239,14 @@ sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
           szczyt R.
 \end{enumerate}\
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1]{Rysunki/unet-postprocess.png}
+    \caption{Uproszczony schemat przetworzenia wyników sieci, od otrzymanych map segmentacji z sieci do rozpoznania szczytu}
+    \label{fig/UNet}
+\end{figure}
+
+
 W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
 (autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
 zastosowanie algorytmu w czasie rzeczywistym. Ponadto zmieniono sposób korekty
@@ -249,13 +258,43 @@ z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
 który by³ wspomniany w podsekcji \ref{subsec:ml_rsa}
 
 \subsection{Model end-to-end do wyznaczania miar HRV}
-W ramach pracy opracowano model sieci neuronowej typu end-to-end, której celem
-by³o przewidywanie parametrów HRV na podstawie surowego sygna³u EKG. Do
-implementacji sieci wykorzystano wysokopoziomowe API biblioteki {tensorflow} o
-nazwie Keras \cite{TensorFlow-Keras}.
+W ramach pracy opracowano model sieci neuronowej typu end-to-end, którego
+przeznaczeniem jest przewidywanie parametrów HRV na podstawie surowego sygna³u
+EKG. Do implementacji sieci wykorzystano wysokopoziomowe API biblioteki
+\emph{tensorflow} o nazwie \emph{Keras} \cite{TensorFlow-Keras}. Schemat
+architektury sieci przedstawiono na Rys. \ref{fig/end-to-end}
 
-Model oparto o trzy jednowymiarowe warstwy splotowe (Conv1D), z których po
-ka¿dej dokonywano nromalizacje wsadow¹ (BatchNormalization) oraz operacje
-poolingu (MaxPooling1D). Nastêpnie u¿yto
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1.5]{Rysunki/end-to-end.png}
+    \caption{Schemat sieci end-to-end do wyznaczania miar HRV}
+    \label{fig/end-to-end}
+\end{figure}
+
+Model oparto o kaskade trzech bloków przetwarzania, z których ka¿dy zawiera jednowymiarowa
+warstwê splotow¹ (Conv1D), normalizacje wsadow¹ (BatchNormalization) oraz
+operacje maksymalnego próbkowania (MaxPooling1D). Warstwy splotowe wykorzystuj¹
+funkcjê aktywacji ReLU i parametr padding=same, który zachowuje rozmiar wyjœcia
+taki sam jak wejœcia. Rozmiary filtrów w warstwach splotowych wynosz¹
+odpowiednio 15, 11 i 9, a ich iloœæ to 32, 64 i 128. Maksymalne próbkowanie
+zmniejsza rozmiar danych na koniec z ka¿dego z bloków, pieciokrotnie w
+przypadku pierwszych dwóch oraz czterokrotnie w wypadku trzeciego.
+
+Po przejœciu przez te trzy bloki, dane trafiaj¹ do warstwy uwagi,
+zaimplementowanej przy u¿yciu warstwy gêstej (Dense) z funkcj¹ aktywacji
+sigmoid. Wynik tej warstwy jest przemna¿any z wynikiem ostatniego bloku
+przetwarzaj¹cego. Nastêpnie dane s¹ globalnie uœredniane
+(GlobalAveragePooling1D), co redukuje je do wektora reprezentuj¹cego œrednie
+wartoœci filtrów wzd³u¿ ca³ego sygna³u.
+
+Po operacji uœredniania dane przechodz¹ przez dwie warstwy gêste, których
+rozmiary wynosz¹ 128 i 64. Po ka¿dej z tych warstw zastosowano mechanizm
+losowego odrzucania neuronów (dropout), odpowiednio na poziomie 40\% i 30\%.
+Zapobiega to przeuczeniu modelu oraz wspiera jego generalizacje.
+
+Na koñcu model zawiera ostatni¹ warstwê gest¹, której liczba neuronów odpowiada
+liczbie przewidywanych przez model wartoœci, na przyk³ad w przypadku
+przewidywania SDNN i RMSSD rozmiar ten wynosi dwa. Warstwa ta wykorzystuje
+liniowa funkcje aktywacji.
 
 \subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}
