@@ -24,7 +24,7 @@ class EcgPlotter:
         self.ecg_data = ecg_data
         self._plot_data = deque(maxlen=ecg_data.frequency * SECONDS_TO_PLOT)
 
-        self.fig, (self.ax_ecg) = plt.subplots(figsize=(16, 8))
+        self.fig, (self.ax_ecg) = plt.subplots(figsize=(12, 6))
         plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)
 
         # ECG plot
@@ -69,18 +69,19 @@ class EcgPlotter:
         handles, labels = self.ax_ecg.get_legend_handles_labels()
         
         # Add the legend
-        legend = self.ax_ecg.legend(
-            loc="lower right",
-            fontsize=12,
-            facecolor="black",
-            edgecolor="green"
-        )
+        if self.ecg_data.loaded_r_peak_ind.size != np.empty(0).size:
+            legend = self.ax_ecg.legend(
+                loc="lower right",
+                fontsize=12,
+                facecolor="black",
+                edgecolor="green"
+            )
+            # Change text color for the legend
+            for text in legend.get_texts():
+                text.set_color("white")
 
-        # Change text color for the legend
-        for text in legend.get_texts():
-            text.set_color("white")
         
-
+        
         self.stats_text = self.ax_ecg.text(
             0.01,
             0.01,
@@ -97,6 +98,7 @@ class EcgPlotter:
 
         # self.timer.start()
         self.ecg_data.add_listener(self.update_plot)
+        self.update_plot()
 
     # def send_single_sample(self, timestamp, voltage):
     #     self._plot_data.append((timestamp, voltage))
@@ -142,9 +144,12 @@ class EcgPlotter:
             timestamps, ecg_values = zip(*self._plot_data)
             x = np.array(timestamps)
             x_normalized = x - x[0]  # Normalize time to start from 0
-
-            # Update ECG plot
-            self.line_ecg.set_data(x_normalized, ecg_values)  # Use normalized time
+            
+            if DISPLAY_X_INDEXES:
+                x_ind = np.arange(0, len(x_normalized))
+                self.line_ecg.set_data(x_ind, ecg_values)
+            else:
+                self.line_ecg.set_data(x_normalized, ecg_values)  # Use normalized time
             self.ax_ecg.relim()  # Recalculate limits
             self.ax_ecg.autoscale_view()  # Auto scale the view
 
@@ -227,6 +232,9 @@ class EcgPlotter:
                 r_peak_times, r_peak_values = zip(*r_peaks)
                 # Normalize the R-peak timestamps
                 r_peak_times_normalized = np.array(r_peak_times) - x[0]
+                if DISPLAY_X_INDEXES:
+                    r_peak_ind = np.squeeze(np.where(np.isin(x_normalized, r_peak_times_normalized)))
+                    r_peak_times_normalized = r_peak_ind
                 # Update scatter plot with R-peaks
                 self.ax_r_peaks.set_offsets(
                     np.array([r_peak_times_normalized, r_peak_values]).T

@@ -7,6 +7,7 @@ from models import sig2sig_unet, sig2sig_cnn
 from wfdb import processing
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 #PLIK ZAWIERAJCY FUNKCJE POMOCNICZE DO FUNKCJONOWANIA SIECI UNET
 
@@ -236,7 +237,7 @@ def mean_preds(win_idx, preds, orig_len, win_size, stride):
     return pred_mean
 
 
-def filter_predictions(signal, preds, threshold):
+def filter_predictions(signal, preds, threshold, frequency):
     """
     Filter model predictions.
     Function filters model predictions by using following steps:
@@ -274,13 +275,14 @@ def filter_predictions(signal, preds, threshold):
     above_thresh = preds[preds > threshold]
     above_threshold_idx = np.where(preds > threshold)[0]
 
+    s_radius = round(30/400*frequency)
     # Keep only points above self.threshold and correct them upwards
     correct_up = processing.correct_peaks(
         sig=signal,
         peak_inds=above_threshold_idx,
-        search_radius=30,
-        smooth_window_size=30,
-        # peak_dir="up",
+        search_radius=s_radius,#30,
+        smooth_window_size=s_radius,#30,
+        peak_dir="up",
     )
 
     filtered_peaks = []
@@ -301,18 +303,45 @@ def filter_predictions(signal, preds, threshold):
 
     return filtered_peaks, filtered_probs
 
-def train_unet(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
-    train(X_train, y_train, R_p_w, epochs, f"{model_file_name}_unet", sig2sig_unet(input_size))
-    
-def train_cnn(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
-    train(X_train, y_train, R_p_w, epochs, f"{model_file_name}_cnn", sig2sig_cnn(input_size))
 
-def train(X_train, y_train, R_p_w, epochs, model_file_name, model):
+def train_unet(
+    X_train,
+    y_train,
+    R_p_w,
+    input_size,
+    epochs,
+    model_file_name,
+    loss_plot_filename=None,
+):
+    train(
+        X_train,
+        y_train,
+        R_p_w,
+        epochs,
+        f"{model_file_name}_unet",
+        sig2sig_unet(input_size),
+        loss_plot_filename
+    )
+
+
+def train_cnn(X_train, y_train, R_p_w, input_size, epochs, model_file_name):
+    train(
+        X_train,
+        y_train,
+        R_p_w,
+        epochs,
+        f"{model_file_name}_cnn",
+        sig2sig_cnn(input_size),
+        model_file_name
+    )
+
+
+def train(X_train, y_train, R_p_w, epochs, model_file_name, model, loss_plot_filename=None):
     start = time.process_time()
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15)
+    # X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.3)
 
     # model = sig2sig_unet(input_size)
-    
+
     model_path = "models\\" + model_file_name + ".keras"
 
     if not os.path.exists("models/"):
@@ -332,15 +361,16 @@ def train(X_train, y_train, R_p_w, epochs, model_file_name, model):
     history = model.fit(
         X_train,
         y_train,
-        validation_data=(X_val, y_val),
+        # validation_data=(X_val, y_val),
         epochs=epochs,
         batch_size=16,
         callbacks=[checkpoint, callback],
         shuffle=True,
-        verbose = 1
+        verbose=1,
     )
 
     print(time.process_time() - start)
+    plot_losses(history, loss_plot_filename)
     pass
 
 
@@ -370,3 +400,27 @@ def test(model_name, epochs, input_size, ecg_data: EcgData, threshold=0.4):
     R_peaks_ver, _ = verifier(ecg, filtered_peaks, filtered_proba, ver_wind=7)
     stats_R = calculate_stats(r_ref=R_ann, r_ans=R_peaks_ver, thr_=0.15, fs=400)
     pass
+
+
+def plot_losses(history, path: str = None):
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    loss = history.history["loss"]
+    
+    epochs = np.arange(1, len(loss)+1)
+    ax.plot(epochs, loss, label="Training Loss", marker="o")
+    try:
+        val_loss = history.history["val_loss"]
+        ax.plot(epochs, val_loss, label="Validation Loss", marker="o")
+    except:
+        pass
+
+    ax.set_title("Training and Validation Loss")
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Loss")
+    ax.legend()
+    ax.grid(True)
+    if path is not None:
+        filename = f"{path}.png"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        fig.savefig(filename, format="png", dpi=300)

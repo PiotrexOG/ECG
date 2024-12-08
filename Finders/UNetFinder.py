@@ -4,7 +4,7 @@ from functools import partial
 from wfdb import processing
 import numpy as np
 from nnHelpers import mean_preds, verifier, filter_predictions
-
+from PanTompkins import bandpass_filter
 
 class UNetFinder(RPeaksFinder):
 
@@ -19,6 +19,7 @@ class UNetFinder(RPeaksFinder):
         # print(len(ecg_signal) > 256)
         stride = int(6 / 8 * self._win_size)
         padded_indices, data_windows = self.extract_windows(ecg_signal, stride)
+        padded_indices, data_windows = self.extract_windows(ecg_signal, stride, frequency)
         predictions = self._model.predict(data_windows, verbose = 0)
         predictions = mean_preds(
             win_idx=padded_indices,
@@ -28,7 +29,7 @@ class UNetFinder(RPeaksFinder):
             stride=stride,
         )
         filtered_peaks, filtered_proba = filter_predictions(
-            signal=ecg_signal, preds=predictions, threshold=threshold
+            signal=ecg_signal, preds=predictions, threshold=threshold, frequency = frequency
         )
         
         filtered_peaks, _ = verifier(ecg_signal, filtered_peaks, filtered_proba, ver_wind = (80/400)*frequency)
@@ -39,10 +40,11 @@ class UNetFinder(RPeaksFinder):
         #R_peaks_ver, _ = verifier(ecg_signal, filtered_peaks, filtered_proba, ver_wind=7)
         return filtered_peaks
 
-    def extract_windows(self, ecg_signal, stride):
+    def extract_windows(self, ecg_signal, stride, frequency):
         normalize = partial(processing.normalize_bound, lb=-1, ub=1)
 
         signal = np.squeeze(ecg_signal)
+        # signal = bandpass_filter(ecg_signal, frequency)
 
         pad_sig = np.pad(
             signal, (self._win_size - stride, self._win_size), mode="edge"

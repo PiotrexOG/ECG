@@ -118,7 +118,8 @@ def run_simulation():
 
 
 def run_load_CSV(data):
-    data.load_csv_data(CSV_PATH)
+    data.load_csv_data(CSV_PATH, False)
+    # data.compare_with_Pan_Tompkins()
     try:
         data.check_detected_peaks()
     except:
@@ -146,8 +147,9 @@ def test_qt_patients(finder):
 
 
 if __name__ == "__main__":
+    print(WINDOW_SIZE)
     finder = PanTompkinsFinder()
-    #finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
+    # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}{MODEL_SUFFIX}_unet.keras", WINDOW_SIZE)
     #finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
     
     # test_mitbih_patients(finder)
@@ -156,12 +158,18 @@ if __name__ == "__main__":
     
     
     # data = EcgData(SAMPLING_RATE, finder, 360)
-    data = EcgData(SAMPLING_RATE, finder)
-    #ecg_plotter = EcgPlotter("ECG", data)
+    if isinstance(finder, PanTompkinsFinder):
+        target_freq = -1
+    else:
+        target_freq = 360
+        
+    print(f"target_freq {target_freq}")
+        
+    data = EcgData(SAMPLING_RATE, finder, target_freq)
     #ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
-    hr_plotter = HRPlotter("HR", data)
-    #fft_plotter = FFTPlotter("FFT", data)
-    #wavelet_plotter = WaveletPlotter("FFT", data)
+    # hr_plotter = HRPlotter("HR", data)
+    # fft_plotter = FFTPlotter("FFT", data)
+    # wavelet_plotter = WaveletPlotter("FFT", data)
 
     if APP_MODE == AppModeEnum.NORMAL:
         run_normal_mode()
@@ -174,7 +182,8 @@ if __name__ == "__main__":
     elif APP_MODE == AppModeEnum.LOAD_QT:
         run_load_qt(data)
 
+    ecg_plotter = EcgPlotter(f"{finder.__class__.__name__} {WINDOW_SIZE}", data)
 
     plt.show()    
-    os.system("pause")
+    # os.system("pause")
     

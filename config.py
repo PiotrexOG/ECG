@@ -71,7 +71,7 @@ class RPeakDetectionAlgorithm(Enum):
 APP_MODE = AppModeEnum.LOAD_CSV
 
 # Scale factor for converting incoming data timestamps to seconds.
-TIMESTAMP_SCALE_FACTOR  = 1e9
+TIMESTAMP_SCALE_FACTOR = 1e9
 
 ### Simulation settings
 LOOP_DATA = False
@@ -81,15 +81,17 @@ NORMALIZED_TEST_DATA_TIME = False
 R_PEAK_DETECTION_METHOD = RPeakDetectionAlgorithm.PAN_TOMKINS
 
 ### NN detection settings
-WINDOW_SIZE = (130 * 60 )%64 * 64
+# WINDOW_SIZE = round((130 * 10 )%64) * 64
+WINDOW_SIZE = round((10 * 130 * 36 / 13) / 64) * 64
+# WINDOW_SIZE = 512
+# WINDOW_SIZE = 256
 # WINDOW_SIZE = 256 * 2
 EPOCHS = 30
+MODEL_SUFFIX = "" + "_noise"
 ###
 
-
-
-MITBIH_PATH = "data\\mit-bih"
-MITBIH_PATIENT = "207"
+MITBIH_PATH = "data\\mit-bih" if "noise" not in MODEL_SUFFIX else "data\\mit-bih-noise-stress"
+MITBIH_PATIENT = "118e00"
 MITBIH_PATIENTS = load_all_patient_indexes(f"{MITBIH_PATH}\\RECORDS")
 QT_PATH = "data\\qt-database"
 QT_PATIENT = "sel30"
@@ -121,8 +123,8 @@ GAUSS_WINDOW_SIZEHR = 600
 # CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
-SECONDS_TO_PLOT = 600000
-
+SECONDS_TO_PLOT = 600000000
+DISPLAY_X_INDEXES = False
 ###
 
 ### NN Settings

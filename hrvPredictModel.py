@@ -88,7 +88,7 @@ def se_block(input_tensor, ratio=16):
 
 # Model definition
 def new_model(input_length, output_len):
-   input_signal = Input(shape=(input_length, 1))  # 1300 próbek, 1 kanał
+    input_signal = Input(shape=(input_length, 1))  # 1300 próbek, 1 kanał
 
     # CustomNormalization
     # normalized_signal = Normalization()(input_signal)
@@ -97,9 +97,9 @@ def new_model(input_length, output_len):
     # x = BatchNormalization()(x)
     # x = MaxPooling1D(pool_size=10)(x)  # 15000 → 3750
 
-   # x = Conv1D(filters=8, kernel_size=11, activation='relu', padding='same')(input_signal)
-   # x = BatchNormalization()(x)
-   # x = MaxPooling1D(pool_size=10)(x)  # 15000 → 3750
+    # x = Conv1D(filters=8, kernel_size=11, activation='relu', padding='same')(input_signal)
+    # x = BatchNormalization()(x)
+    # x = MaxPooling1D(pool_size=10)(x)  # 15000 → 3750
 
    x = Conv1D(filters=32, kernel_size=7, activation='relu', padding='same')(input_signal)
    x = BatchNormalization()(x)
@@ -113,21 +113,21 @@ def new_model(input_length, output_len):
    x = BatchNormalization()(x)
    x = MaxPooling1D(pool_size=6)(x)
 
-   # Attention Layer
-   x_attention = Dense(128, activation='sigmoid')(x)
-   x = Multiply()([x, x_attention])
+    # Attention Layer
+    x_attention = Dense(128, activation='sigmoid')(x)
+    x = Multiply()([x, x_attention])
 
-   x = GlobalAveragePooling1D()(x)
-   x = Dense(128, activation='relu')(x)
-   x = Dropout(0.4)(x)
-   x = Dense(64, activation='relu')(x)
-   x = Dropout(0.3)(x)
+    x = GlobalAveragePooling1D()(x)
+    x = Dense(128, activation='relu')(x)
+    x = Dropout(0.4)(x)
+    x = Dense(64, activation='relu')(x)
+    x = Dropout(0.3)(x)
 
-   # Wyjścia: SDNN i RMSSD
-   output = Dense(output_len, activation='linear')(x)
-   # Model
-   model = Model(inputs=input_signal, outputs=output)
-   return model
+    # Wyjścia: SDNN i RMSSD
+    output = Dense(output_len, activation='linear')(x)
+    # Model
+    model = Model(inputs=input_signal, outputs=output)
+    return model
 
 
 def with_lstm(input_length, output_len):
@@ -332,7 +332,8 @@ def create_scatter_line_plots(
     r2_without_outliers = r2_score(filt_real_pred, filtered_predicts)
     
     mse_without_outliers = mean_squared_error(filt_real_pred, filtered_predicts)
-    metrics_text = f"Real mean value: {real_mean:.2f}\nReal mean without outliers: {real_mean_without_outliers:.2f}\nMAE: {mae:.2f}\nMSE: {mse:.2f}\nRMSE: {rmse:.2f}\nR²: {r2:.2f}\nR² without outliers: {r2_without_outliers:.2f}\nMSE without outliers {mse_without_outliers:.2f}"
+    # metrics_text = f"Real mean value: {real_mean:.2f}\nReal mean without outliers: {real_mean_without_outliers:.2f}\nMAE: {mae:.2f}\nMSE: {mse:.2f}\nRMSE: {rmse:.2f}\nR²: {r2:.2f}\nR² without outliers: {r2_without_outliers:.2f}\nMSE without outliers {mse_without_outliers:.2f}"
+    metrics_text = f"MAE: {mae:.2f}\nMSE: {mse:.2f}\nRMSE: {rmse:.2f}\nR²: {r2:.2f}"
     axs[0].text(
         0.05,
         0.95,
@@ -364,7 +365,7 @@ if __name__ == "__main__":
     finder = PanTompkinsFinder()
     # model = create_hrv_model(input_length, len(METRICS))
     # model = new_model(input_length, len(METRICS))
-   # model = new_model(input_length, len(METRICS))
+    # model = new_model(input_length, len(METRICS))
 
     # model.compile(
     #     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
@@ -500,8 +501,10 @@ if __name__ == "__main__":
         sdnn_test = y_val[:, 0]
         rmssd_test = y_val[:, 1]
 
-        create_scatter_line_plotsc("SDNN", sdnn_test, sdnn_pred)
-        create_scatter_line_plotsc("RMSSD", rmssd_test, rmssd_pred)
+        # create_scatter_line_plotsc("SDNN", sdnn_test, sdnn_pred)
+        # create_scatter_line_plotsc("RMSSD", rmssd_test, rmssd_pred)
+        create_scatter_line_plots(f"SDNN - Fold {fold + 1}",  sdnn_test, sdnn_pred, f"hrvPlots\\FOLD{fold+1}")
+        create_scatter_line_plots(f"RMSSD - Fold {fold + 1}",  rmssd_test, rmssd_pred, f"hrvPlots\\FOLD{fold+1}")
 
         # Obliczanie metryk dla SDNN
         mae_sdnn = mean_absolute_error(sdnn_test, sdnn_pred)
@@ -527,7 +530,6 @@ if __name__ == "__main__":
         r2_rmssd_list.append(r2_rmssd)
 
     # Wyświetlanie średnich wyników
-    plt.show()
     print("\n### Wyniki Średnie ###")
     print("### SDNN ###")
     print(f"Średnie MAE: {np.mean(mae_sdnn_list):.2f} ± {np.std(mae_sdnn_list):.2f}")
@@ -540,6 +542,7 @@ if __name__ == "__main__":
     print(f"Średnie MSE: {np.mean(mse_rmssd_list):.2f} ± {np.std(mse_rmssd_list):.2f}")
     print(f"Średnie RMSE: {np.mean(rmse_rmssd_list):.2f} ± {np.std(rmse_rmssd_list):.2f}")
     print(f"Średnie R^2: {np.mean(r2_rmssd_list):.2f} ± {np.std(r2_rmssd_list):.2f}")
+    plt.show()
 
     pass
 
