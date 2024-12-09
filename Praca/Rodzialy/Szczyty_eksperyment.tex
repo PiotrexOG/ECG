@@ -1,0 +1,239 @@
+\section{Porównanie zastosowanych metod wykrywania za³amków R}
+\subsection{Wprowadzenie}
+Celem niniejszego eksperymentu jest ocena skutecznoœci zastosowanych w pracy
+metod wykrywania za³amków R w sygnale EKG w danych pochodz¹cych z urz¹dzenia
+Polar H10. Porównania dokonano zarówno na danych dobrej jakoœæ, o niskim
+poziomie zak³óceñ, jak i na sygnale mniej czystym, charakteryzuj¹cym siê
+wiêksz¹ nieprzewidywalnoœci¹.
+\subsection{Definicja miar do analizy wyników}
+Analizê wyników przeprowadzono na podstawie miar takich jak czu³oœæ (recall),
+precyzja (precision), oraz ich œrednia harmoniczna, czyli F1. Miary te obliczne
+s¹ na podstawie wartoœci TP (True Positive), FP (False Positive), oraz FN
+(False Negative). Sposób obliczania oraz krótki opis wspomnianych metryk
+znajduje siê poni¿ej:
+\begin{itemize}
+    \item \textbf{TP (True Positive)} - liczba przypadków, w których model prawid³owo rozpozna³ za³amki R
+    \item \textbf{FP (False Positive)} - liczba przypadków, w których model b³êdnie zaklasyfikowa³ fragment sygna³u jako sczyt R
+    \item \textbf{FN (False Negative)} - liczba przypadków, w których model nie rozpozna³ rzeczywistego za³amka R.
+    \item \textbf{Czu³oœæ (Recall)} – wskazuje, jaka czêœæ rzeczywistych pozytywnych przypadków zosta³a poprawnie zidentyfikowana:
+          \begin{equation}
+              \text{Recall} = \frac{TP}{TP + FN}
+          \end{equation}
+
+    \item \textbf{Precyzja (Precision)} – wskazuje, jaka czêœæ przewidzianych pozytywnych przypadków jest rzeczywiœcie poprawna:
+          \begin{equation}
+              \text{Precision} = \frac{TP}{TP + FP}
+          \end{equation}
+
+    \item \textbf{F1} – œrednia harmoniczna czu³oœci i precyzji, która daje zbalansowan¹ miarê tych dwóch wskaŸników:
+          \begin{equation}
+              F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+          \end{equation}
+\end{itemize}
+
+\subsection{Trening modelu}
+Przeprowadzono trening dwóch wariantów modelu sieci UNet. Pierwszy wariant
+wytrenowano na danych pacjentów ze zbioru MIT-BIH, a drugi na zbiorze MIT-BIH
+Noise Stress, który zawiera dane wybranych pacjentów z pierwotnego zbioru,
+wzbogacone o szum oraz zjawisko dryftu linii izoelektrycznej (baseline wander).
+Oba zbiory posiadaj¹ etykiety dotycz¹ce pozycji za³amków R. Do treningu i oceny wydajnoœci sieci
+UNet zastosowano okna o d³ugoœci 10 sekund, poniewa¿ w trakcie fazy projektowej
+taki rozmiar wykazywa³ najwy¿sz¹ skutecznoœæ. Modele by³y trenowane przez 30
+epok, przy u¿yciu funkcji straty Binary Crossentropy oraz optymalizatora Adam
+do dostosowywania wag modelu.
+
+Po wytrenowaniu modeli przeprowadzono ich ewaluacjê na tych samych zbiorach
+danych, porównuj¹c wyniki klasyfikacji z oznaczeniami wykonanymi przez
+specjalistów. Wstêpne rezultaty przedstawiono w tabeli \ref{wyniki1}.
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Wyniki pierwszego testu}
+    \centering
+    \begin{tabular}{|l|l|c|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{Lp.}} & \multicolumn{1}{l|}{\textbf{MIT-BIH}} & \multicolumn{1}{c|}{\textbf{MIT-BIH Noise Stress}} \\
+        \hline
+        TP                                 & 33436                                 & 5801                                               \\
+        \hline
+        FP                                 & 76273                                 & 19992                                              \\
+        \hline
+        FN                                 & 79211                                 & 20569                                              \\
+        \hline
+        Recall                             & 0,297                                 & 0,220                                              \\
+        \hline
+        Precision                          & 0,305                                 & 0,225                                              \\
+        \hline
+        F1                                 & 0,301                                 & 0,222                                              \\
+        \hline
+    \end{tabular}
+    \label{wyniki1}
+\end{table}
+Otrzymane wyniki by³y zaskakuj¹ce, co sk³oni³o do dok³adniejszej analizy wyników w
+postaci graficznej. Inspekcja wizualna ujawni³a przesuniêcie wielu etykiet
+wzglêdem rzeczywistych maksimów sygna³u, co by³o trudne do wyjaœnienia.
+Przyk³ad tego zjawiska zaprezentowano na Rys. \ref{fig/zleEtykietyMit}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{Rysunki/Unet bledna klasyfikacja.png}
+    \caption{Przyk³ad nieprecyzyjnych etykiet w zbiorze MIT-BIH.}
+    \label{fig/zleEtykietyMit}
+\end{figure}
+
+W licznych przypadkach etykiety by³y nieznacznie przesuniête wzglêdem
+rzeczywistego szczytu – o kilka próbek – natomiast sczyty przewidywane przez
+sieæ wydawa³y siê bardziej precyzyjne. Aby umo¿liwiæ analizê wyników w zgodzie
+z faktyczn¹ jakoœci¹ dokonywanych przewidywañ, wprowadzono tolerancjê na
+poziomie 30 ms. Rozpoznanie szczytu w zakresie 30 ms od etykiety zosta³o uznane
+za prawdziwie pozytywne (TP). Wyniki po wprowadzeniu tolerancji przedstawiono w tabeli \ref{wyniki2} oraz graficznie na Rys. \ref{fig/poprawioneEtykietyMit}
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Wyniki drugiego testu - po wprowadzeniu tolerancji}
+    \centering
+    \begin{tabular}{|l|l|c|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{Lp.}} & \multicolumn{1}{l|}{\textbf{MIT-BIH}} & \multicolumn{1}{c|}{\textbf{MIT-BIH Noise Stress}} \\
+        \hline
+        TP                                 & 105183                                & 24341                                              \\
+        \hline
+        FP                                 & 4526                                  & 1453                                               \\
+        \hline
+        FN                                 & 7464                                  & 2029                                               \\
+        \hline
+        Recall                             & 0,934                                 & 0,923                                              \\
+        \hline
+        Precision                          & 0,959                                 & 0,944                                              \\
+        \hline
+        F1                                 & 0,946                                 & 0,933                                              \\
+        \hline
+    \end{tabular}
+    \label{wyniki2}
+\end{table}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{Rysunki/unet tolerancja.png}
+    \caption{Wyniki klasyfikacji po wprowadzeniu tolerancji}
+    \label{fig/poprawioneEtykietyMit}
+\end{figure}
+
+\subsection{Zastosowanie modeli na danych z Polar H10}
+Dane w zbiorach MIT-BIH zosta³y zarejestrowane z czêstotliwoœci¹ próbkowania
+360 Hz, natomiast dane z czujnika Polar H10 s¹ zbierane z czêstotliwoœci¹ 130
+Hz. Aby umo¿liwiæ wykorzystanie modeli wytrenowanych na danych o innej
+czêstotliwoœci próbkowania ni¿ dane testowe, mo¿na zastosowaæ jedno z dwóch
+podejœæ. Pierwsze polega na redukcji czêstotliwoœci wy¿szego próbkowania do
+ni¿szego poprzez decymacjê, co wi¹¿e siê z utrat¹ czêœci szczegó³owoœci danych.
+Drugie podejœcie zak³ada zwiêkszenie czêstotliwoœci próbkowania wolniejszego
+zbioru, na przyk³ad poprzez interpolacjê. W niniejszym eksperymencie
+zastosowano drugie podejœcie – dane z czujnika Polar H10 poddano interpolacji
+liniowej do 360 Hz, z wykorzystaniem funkcji \emph{interp1d} z modu³u
+\emph{scipy.interpolate}.
+
+\subsection{Analiza danych wysokiej jakoœci}
+W trakcie analizy danych pozbawionych zak³óceñ przeprowadzono empiryczn¹ ocenê
+algorytmu Pan-Tompkinsa, który wykaza³ siê bardzo wysok¹ skutecznoœci¹,
+osi¹gaj¹c ponad 99\% trafnych klasyfikacji. W 24-godzinnym fragmencie danych
+zaobserwowano jedynie sporadyczne przypadki fa³szywie negatywne (FN). Z tego
+wzglêdu algorytm Pan-Tompkinsa zosta³ uznany za „z³oty standard” w tym
+przypadku, wzglêdem którego oceniono wydajnoœæ modeli UNet. Wyniki porównania
+modeli z wynikami algorytmu Pan-Tompkinsa przedstawiono w tabeli
+\ref{wynikiClearUnet}. Na podstawie przeprowadzonej analizy stwierdzono, ¿e oba
+algorytmy bardzo dobrze radz¹ sobie z sygna³em wysokiej jakoœci.
+
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Porównanie wyników sieci UNet wzglêdem wartoœci wyznaczonych przez Pan-Tompkins}
+    \centering
+    \begin{tabular}{|l|l|c|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{Lp.}} & \multicolumn{1}{l|}{\textbf{MIT-BIH}} & \multicolumn{1}{c|}{\textbf{MIT-BIH Noise Stress}} \\
+        \hline
+        TP                                 & 93903                                 & 93899                                                  \\
+        \hline
+        FP                                 & 16                                    & 95                                                  \\
+        \hline
+        FN                                 & 83                                    & 87                                                  \\
+        \hline
+        Recall                             & >0.999                                & 0,999                                              \\
+        \hline
+        Precision                          & >0.999                                & 0,999                                              \\
+        \hline
+        F1                                 & >0.999                                & 0,999                                              \\
+        \hline
+    \end{tabular}
+    \label{wynikiClearUnet}
+\end{table}
+
+\subsection{Analiza danych zaszumionych}
+% W przypadku danych zaszumionych empiryczna ocena wykaza³a liczne nieprawid³owoœci w dzia³aniu algorytmu Pan-Tompkinsa. Przyk³ad b³êdnego dzia³ania algorytmu przedstawiono na Rys. ref{rys1}. Z tego powodu, w celu okreœlenia skutecznoœci algorytmów przeprowadzono rêczne etykietowanie fragmentu danych z czujnika Polar H10. Nale¿y jednak zaznaczyæ, ¿e etykietyzacja nie zosta³a przeprowadzono przez specjalistê, z potwierdzon¹ wiedz¹ medyczn¹, a przez autorów niniejszej pracy, tzn. studentów kierunku informatycznego, co mog³o wp³yn¹c na jakoœæ etykiet.
+
+W przypadku danych zaszumionych empiryczna ocena wykaza³a liczne
+nieprawid³owoœci w dzia³aniu algorytmu Pan-Tompkinsa. Problemy te wynika³y
+g³ównie z obecnoœci zak³óceñ, takich jak szum czy dryft linii izoelektrycznej
+(baseline wander), które znacz¹co utrudnia³y prawid³owe wykrywanie za³amków R.
+Przyk³ad b³êdnego dzia³ania algorytmu przedstawiono na Rys.
+\ref{fig/zaszumionyTompkins}, gdzie zauwa¿alne jest pomijanie istotnych
+szczytów sygna³u.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{Rysunki/faultyPanTompkins.png}
+    \caption{Zaszumiony sygna³ oceniony przez Pan-Tompkins}
+    \label{fig/zaszumionyTompkins}
+\end{figure}
+
+Aby przprowadziæ ocenê skutecznoœci zastosowanych podejœæ, dokonano rêcznego
+oznaczenia fragmentu danych pochodz¹cych z czujnika Polar H10. Nale¿y jednak
+zaznaczyæ, ¿e etykietyzacja nie zosta³a przeprowadzono przez specjalistê, z
+potwierdzon¹ wiedz¹ medyczn¹, a przez autorów niniejszej pracy, co mog³o wp³yn¹c na jakoœæ etykiet.
+
+Wyniki dzia³ania poszczególnych algorytmów uzyskane na oznaczonym fragmencie danych
+przedstawiono w tabeli \ref{wynikiClearUnet}. Analizuj¹c jej zawartoœæ mo¿na
+dojœæ do wniosku, ¿e warianty sieci UNet lepiej radz¹ sobie z klasyfikacj¹
+sygna³ów zaszumionych w porównaniu do algorytmu Pan-Tompkinsa. Modele UNet
+wykaza³y du¿o wiêksz¹ iloœci¹ szczytów poprawnie zaklasyfikowanych, mniejsz¹
+liczb¹ pominiêtych za³amków (FN) oraz, w przypadku wariantu trenowanego na
+zbiorze zaszumionym, ni¿sz¹ liczb¹ fa³szywych trafieñ (FP).
+
+Uzyskane rezultaty sugeruj¹ przewagê modeli UNet nad zastosowanym algorytmem
+Pan-Tompkinsa w przypadku zaszumionych sygna³ów. Na cele tego eksperymentu zdecydowano siê na ocenê sygna³u zawieraj¹cego oko³o 300 szczytów, niemniej jednak, aby uzykaæ
+bardziej kompleksow¹ ocenê skutecznoœci zastosowanych metod, nale¿a³oby zebraæ
+oraz rêcznie oznaczyæ znacznie wiêksz¹ próbê danych.
+
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Porównanie wyników wariantów sieci UNet oraz algorytmu Pan-Tompkins na oznaczonym rêcznie fragmencie}
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{Lp.}} & \multicolumn{1}{l|}{\textbf{Pan-Tompkins}} & \multicolumn{1}{l|}{\textbf{MIT-BIH}} & \multicolumn{1}{c|}{\textbf{MIT-BIH Noise Stress}} \\
+        \hline
+        TP                                 & 212                                        & 272                                   & 276                                                \\
+        \hline
+        FP                                 & 4                                          & 5                                     & 2                                                  \\
+        \hline
+        FN                                 & 77                                         & 17                                    & 13                                                 \\
+        \hline
+        Recall                             & 0.734                                      & 0,941                                 & 0,955                                              \\
+        \hline
+        Precision                          & 0.981                                      & 0,982                                 & 0,993                                              \\
+        \hline
+        F1                                 & 0.840                                      & 0,961                                 & 0,974                                              \\
+        \hline
+    \end{tabular}
+    \label{wynikiClearUnet}
+\end{table}
+
+\subsection{Wnioski}
+Zastosowane warianty sieci UNet oraz algorytm Pan-Tompkinsa uzyska³y œwietn¹
+skutecznoœæ w rozpoznawaniu szczytów R w sygna³ach dobrej jakoœci, wykazuj¹c
+marginalne ró¿nice miedzy dokonywanymi klasyfikacjami. Wiêksze odchy³y w
+wynikach zauwa¿ono podczas analizy sygna³ów mniej idealnych, gdzie lepsze
+rezultaty uzyska³y oba przetronowane modele sieci neuronowych.
+
+Na podstawie tych wyników mo¿na stwierdziæ, ¿e w przypadku analizy sygna³u EKG,
+pochodz¹cego z czujnika Polar H10 lepszym wyborem bêdzie zastosowanie modelu
+Unet przetrenowanego na zaszumionym zbiorze. Model ten wykaza³ siê porównywalna
+dok³adnoœci¹ na sygnale dobrej jakoœci, co inne metody, oraz wyraŸnie lepsz¹ w
+analizie sygna³ow mniej idealnych.
+
