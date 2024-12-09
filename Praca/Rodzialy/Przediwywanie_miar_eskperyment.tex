@@ -1,0 +1,158 @@
+\section{Przewidywanie parametrów HRV oraz RSA, przy u¿yciu sieci neuronowej opartej na cechach}
+
+\subsection{Wprowadzenie}
+Jako etap poœredni w opracowywaniu sieci typu end-to-end do przewidywania miar
+HRV oraz RSA na podstawie sygna³u EKG z czujnika Polar H10, stworzono model,
+który przewiduje te miary na podstawie interwa³ów RR. Celem tego eksperymentu
+jest ocena skutecznoœci opracowanego modelu w porównaniu z klasycznymi metodami
+analitycznymi.
+
+\subsection{Definicja miar oceny modeli}
+Do analizy uzyskanych wyników zastosowano nastêpuj¹ce miary:
+
+\begin{itemize}
+    \item Œredni b³¹d bezwzglêdny (Mean Absolute Error, MAE): Œrednia arytmetyczna wartoœci bezwzglêdnych ró¿nic miêdzy wartoœciami rzeczywistymi a przewidywanymi.
+          \begin{equation}
+              \text{MAE} = \frac{1}{n} \sum_{i=1}^n |y_i - \hat{y}_i|
+          \end{equation}
+
+    \item B³¹d œredniokwadratowy (Mean Squared Error, MSE): Œrednia arytmetyczna
+          kwadratów ró¿nic miêdzy wartoœciami rzeczywistymi a przewidywanymi,
+          podkreœlaj¹ca wiêksze b³êdy.
+          \begin{equation}
+              \text{MSE} = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2
+          \end{equation}
+
+    \item Pierwiastek ze œredniego b³êdu kwadratowego (Root Mean Squared Error, RMSE):
+          Pierwiastek kwadratowy z MSE, interpretowany w tych samych jednostkach, co dane
+          wejœciowe.
+          \begin{equation}
+              \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2}
+          \end{equation}
+
+    \item Wspó³czynnik determinacji ($R^2$): Miara jakoœci dopasowania modelu do danych.
+          Reprezentuje jaka czêœæ zmiennoœæi wartoœci w danych jest wyjaœniana przez
+          model. Wartoœæ $R^2$. przyjmuje wartoœci z zakresu od 0 do 1, gdzie 1 oznacza
+          idealne dopasowanie.
+
+          \begin{equation}
+              R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
+          \end{equation}
+          gdzie:
+          \begin{itemize}
+              \item \( n \) – liczba analizowanych wartoœci,
+              \item \( y_i \) – wartoœæ rzeczywista dla i-tej obserwacji,
+              \item \( \hat{y}_i \) – wartoœæ przewidywana przez model dla i-tej obserwacji,
+              \item \( \bar{y} \) – œrednia wartoœæ rzeczywistych obserwacji.
+          \end{itemize}
+\end{itemize}
+
+\section{Przewidywanie miar HRV oraz RSA za pomoc¹ sieci typu end-to-end}
+
+\subsection{Wprowadzenie}
+Celem niniejszego eksperymentu by³o zbadanie mo¿liwoœci zaprojektowanej sieci
+typu end-to-end do przewidywania miar HRV oraz RSA, opisanej szczegó³owo w
+podrozdziale \ref{siec-end-to-end}. Przegl¹d literatury nie wykaza³ istnienia
+podobnych rozwi¹zañ dzia³aj¹cych w ten sposób, co podkreœla innowacyjny
+charakter proponowanego podejœcia. Jednoczeœnie brak takich rozwi¹zañ
+uniemo¿liwia bezpoœrednie porównanie wyników z innymi badaniami. Eksperyment
+mia³ na celu ukazanie potencjalnych mo¿liwoœci tego modelu oraz jego
+skutecznoœci w przewidywaniu wybranych miar, na podstawie danych EKG
+pochodz¹cych z rejestratora Polar H10.
+
+\subsection{Warianty modeli}
+W eksperymencie przeanalizowano ró¿ne warianty zaproponowanej sieci, ró¿ni¹ce
+siê iloœcia oraz rodzajem przewidywanych miar HRV i RSA. Rozwa¿ane konfiguracje
+obejmowa³y m. in. przewidywanie pojedynczych miar takich jak SDNN czy RMSSD
+oraz przewidywanie wielu miar na raz, na przyk³ad jednoczesne przewidywanie
+SDNN i RMSSD oraz znormalizowanych wartoœci LF i HF.
+
+\subsection{Dane i przygotowanie}
+Dane do eksperymentu pochodzi³y z w³asnych nagrañ EKG zarejestrowanych za
+pomoc¹ Polar H10, obejmuj¹cych ³¹cznie oko³o 48 godzin. Do treningu i
+przewidywañ wykorzystano 5-minutowe fragmenty sygna³u, które wczeœniej
+znormalizowano do zakresu od -1 do 1. Wartoœci referencyjne miar by³y obliczane
+na podstawie oznaczeñ za³amków R, wytworzonych przez sieæ UNet oraz wzorów
+przedstawionych w podrodziale \ref{MiaryHRV}. Wykorzystano wariant sieci
+przetrenowany na zaszumionym zbiorze, który by³ przedmiotem szerszej analizy w
+poprzednim eksperymencie.
+
+\subsection{Trening oraz metoda ewaluacji skutecznoœci}
+Trening ka¿dego modelu przeprowadzono w jednolitych warunkach: przez 150 epok z
+u¿yciem funkcji straty MSE oraz optymalizatora Adam.
+
+Skutecznoœæ ka¿dego wariantu sieci oceniono za pomoc¹ 5-krotnej walidacji
+krzy¿owej, co zapewni³o wiarygodn¹ ocenê jakoœci przewidywañ oraz umo¿liwi³o
+porównanie wyników miêdzy ró¿nymi konfiguracjami modeli.
+
+\subsection{Wyniki}
+Œrednie wyniki uzyskane w ramach walidacji krzy¿owej dla wybranych modeli przedstawiono w tabelach \ref{wyniki_hrv_pojedyncze} oraz \ref{wyniki_hrv_wiele}.
+
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary.}
+    \centering
+    \begin{tabular}{|l|c|c|c|c|c|c|}
+        \hline
+        \textbf{Wariant} & \textbf{SDNN}       & \textbf{RMSSD}      \\ \hline
+        MAE              & $11,22 \pm 2,15$    & $12,06 \pm 7,26$    \\ \hline
+        MSE              & $319,90 \pm 185,50$ & $486,95 \pm 488,95$ \\ \hline
+        RMSE             & $17,70 \pm 5,00$    & $19,48 \pm 10,37$   \\ \hline
+        R2               & $0,7 \pm 0,17$      & $-0,61 \pm 1,74$    \\ \hline
+    \end{tabular}
+    \label{wyniki_hrv_pojedyncze}
+\end{table}
+
+
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar.}
+    \centering
+    \begin{tabular}{|l|c|c|c|c|c|c|}
+        \hline
+        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{Znormalizowany LF i HF}}                                     \\ \hline
+        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF}     & \textbf{HF}     \\ \hline
+        MAE              & $9,69 \pm 0,56$                    & $8,32 \pm 1,84$                                       & $0,07 \pm 0,01$ & $0,07 \pm 0,01$ \\ \hline
+        MSE              & $191,71 \pm 31,69$                 & $141,93 \pm 49,51$                                    & $\sim0,01$      & $\sim0,01$      \\ \hline
+        RMSE             & $13,80 \pm 1,17$                   & $11,70 \pm 2,23$                                      & $0,09 \pm 0,01$ & $0,09 \pm 0,01$ \\ \hline
+        R2               & $0,81 \pm 0,04$                    & $0,58 \pm 0,13$                                       & $0,42 \pm 0,07$ & $0,42 \pm 0,07$ \\ \hline
+    \end{tabular}
+    \label{wyniki_hrv_wiele}
+\end{table}
+
+Ku zaskoczeniu, najlepsz¹ jakoœæ przewidywañ osi¹gn¹³ model jednoczeœnie
+przewiduj¹cy SDNN i RMSSD. Uzyska³ on œredni wynik wspó³czynnika $R^2$ na
+poziomie ok. 0,8 dla SDNN oraz ok. 0,58 dla RMSSD, co przewy¿sza³o rezultaty
+uzyskane przez modele przewiduj¹ce te miary oddzielnie. Moze to wynikaæ z
+wystêpuj¹cej miêdzy tymi miarami korelacji, która u³atwia modelowi rozpoznanie
+bardziej z³o¿onych zale¿noœci. Wyniki tego wariantu dla jednego z foldów
+walidacji krzy¿owej przedstawiono na Rys \ref{fig/SDNN_RMSSD}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/SDNN i RMSSD.png}
+    \caption{Wyniki przewidywañ SDNN oraz RMSSD dla jednego z foldów}
+    \label{fig/SDNN_RMSSD}
+\end{figure}
+
+Ni¿szy wynik wspó³czynnika determinacj RMSSD, wzglêdem SDNN w tym modelu mo¿e
+byæ zwi¹zany z ró¿nic¹ w ich typowych wartoœciach. Zastosowana funkcja straty
+MSE, faworyzuje redukcjê b³êdów dla miar o wy¿szych wartoœciach, co mo¿e
+prowadziæ do niedoszczacowania wartoœci o mniejszym zakresie.
+
+Wynikiem akceptowalnym wykaza³ sie wariant przewiduj¹cy jedynie SDNN, który
+uzyska³ wspó³czynnik $R^2$ na poziomie $0,7\pm0.17$. Pozosta³e warianty
+wykaza³y nisk¹ zgodnoœæ przewidywañ z rzeczywistoœci¹, co wskazuje na trudnoœci
+modelu w nauce tych miar i ogranicza ich praktyczn¹ u¿ytecznoœæ.
+
+Najwiêkszym zaskoczeniem w trakcie przeprowadzania badania okaza³a sie bardzo wysoka niespójnoœæ wyników miêdzy foldami w walidacji krzy¿owej dla RMSSD. By³a ona znacznie wiêksza ni¿ w przypadku innych sprawdzanych wariantów. Podczas analizy foldów stwierdzono, ¿e pomimo dobrych rokowañ na niektórych zbiorach, model nie generalizuje siê zbyt dobrze i osi¹ga mocno skrajne wyniki w zale¿noœci od testowanych danych. Przyk³ad ogromnej ró¿nicy miêdzy dwoma foldami przedstawiono na Rys. \ref{fig/RMSSD_2_folds}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.25]{Rysunki/RMSSD_2_folds.png}
+    \caption{Wyniki przewidywañ RMSSD dla dwóch foldów}
+    \label{fig/RMSSD_2_folds}
+\end{figure}
+
+
+
