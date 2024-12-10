@@ -1,22 +1,6 @@
 % \chapter{Implementacja algorytmów do analizy EKG}
 % Lorem ipsum
-\section{Identyfikacja szczytów R}
-Identyfikacja szczytów R by³a kluczowym etapem w przygotowaniu danych
-treningowych wykorzystywanych w pracy. Dane pochodz¹ce z dostêpnych baz, takich
-jak MIT-BIH, zawiera³y w wiêkszoœci przypadków oznaczone szczyty R, co znacznie
-u³atwia³o proces analizy. Jednak w przypadku samodzielnie zebranych danych przy
-u¿yciu urz¹dzenia Polar H10 konieczne by³o opracowanie skutecznej metody
-identyfikacji szczytów R. W tym celu zastosowano algorytm Pan-Tompkins, który
-jest powszechnie uznawanym narzêdziem do wykrywania charakterystycznych
-za³amków w sygna³ach EKG, zapewniaj¹cym wysok¹ precyzjê w detekcji szczytów R.
-Dziêki jego zastosowaniu mo¿liwe by³o uzyskanie precyzyjnych i wiarygodnych
-danych do dalszej analizy i modelowania. Algorytm sk³ada sie z kilku kluczowych
-etapów przetwarzania sygna³u: filtracja œrodkowoprzepustowa, ró¿niczkowanie,
-kwadratowanie, okno ca³kuj¹ce, ustalenie progów i detekcja szczytów R
-\cite{Fariha-PanTompkins}. Dodatkowo, aby dok³adnie dopasowaæ wykryte szczyty
-do rzeczywistych najwy¿szych wartoœci sygna³u, wprowadzono dodatkowy krok,
-polegaj¹cy na sprawdzaniu otoczenia wykrytego szczytu.
-
+\section{Wyznaczanie szczytów R}
 \subsection{Pan-Tompkins}\label{P-Tomkins}
 Algorytm Pan-Tomkins jest powszechnie uznawanym narzêdziem do wykrywania
 za³amków R w sygna³ach EKG, zapewniaj¹c przy tym wysok¹ precyzjê. Algorytm
@@ -84,7 +68,7 @@ ryzyko fa³szywych wykryæ szczytów R \cite{Fariha-PanTompkins}. \\
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_squared.png}
-    \caption{Fragment sygna³u EKG z czujnika Polar H10 po ró¿niczkowaniu}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po kwadratowaniu}
     \label{fig/PanTompkinsSquared}
 \end{figure}
 
@@ -99,8 +83,8 @@ mniejszych zak³óceñ, które mog³yby powodowaæ fa³szywe wykrycia szczytów,
 zwiêkszaj¹c precyzjê i wiarygodnoœæ procesu detekcji. Dziêki zastosowaniu tego
 etapu mo¿liwe jest uzyskanie lepszej separacji szczytów R od pozosta³ych
 elementów sygna³u. Dla danych pochodz¹cych z czujnika Polar H10 zastosowano
-okno o szerokoœci 50 ms, co przek³ada³o siê na oko³o 6 próbek, bior¹c pod uwagê
-czêstotliwoœæ próbkowania czujnika: 130 Hz.
+okno o szerokoœci 150 ms \cite{Fariha-PanTompkins}, co przek³ada³o siê na oko³o
+20 próbek, bior¹c pod uwagê czêstotliwoœæ próbkowania czujnika: 130 Hz.
 
 \begin{figure}[ht]
     \centering
@@ -148,7 +132,7 @@ maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.\\
     \label{fig/Pan_tomkins_refined_peaks}
 \end{figure}
 
-\subsection{Sieæ UNet}\label{subsec:ml_rsa}
+\subsection{Sieæ UNet}
 
 % Nastêpn¹ metoda wykorzystana do wyznaczenia pozycji sczytów R w niniejszej pracy jest sieæ
 % neuronowa oparta o architekturê 1D UNet, zaczerpniêta z pracy
@@ -169,7 +153,7 @@ elementów: œcie¿ki koduj¹cej i œcie¿ki dekoduj¹cej. Implementacja w projekcie
 in¿ynierskim bazuje na kodzie udostêpnionym przez autorów, jednak zosta³a
 zmodyfikowana i dostosowana do potrzeb projektu. Ca³oœæ zrealizowano przy
 u¿yciu biblioteki TensorFlow oraz jej wysokopoziomowego API o nazwie Keras
-\cite{TensorFlow-Keras}. Sschemat budowy sieci, pochodz¹cy z tej samej
+\cite{TensorFlow-Keras}. Schemat budowy sieci, pochodz¹cy z tej samej
 publikacji, przedstawiono na Rys \ref{fig/UNet}
 
 \begin{figure}[ht]
@@ -215,7 +199,6 @@ informacji, zawieraj¹cego zarówno cechy szczegó³owe, jak i bardziej ogólne. To
 po³¹czenie pozwala na dok³adniejsz¹ rekonstrukcjê sygna³u i unikniêcie utraty
 szczegó³ów w procesie kodowania.\\
 
-
 Wynik uzyskany z modelu wymaga dodatkowego przetwarzania, aby precyzyjnie
 zidentyfikowaæ rzeczywiste za³amki R. Ca³y proces wykrywania tych szczytów, od
 sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
@@ -237,48 +220,100 @@ sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
     \item Finalne rozpoznanie szczytów R: Jeœli co najmniej piêæ punktów zostanie
           podci¹gniête do tego samego miejsca, punkt ten zostaje zaklasyfikowany jako
           szczyt R.
-\end{enumerate}\
+\end{enumerate}
 
+\vspace{1em}
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=1]{Rysunki/unet-postprocess.png}
     \caption{Uproszczony schemat przetworzenia wyników sieci, od otrzymanych map segmentacji z sieci do rozpoznania szczytu}
-    \label{fig/UNet}
+    \label{fig/UNet-r-preak-identification}
 \end{figure}
 
-
-W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
-(autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
-zastosowanie algorytmu w czasie rzeczywistym. Ponadto zmieniono sposób korekty
+W ramach modyfikacji wzglêdem pierwotnej implementacji zmieniono sposób korekty
 za³amków R — w pierwotnej wersji korekta by³a zawsze wykonywana do wartoœci
 najwy¿szej, natomiast wprowadzone zmiany pozwalaj¹ na korektê do wartoœci
 najbardziej oddalonej od œredniej. Udoskonalenie to umo¿liwi³o poprawne
 rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
-z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
-który by³ wspomniany w podsekcji \ref{subsec:ml_rsa}
+z powodu zamiany polaryzacji elektrod. Metodê wykrywania szczytów obudowano w³asnym interfejsem,
+który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} 
 
-\subsection{Model end-to-end do wyznaczania miar HRV}\label{siec-end-to-end}
-W ramach pracy opracowano model sieci neuronowej typu end-to-end, którego
-przeznaczeniem jest przewidywanie parametrów HRV na podstawie surowego sygna³u
-EKG. Do implementacji sieci wykorzystano wysokopoziomowe API biblioteki
-\emph{tensorflow} o nazwie \emph{Keras} \cite{TensorFlow-Keras}. Schemat
-architektury sieci przedstawiono na Rys. \ref{fig/end-to-end}
+% W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
+% (autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
+% zastosowanie algorytmu w czasie rzeczywistym. Ponadto zmieniono sposób korekty
+% za³amków R — w pierwotnej wersji korekta by³a zawsze wykonywana do wartoœci
+% najwy¿szej, natomiast wprowadzone zmiany pozwalaj¹ na korektê do wartoœci
+% najbardziej oddalonej od œredniej. Udoskonalenie to umo¿liwi³o poprawne
+% rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
+% z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
+% który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} 
+\FloatBarrier
+\section{Modele neuronowe do wyznaczania miar HRV}
+\subsection{Model oparty o interwa³y RR}\label{rr-based}
+% \subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}
+W trakcie prac nad modelem end-to-end opracowano model poœredni, który
+przewiduje miary HRV na podstawie interwa³ów RR. Pocz¹tkowo planowano jego
+intergracje z modelem UNet w jedn¹ sieæ typu end-to-end, jednak ostatecznie
+zrezygnowano z tego podejœcia. Model end-to-end zosta³ stworzony jako
+bezpoœrednie rozwiniêcie tego modelu. Do implementacji modelu wykorzystano
+wysokopoziomowe API biblioteki \emph{tensorflow} o nazwie \emph{Keras}
+\cite{TensorFlow-Keras}. Schemat modelu poœredniego przedstawiono na Rys.
+\ref{fig/rr_siec}.
+
+Model oparto o kaskade trzech bloków przetwarzania, z których ka¿dy zawiera
+jednowymiarowa warstwê splotow¹ (Conv1D), normalizacje wsadow¹
+(BatchNormalization) oraz operacje maksymalnego próbkowania (MaxPooling1D).
+Warstwy splotowe wykorzystuj¹ funkcjê aktywacji ReLU i parametr padding=same,
+który zachowuje rozmiar wyjœcia taki sam jak wejœcia. Rozmiary filtrów w
+warstwach splotowych wynosz¹ odpowiednio 7, 5 i 3, a ich iloœæ to 64, 128 i
+256. Maksymalne próbkowanie zmniejsza dwukrotnie rozmiar danych na koñcu
+ka¿dego z bloków poprzez zastosowanie parametru pool\_size=2, oznaczaj¹cego, ¿e
+dla ka¿dej pary s¹siaduj¹cych próbek wybierana jest wartoœæ maksymalna.
+
+Po przejœciu przez pierwsze bloki przetwarzaj¹ce wyniki trafiaj¹ do warstwy
+rekurencyjnej LSTM (Long Short-Term Memory), która zawiera 128 jednostek.
+Wartswa ta przetwarza dane sekwencyjne, ucz¹c siê wzorców czasowych w sygnale.
+Na wyjœciu warstwy LSTM zastosowano warstwê dropout na poziomie 30\%, co
+oznacza, ¿e w trakcie treningu 30\% neuronów jest losowo dezaktywowanych.
+Zapobiega to przeuczeniu modelu oraz poprawia jego zdolnoœci generalizacyjne.
+
+Na koñcu model zawiera ostatni¹ warstwê gest¹, której liczba neuronów odpowiada
+liczbie przewidywanych przez model wartoœci, na przyk³ad w przypadku
+przewidywania SDNN i RMSSD rozmiar ten wynosi dwa. Warstwa ta wykorzystuje
+liniowa funkcje aktywacji, co pozwala na generowanie ci¹g³ych wartoœci
+wyjsciowych, zgodnych ze skala przewidywanych miar.
 
 \begin{figure}[ht]
     \centering
+    \includegraphics[scale=1.5]{Rysunki/RR_siec.png}
+    \caption{Schemat modelu wyznaczaj¹cego miary HRV na podstawie interwa³ów RR}
+    \label{fig/rr_siec}
+\end{figure}
+
+% \subsection{Model end-to-end do wyznaczania miar HRV}\label{siec-end-to-end}\
+\FloatBarrier
+\subsection{Model end-to-end}\label{siec-end-to-end}
+W ramach pracy opracowano model sieci neuronowej typu end-to-end, bêdacy
+rozwojow¹ wersj¹ prostego modelu opartego o interwa³y RR, opisanego w
+podrozdziale \ref{rr-based}. Jego przeznaczeniem jest przewidywanie parametrów
+HRV na podstawie surowego sygna³u EKG. Do jego implementacji wykorzystano
+wysokopoziomowe API biblioteki \emph{tensorflow} o nazwie \emph{Keras}
+\cite{TensorFlow-Keras}. Schemat architektury sieci przedstawiono na Rys.
+\ref{fig/end-to-end}
+
+\begin{figure}[!ht]
+    \centering
     \includegraphics[scale=1.5]{Rysunki/end-to-end.png}
-    \caption{Schemat sieci end-to-end do wyznaczania miar HRV}
+    \caption{Schemat modelu end-to-end do wyznaczania miar HRV}
     \label{fig/end-to-end}
 \end{figure}
 
-Model oparto o kaskade trzech bloków przetwarzania, z których ka¿dy zawiera jednowymiarowa
-warstwê splotow¹ (Conv1D), normalizacje wsadow¹ (BatchNormalization) oraz
-operacje maksymalnego próbkowania (MaxPooling1D). Warstwy splotowe wykorzystuj¹
-funkcjê aktywacji ReLU i parametr padding=same, który zachowuje rozmiar wyjœcia
-taki sam jak wejœcia. Rozmiary filtrów w warstwach splotowych wynosz¹
-odpowiednio 15, 11 i 9, a ich iloœæ to 32, 64 i 128. Maksymalne próbkowanie
-zmniejsza rozmiar danych na koniec z ka¿dego z bloków, pieciokrotnie w
-przypadku pierwszych dwóch oraz czterokrotnie w wypadku trzeciego.
+Model u¿ywa takiej samej kombinacji bloków przetwarzaj¹cych co pierwowzór,
+jednak ze zmodyfikowanymi parametrami. Rozmiary j¹der w warstwach
+konwolucyjnych wynosz¹ kolejno 15, 11 i 9, a ich iloœæ zosta³a zmniejszona do
+32, 64, oraz 128. Dodatkowo zmieniono parametr maksymalnego próbkowania: w
+pierwszych dwóch warstwach zastosowano piêciokrotn¹ redukcjê wymiaru, a w
+trzeciej warstwie czterokrotn¹.
 
 Po przejœciu przez te trzy bloki, dane trafiaj¹ do warstwy uwagi,
 zaimplementowanej przy u¿yciu warstwy gêstej (Dense) z funkcj¹ aktywacji
@@ -292,9 +327,52 @@ rozmiary wynosz¹ 128 i 64. Po ka¿dej z tych warstw zastosowano mechanizm
 losowego odrzucania neuronów (dropout), odpowiednio na poziomie 40\% i 30\%.
 Zapobiega to przeuczeniu modelu oraz wspiera jego generalizacje.
 
-Na koñcu model zawiera ostatni¹ warstwê gest¹, której liczba neuronów odpowiada
-liczbie przewidywanych przez model wartoœci, na przyk³ad w przypadku
-przewidywania SDNN i RMSSD rozmiar ten wynosi dwa. Warstwa ta wykorzystuje
-liniowa funkcje aktywacji.
+Ostatnia warstwa modelu pozosta³a niezmieniona w stosunku do pierwowzoru. Jest
+to gêsta warstwa, której liczba neuronów odpowiada liczbie przewidywanych
+wartoœci. Na przyk³ad, przy prognozowaniu SDNN i RMSSD, warstwa ta zawiera dwa
+neurony. Wykorzystuje ona liniow¹ funkcjê aktywacji, co umo¿liwia modelowi
+zwracanie ci¹g³ych wartoœci wyjœciowych, zgodnych z zakresem przewidywanych
+parametrów.
 
-\subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}
+\FloatBarrier
+
+% W ramach pracy opracowano model sieci neuronowej typu end-to-end, bêdacy
+% rozwojow¹ wersj¹ prostego modelu opartego o interwa³y RR z którego
+% przeznaczeniem jest przewidywanie parametrów HRV na podstawie surowego sygna³u
+% EKG. Do implementacji sieci wykorzystano wysokopoziomowe API biblioteki
+% \emph{tensorflow} o nazwie \emph{Keras} \cite{TensorFlow-Keras}. Schemat
+% architektury sieci przedstawiono na Rys. \ref{fig/end-to-end}
+
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[scale=1.5]{Rysunki/end-to-end.png}
+%     \caption{Schemat sieci end-to-end do wyznaczania miar HRV}
+%     \label{fig/end-to-end}
+% \end{figure}
+
+% Model oparto o kaskade trzech bloków przetwarzania, z których ka¿dy zawiera
+% jednowymiarowa warstwê splotow¹ (Conv1D), normalizacje wsadow¹
+% (BatchNormalization) oraz operacje maksymalnego próbkowania (MaxPooling1D).
+% Warstwy splotowe wykorzystuj¹ funkcjê aktywacji ReLU i parametr padding=same,
+% który zachowuje rozmiar wyjœcia taki sam jak wejœcia. Rozmiary filtrów w
+% warstwach splotowych wynosz¹ odpowiednio 15, 11 i 9, a ich iloœæ to 32, 64 i
+% 128. Maksymalne próbkowanie zmniejsza rozmiar danych na koniec z ka¿dego z
+% bloków, pieciokrotnie w przypadku pierwszych dwóch oraz czterokrotnie w wypadku
+% trzeciego.
+
+% Po przejœciu przez te trzy bloki, dane trafiaj¹ do warstwy uwagi,
+% zaimplementowanej przy u¿yciu warstwy gêstej (Dense) z funkcj¹ aktywacji
+% sigmoid. Wynik tej warstwy jest przemna¿any z wynikiem ostatniego bloku
+% przetwarzaj¹cego. Nastêpnie dane s¹ globalnie uœredniane
+% (GlobalAveragePooling1D), co redukuje je do wektora reprezentuj¹cego œrednie
+% wartoœci filtrów wzd³u¿ ca³ego sygna³u.
+
+% Po operacji uœredniania dane przechodz¹ przez dwie warstwy gêste, których
+% rozmiary wynosz¹ 128 i 64. Po ka¿dej z tych warstw zastosowano mechanizm
+% losowego odrzucania neuronów (dropout), odpowiednio na poziomie 40\% i 30\%.
+% Zapobiega to przeuczeniu modelu oraz wspiera jego generalizacje.
+
+% Na koñcu model zawiera ostatni¹ warstwê gest¹, której liczba neuronów odpowiada
+% liczbie przewidywanych przez model wartoœci, na przyk³ad w przypadku
+% przewidywania SDNN i RMSSD rozmiar ten wynosi dwa. Warstwa ta wykorzystuje
+% liniowa funkcje aktywacji.

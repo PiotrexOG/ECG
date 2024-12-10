@@ -1,43 +1,107 @@
 \chapter{Implementacja systemu}
 
-
+\input{Rodzialy/Aplikacja_glowna.tex}
+\input{Rodzialy/Przetwarzanie_sygnalu_ekg.tex}
 \section{Analiza faz cyklu oddechowego na podstawie wykresu têtna}
 
 \subsection{Wprowadzenie}
-System zaprojektowano do okreœlania faz oddechu na podstawie zmian w têtnie. Silny efekt RSA powodowa³ wzrost mocy sygna³u w tym samym paœmie czêstotliwoœci, co dominuj¹ca czêstotliwoœæ rytmu oddechowego w danej próbce. Na przyk³ad dla osoby oddychaj¹cej w tempie 12 cykli na minutê (0.2 Hz), wysoki poziom mocy sygna³u w tej czêstotliwoœci wskazywa³ na intensywny efekt RSA. 
+System zaprojektowano do okreœlania faz oddechu na podstawie zmian w têtnie.
+Silny efekt RSA powodowa³ wzrost mocy sygna³u w tym samym paœmie
+czêstotliwoœci, co dominuj¹ca czêstotliwoœæ rytmu oddechowego w danej próbce.
+Na przyk³ad dla osoby oddychaj¹cej w tempie 12 cykli na minutê (0.2 Hz), wysoki
+poziom mocy sygna³u w tej czêstotliwoœci wskazywa³ na intensywny efekt RSA.
 
-Aby precyzyjnie okreœliæ fazy oddechu, konieczne by³o wykrywanie lokalnych ekstremów w sygnale têtna. Minima odpowiada³y pocz¹tkom wdechu, a maksima pocz¹tkom wydechu.
+Aby precyzyjnie okreœliæ fazy oddechu, konieczne by³o wykrywanie lokalnych
+ekstremów w sygnale têtna. Minima odpowiada³y pocz¹tkom wdechu, a maksima
+pocz¹tkom wydechu.
 
 \subsection{Przetwarzanie sygna³u za pomoc¹ filtru pasmowego}
-W celu identyfikacji tych zmian, sygna³ têtna zosta³ przetworzony za pomoc¹ cyfrowego filtru pasmowego w konfiguracji bez przesuniêcia fazowego, wykorzystuj¹c funkcjê \texttt{filtfilt} z biblioteki \texttt{scipy.signal}. Filtr pasmowy zosta³ zoptymalizowany pod k¹tem czêstotliwoœci oddechu  osoby badanej. Zastosowano filtr Butterwortha 4. rzêdu, zapewniaj¹cy odpowiedni¹ równowagê miêdzy stromoœci¹ charakterystyki a stabilnoœci¹ przetwarzanego sygna³u. Nale¿y jednak zauwa¿yæ, ¿e zastosowanie filtra 4. rzêdu powoduje znacz¹ce opóŸnienie w przetwarzaniu sygna³u. W konsekwencji prawid³owe dzia³anie algorytmu wymaga uwzglêdnienia co najmniej 28 próbek interwa³ów RR, aby unikn¹æ zniekszta³ceñ wynikaj¹cych z niewystarczaj¹cego buforowania danych.
+W celu identyfikacji tych zmian, sygna³ têtna zosta³ przetworzony za pomoc¹
+cyfrowego filtru pasmowego w konfiguracji bez przesuniêcia fazowego,
+wykorzystuj¹c funkcjê \texttt{filtfilt} z biblioteki \texttt{scipy.signal}.
+Filtr pasmowy zosta³ zoptymalizowany pod k¹tem czêstotliwoœci oddechu osoby
+badanej. Zastosowano filtr Butterwortha 4. rzêdu, zapewniaj¹cy odpowiedni¹
+równowagê miêdzy stromoœci¹ charakterystyki a stabilnoœci¹ przetwarzanego
+sygna³u. Nale¿y jednak zauwa¿yæ, ¿e zastosowanie filtra 4. rzêdu powoduje
+znacz¹ce opóŸnienie w przetwarzaniu sygna³u. W konsekwencji prawid³owe
+dzia³anie algorytmu wymaga uwzglêdnienia co najmniej 28 próbek interwa³ów RR,
+aby unikn¹æ zniekszta³ceñ wynikaj¹cych z niewystarczaj¹cego buforowania danych.
 
-Filtr Butterwortha w konfiguracji pasmowo-przepustowej przepuszcza³ tylko czêstotliwoœci w zakresie okreœlonym parametrami \textit{low} i \textit{high}, znormalizowanym wzglêdem czêstotliwoœci Nyquista (65 Hz dla czêstotliwoœci próbkowania 130 Hz). 
+Filtr Butterwortha w konfiguracji pasmowo-przepustowej przepuszcza³ tylko
+czêstotliwoœci w zakresie okreœlonym parametrami \textit{low} i \textit{high},
+znormalizowanym wzglêdem czêstotliwoœci Nyquista (65 Hz dla czêstotliwoœci
+próbkowania 130 Hz).
 
 \subsection{Dobór parametrów filtru}
-Na podstawie literatury \cite{Boashash1992} oraz analizy heurystycznej ustalono, ¿e najlepsze wyniki mo¿na uzyskaæ, stosuj¹c filtr przepuszczaj¹cy czêstotliwoœci w zakresie od po³owy czêstotliwoœci centralnej do dwukrotnoœci tej czêstotliwoœci. Czêstotliwoœæ centraln¹ definiuje siê jako wartoœæ, dla której analizowany sygna³ wykazuje najwiêksz¹ moc.
+Na podstawie literatury \cite{Boashash1992} oraz analizy heurystycznej ustalono, ¿e najlepsze
+wyniki mo¿na uzyskaæ, stosuj¹c filtr przepuszczaj¹cy czêstotliwoœci w zakresie
+od po³owy czêstotliwoœci centralnej do dwukrotnoœci tej czêstotliwoœci.
+Czêstotliwoœæ centraln¹ definiuje siê jako wartoœæ, dla której analizowany
+sygna³ wykazuje najwiêksz¹ moc.
 
-Przyk³adowo, dla osoby oddychaj¹cej z czêstotliwoœci¹ oko³o 6 oddechów na minutê (co odpowiada 0,1 Hz), optymalne pasmo filtra wynosi od 0,05 Hz do 0,2 Hz. W celu uzyskania takich ustawieñ, parametry filtra \textit{low} i \textit{high} nale¿y ustawiæ odpowiednio na wartoœci 0,05 Hz i 0,2 Hz. Tak dobrany zakres pozwala na uzyskanie wyraŸnych lokalnych ekstremów w przefiltrowanym sygnale têtna, co umo¿liwia precyzyjne okreœlenie faz cyklu oddechowego.
+Przyk³adowo, dla osoby oddychaj¹cej z czêstotliwoœci¹ oko³o 6 oddechów na
+minutê (co odpowiada 0,1 Hz), optymalne pasmo filtra wynosi od 0,05 Hz do 0,2
+Hz. W celu uzyskania takich ustawieñ, parametry filtra \textit{low} i
+\textit{high} nale¿y ustawiæ odpowiednio na wartoœci 0,05 Hz i 0,2 Hz. Tak
+dobrany zakres pozwala na uzyskanie wyraŸnych lokalnych ekstremów w
+przefiltrowanym sygnale têtna, co umo¿liwia precyzyjne okreœlenie faz cyklu
+oddechowego.
 
-Filtracja dolnych wartoœci (poni¿ej 0,05 Hz) pozwala odfiltrowaæ powolne wahania sygna³u, takie jak wp³yw zmian pozycji cia³a, artefakty ruchowe o niskiej czêstotliwoœci lub d³ugoterminowe trendy w sygnale. Z kolei odciêcie górnych wartoœci (powy¿ej 0,2 Hz) eliminuje zak³ócenia wynikaj¹ce z takich czynników jak szum o wysokiej czêstotliwoœci, szybkie artefakty ruchowe lub sk³adowe zwi¹zane z wysokoczêstotliwoœciowymi procesami fizjologicznymi, które nie s¹ zwi¹zane z oddechem.
+Filtracja dolnych wartoœci (poni¿ej 0,05 Hz) pozwala odfiltrowaæ powolne
+wahania sygna³u, takie jak wp³yw zmian pozycji cia³a, artefakty ruchowe o
+niskiej czêstotliwoœci lub d³ugoterminowe trendy w sygnale. Z kolei odciêcie
+górnych wartoœci (powy¿ej 0,2 Hz) eliminuje zak³ócenia wynikaj¹ce z takich
+czynników jak szum o wysokiej czêstotliwoœci, szybkie artefakty ruchowe lub
+sk³adowe zwi¹zane z wysokoczêstotliwoœciowymi procesami fizjologicznymi, które
+nie s¹ zwi¹zane z oddechem.
 
-Opisywany algorytm wykazywa³ jednak pewne ograniczenia, szczególnie w przypadku szybszych oddechów (o czêstotliwoœci powy¿ej 0,25 Hz). Ponadto, w obecnej implementacji wymaga³ on filtrowania ca³ego sygna³u, co w trybie rzeczywistym lub podczas analizy du¿ych próbek danych, znacz¹co zwiêksza³o obci¹¿enie obliczeniowe.
+Opisywany algorytm wykazywa³ jednak pewne ograniczenia, szczególnie w przypadku
+szybszych oddechów (o czêstotliwoœci powy¿ej 0,25 Hz). Ponadto, w obecnej
+implementacji wymaga³ on filtrowania ca³ego sygna³u, co w trybie rzeczywistym
+lub podczas analizy du¿ych próbek danych, znacz¹co zwiêksza³o obci¹¿enie
+obliczeniowe.
 
 \subsection{Detekcja szczytów lokalnych i analiza faz oddechowych}
 
-Do identyfikacji lokalnych szczytów w sygnale wykorzystano funkcjê \texttt{find\_peaks} z biblioteki \texttt{scipy.signal}. W parametrach funkcji zdefiniowano próg (\textit{threshold}) jako œredni¹ wartoœæ przefiltrowanego sygna³u powiêkszon¹ o 10\% odchylenia standardowego, co okreœla³o minimalny poziom, powy¿ej którego poszukiwano szczytów. Dodatkowo, ustawiono minimaln¹ odleg³oœæ (\textit{distance}) miêdzy kolejnymi szczytami jako liczbê próbek odpowiadaj¹c¹ czasowi trwania po³owy jednego cyklu oddechowego. 
+Do identyfikacji lokalnych szczytów w sygnale wykorzystano funkcjê
+\texttt{find\_peaks} z biblioteki \texttt{scipy.signal}. W parametrach funkcji
+zdefiniowano próg (\textit{threshold}) jako œredni¹ wartoœæ przefiltrowanego
+sygna³u powiêkszon¹ o 10\% odchylenia standardowego, co okreœla³o minimalny
+poziom, powy¿ej którego poszukiwano szczytów. Dodatkowo, ustawiono minimaln¹
+odleg³oœæ (\textit{distance}) miêdzy kolejnymi szczytami jako liczbê próbek
+odpowiadaj¹c¹ czasowi trwania po³owy jednego cyklu oddechowego.
 
-W celu detekcji do³ków sygna³ zosta³ odwrócony poprzez zmianê znaku wszystkich próbek, a nastêpnie zastosowano te same procedury co w przypadku wykrywania szczytów. Proces detekcji uzupe³niono o autorski algorytm korekcji pozycji wykrytych ekstremów wzglêdem sygna³u nieprzefiltrowanego, co opisano szczegó³owo w Rozdziale \ref{P-Tomkins}.
+W celu detekcji do³ków sygna³ zosta³ odwrócony poprzez zmianê znaku wszystkich
+próbek, a nastêpnie zastosowano te same procedury co w przypadku wykrywania
+szczytów. Proces detekcji uzupe³niono o autorski algorytm korekcji pozycji
+wykrytych ekstremów wzglêdem sygna³u nieprzefiltrowanego, co opisano
+szczegó³owo w Rozdziale \ref{P-Tomkins}.
 
-Wyznaczone ekstrema oznaczono na wykresie têtna kolorami: minima jako zielone punkty, a maksima jako czerwone punkty. Na podstawie wykrytych ekstremów zaimplementowano algorytm identyfikuj¹cy momenty trwania poszczególnych wdechów i wydechów. Wdech zdefiniowano jako fragment sygna³u rozpoczynaj¹cy siê w minimum wykresu têtna i koñcz¹cy siê w kolejnym maksimum, pod warunkiem, ¿e pomiêdzy tymi punktami nie wystêpowa³y dodatkowe minima. Analogicznie, wydech okreœlono jako fragment rozpoczynaj¹cy siê w maksimum i koñcz¹cy w kolejnym minimum.
+Wyznaczone ekstrema oznaczono na wykresie têtna kolorami: minima jako zielone
+punkty, a maksima jako czerwone punkty. Na podstawie wykrytych ekstremów
+zaimplementowano algorytm identyfikuj¹cy momenty trwania poszczególnych wdechów
+i wydechów. Wdech zdefiniowano jako fragment sygna³u rozpoczynaj¹cy siê w
+minimum wykresu têtna i koñcz¹cy siê w kolejnym maksimum, pod warunkiem, ¿e
+pomiêdzy tymi punktami nie wystêpowa³y dodatkowe minima. Analogicznie, wydech
+okreœlono jako fragment rozpoczynaj¹cy siê w maksimum i koñcz¹cy w kolejnym
+minimum.
 
-Przyjête podejœcie zapewnia odpornoœæ na sytuacje, w których algorytm nie wykry³by niektórych minimów lub maksimów. Na przyk³ad brak detekcji koñca fazy oddechowej móg³by prowadziæ do sztucznego wyd³u¿enia czasu jej trwania. Dziêki zdefiniowanym regu³om minimalizowano wp³yw takich przypadków na wyniki analizy.
+Przyjête podejœcie zapewnia odpornoœæ na sytuacje, w których algorytm nie
+wykry³by niektórych minimów lub maksimów. Na przyk³ad brak detekcji koñca fazy
+oddechowej móg³by prowadziæ do sztucznego wyd³u¿enia czasu jej trwania. Dziêki
+zdefiniowanym regu³om minimalizowano wp³yw takich przypadków na wyniki analizy.
 
-Na podstawie wykrytych wdechów i wydechów obliczono wskaŸnik RSA Index – kluczow¹ miarê opisuj¹c¹ si³ê efektu RSA. WskaŸnik ten okreœla œredni¹ ró¿nicê w d³ugoœci interwa³u RR pomiêdzy pocz¹tkiem a koñcem zarówno wdechu, jak i wydechu.
-
-
+Na podstawie wykrytych wdechów i wydechów obliczono wskaŸnik RSA Index –
+kluczow¹ miarê opisuj¹c¹ si³ê efektu RSA. WskaŸnik ten okreœla œredni¹ ró¿nicê
+w d³ugoœci interwa³u RR pomiêdzy pocz¹tkiem a koñcem zarówno wdechu, jak i
+wydechu.
 
 \subsection{Przyk³ad zastosowania algorytmu}
-Na Rys. \ref{fig/oddechy} przedstawiono wyniki analizy sygna³u EKG zarejestrowanego na odcinku 118 sekund, podczas którego osoba oddycha³a ze sta³¹ czêstotliwoœci¹ 0,07 Hz (œrednio 14 sekund na cykl oddechowy). Wykresy zosta³y wygenerowane przy u¿yciu opisywanej aplikacji i uporz¹dkowane w czterech rzêdach:
+Na Rys. \ref{fig/oddechy} przedstawiono wyniki analizy sygna³u EKG
+zarejestrowanego na odcinku 118 sekund, podczas którego osoba oddycha³a ze
+sta³¹ czêstotliwoœci¹ 0,07 Hz (œrednio 14 sekund na cykl oddechowy). Wykresy
+zosta³y wygenerowane przy u¿yciu opisywanej aplikacji i uporz¹dkowane w
+czterech rzêdach:
 
 \begin{figure}[ht]
     \centering
@@ -49,15 +113,19 @@ Na Rys. \ref{fig/oddechy} przedstawiono wyniki analizy sygna³u EKG zarejestrowan
 \FloatBarrier
 
 \begin{itemize}
-    \item Pierwszy rz¹d: Wartoœci napiêcia (w \textmu{}V) dla wykrytych szczytów R w czasie, wyznaczone za pomoc¹ algorytmu Pan-Tompkinsa.
-    \item Drugi rz¹d: Ró¿nice miêdzy kolejnymi interwa³ami RR (w sekundach) w funkcji czasu.
-    \item Trzeci rz¹d: Przebieg têtna (w uderzeniach na minutê) z zaznaczonymi minimami i maksimami zgodnie z opisanymi kryteriami.
-    \item Czwarty rz¹d: Przefiltrowany sygna³ têtna (w jednostkach znormalizowanych) w funkcji czasu.
+    \item Pierwszy rz¹d: Wartoœci napiêcia (w \textmu{}V) dla wykrytych szczytów R w
+          czasie, wyznaczone za pomoc¹ algorytmu Pan-Tompkinsa.
+    \item Drugi rz¹d: Ró¿nice miêdzy kolejnymi interwa³ami RR (w sekundach) w funkcji
+          czasu.
+    \item Trzeci rz¹d: Przebieg têtna (w uderzeniach na minutê) z zaznaczonymi minimami i
+          maksimami zgodnie z opisanymi kryteriami.
+    \item Czwarty rz¹d: Przefiltrowany sygna³ têtna (w jednostkach znormalizowanych) w
+          funkcji czasu.
 \end{itemize}
 
-
 \subsection{Podsumowanie wyników}
-Na podstawie analizy sygna³u aplikacja wyznaczy³a nastêpuj¹ce miary charakterystyczne:
+Na podstawie analizy sygna³u aplikacja wyznaczy³a nastêpuj¹ce miary
+charakterystyczne:
 \begin{itemize}
     \item Œredni czas trwania wdechu: 9,99 s,
     \item Œredni czas trwania wydechu: 4,25 s,
@@ -66,14 +134,23 @@ Na podstawie analizy sygna³u aplikacja wyznaczy³a nastêpuj¹ce miary charakteryst
     \item Œrednia d³ugoœæ pe³nego cyklu oddechowego: 14,24 s.
 \end{itemize}
 
-
 \section{Analiza sygna³u EKG za pomoc¹ transformacji Fouriera}
 
 \subsection{Interpolacja i spe³nienie warunku Nyquista}
-W celu analizy sygna³u EKG przy u¿yciu szybkiej transformacji Fouriera (FFT) obejmuj¹cej czêstotliwoœci w zakresie 0,04–0,4 Hz, konieczne by³o przekszta³cenie nierównomiernie próbkowanego sygna³u RR w równomierny. W tym celu zastosowano interpolacjê liniow¹ interwa³ów RR z czêstotliwoœci¹ próbkowania 4 Hz. Dziêki temu spe³niono warunek Nyquista, poniewa¿ najwiêksza analizowana czêstotliwoœæ (0,4 Hz) le¿y poni¿ej po³owy czêstotliwoœci próbkowania (2 Hz).
+W celu analizy sygna³u EKG przy u¿yciu szybkiej transformacji Fouriera (FFT)
+obejmuj¹cej czêstotliwoœci w zakresie 0,04–0,4 Hz, konieczne by³o
+przekszta³cenie nierównomiernie próbkowanego sygna³u RR w równomierny. W tym
+celu zastosowano interpolacjê liniow¹ interwa³ów RR z czêstotliwoœci¹
+próbkowania 4 Hz. Dziêki temu spe³niono warunek Nyquista, poniewa¿ najwiêksza
+analizowana czêstotliwoœæ (0,4 Hz) le¿y poni¿ej po³owy czêstotliwoœci
+próbkowania (2 Hz).
 
 \subsection{Przygotowanie sygna³u do analizy}
-Przed wykonaniem transformacji na sygna³ na³o¿ono okno Hanninga. Okno to redukuje amplitudy na pocz¹tku i koñcu sygna³u, co pozwala na wyg³adzenie danych i minimalizacjê efektów nieci¹g³oœci. Nastêpnie wykonano dyskretn¹ transformacjê Fouriera, która przekszta³ca sygna³ z dziedziny czasu do dziedziny czêstotliwoœci. \cite{Boashash1992}
+Przed wykonaniem transformacji na sygna³ na³o¿ono okno Hanninga. Okno to
+redukuje amplitudy na pocz¹tku i koñcu sygna³u, co pozwala na wyg³adzenie
+danych i minimalizacjê efektów nieci¹g³oœci. Nastêpnie wykonano dyskretn¹
+transformacjê Fouriera, która przekszta³ca sygna³ z dziedziny czasu do
+dziedziny czêstotliwoœci.\cite{Boashash1992}
 
 W wyniku FFT uzyskano dwa wektory:
 \begin{itemize}
@@ -82,21 +159,32 @@ W wyniku FFT uzyskano dwa wektory:
 \end{itemize}
 
 \subsection{Obliczanie mocy w pasmach czêstotliwoœci}
-Moc sygna³u w okreœlonych pasmach, takich jak LF czy HF, obliczono jako ca³kê z kwadratu modu³u amplitud \(|FFT|^2\) w odpowiednim przedziale czêstotliwoœci. W praktyce odpowiada to sumie wartoœci mocy przypisanych do tych czêstotliwoœci:
+Moc sygna³u w okreœlonych pasmach, takich jak LF czy HF, obliczono jako ca³kê z
+kwadratu modu³u amplitud \(|FFT|^2\) w odpowiednim przedziale czêstotliwoœci. W
+praktyce odpowiada to sumie wartoœci mocy przypisanych do tych czêstotliwoœci:
 \[
-\text{Power} = \int_{f_1}^{f_2} |FFT(f)|^2 df.
+    \text{Power} = \int_{f_1}^{f_2} |FFT(f)|^2 df.
 \]
-Dziêki temu mo¿liwe by³o zwizualizowanie mocy w ca³ym zakresie czêstotliwoœci, jak równie¿ w wybranych pasmach, a tak¿e obliczanie stosunku LF/HF. 
+Dziêki temu mo¿liwe by³o zwizualizowanie mocy w ca³ym zakresie czêstotliwoœci,
+jak równie¿ w wybranych pasmach, a tak¿e obliczanie stosunku LF/HF.
 
 \subsection{Ograniczenia i uwagi dotycz¹ce metody FFT}
-Transformacja FFT wymaga dostêpu do ca³ego sygna³u, co oznacza, ¿e analiza w czasie rzeczywistym jest obarczona opóŸnieniem wynikaj¹cym z czasu potrzebnego na zebranie danych i przeprowadzenie obliczeñ.
+Transformacja FFT wymaga dostêpu do ca³ego sygna³u, co oznacza, ¿e analiza w
+czasie rzeczywistym jest obarczona opóŸnieniem wynikaj¹cym z czasu potrzebnego
+na zebranie danych i przeprowadzenie obliczeñ.
 
 \subsection{Wyniki analizy FFT}
-Poni¿ej zamieszczono wynik szybkiej transformaty Fouriera który zosta³ wygenerowany przy u¿yciu modu³u implementowanego w ramach stworzonej aplikacji. Na wykresie przedstawiono widmow¹ gêstoœæ mocy (Power Spectral Density, PSD), wyra¿on¹ w jednostkach \([ms^2/Hz]\), w dziedzinie czêstotliwoœci. Analiza zosta³a wykonana na sygnale z 5-minutowego badania przeprowadzonego podczas snu.
-
+Poni¿ej zamieszczono wynik szybkiej transformaty Fouriera który zosta³
+wygenerowany przy u¿yciu modu³u implementowanego w ramach stworzonej aplikacji.
+Na wykresie przedstawiono widmow¹ gêstoœæ mocy (Power Spectral Density, PSD),
+wyra¿on¹ w jednostkach \([ms^2/Hz]\), w dziedzinie czêstotliwoœci. Analiza
+zosta³a wykonana na sygnale z 5-minutowego badania przeprowadzonego podczas
+snu.
 
 \subsection{Wizualizacja wyników}
-Na wykresie \ref{fig:fft_psd}, uwidoczniono wartoœci mocy w poszczególnych pasmach czêstotliwoœci: LF, HF oraz stosunek LF/HF. Zauwa¿alna jest dominuj¹ca moc w paœmie ULF (Ultra-Low Frequency, poni¿ej 0,003 Hz).
+Na wykresie \ref{fig:fft_psd}, uwidoczniono wartoœci mocy w poszczególnych
+pasmach czêstotliwoœci: LF, HF oraz stosunek LF/HF. Zauwa¿alna jest dominuj¹ca
+moc w paœmie ULF (Ultra-Low Frequency, poni¿ej 0,003 Hz).
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{Rysunki/fftFAR.png}
@@ -106,7 +194,10 @@ Na wykresie \ref{fig:fft_psd}, uwidoczniono wartoœci mocy w poszczególnych pasma
 
 \FloatBarrier
 
-Na wykresie \ref{fig:fft_zoomed}, bêd¹cym przybli¿eniem rozk³adu gêstoœci mocy tego samego sygna³u, widoczne s¹ lokalne wzrosty mocy w paœmie czêstotliwoœci \(0,28\ \text{Hz}\) (HF) oraz mniejszy, ale wyraŸny wzrost dla czêstotliwoœci \(0,09\ \text{Hz}\) (LF).
+Na wykresie \ref{fig:fft_zoomed}, bêd¹cym przybli¿eniem rozk³adu gêstoœci mocy
+tego samego sygna³u, widoczne s¹ lokalne wzrosty mocy w paœmie czêstotliwoœci
+\(0,28\ \text{Hz}\) (HF) oraz mniejszy, ale wyraŸny wzrost dla czêstotliwoœci
+\(0,09\ \text{Hz}\) (LF).
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{Rysunki/fftCLOSE.png}
@@ -116,34 +207,58 @@ Na wykresie \ref{fig:fft_zoomed}, bêd¹cym przybli¿eniem rozk³adu gêstoœci mocy t
 
 \FloatBarrier
 
-
 \section{Analiza czasowo-czêstotliwoœciowa}
 
-W analizie czasowo-czêstotliwoœciowej, równie¿ zastosowano interpolacjê interwa³ów RR do czêstotliwoœci 4 Hz, aby zapewniæ równomierne próbkowanie sygna³u. Do analizy wykorzystano sinusoidaln¹ falkê Morleta, która jest szczególnie dobrze dopasowana do sygna³ów harmonicznych, takich jak RSA. 
+W analizie czasowo-czêstotliwoœciowej, równie¿ zastosowano interpolacjê
+interwa³ów RR do czêstotliwoœci 4 Hz, aby zapewniæ równomierne próbkowanie
+sygna³u. Do analizy wykorzystano sinusoidaln¹ falkê Morleta, która jest
+szczególnie dobrze dopasowana do sygna³ów harmonicznych, takich jak RSA.
 
 \subsection{Parametry analizy falkowej}
-Falka Morleta, zaimplementowana przy u¿yciu biblioteki PyWavelets, umo¿liwia precyzyjn¹ analizê w interesuj¹cym zakresie czêstotliwoœci. Kluczowe parametry falki zosta³y dostosowane w nastêpuj¹cy sposób:
+Falka Morleta, zaimplementowana przy u¿yciu biblioteki PyWavelets, umo¿liwia
+precyzyjn¹ analizê w interesuj¹cym zakresie czêstotliwoœci. Kluczowe parametry
+falki zosta³y dostosowane w nastêpuj¹cy sposób:
 \begin{itemize}
     \item \textbf{Szerokoœæ pasma:} \(B = 15\), co dziêki stosunkowo wysokiej wartoœci zwiêksza precyzjê w dziedzinie czêstotliwoœci, jednoczeœnie zachowuj¹c odpowiedni kompromis z rozdzielczoœci¹ czasow¹,
     \item \textbf{Czêstotliwoœæ centralna:} \(C = 0.22\), która skupia energiê falki na kluczowym dla analizy przedziale czêstotliwoœci.
 \end{itemize}
 
 \subsection{Wyznaczanie mocy sygna³u}
-Stworzono funkcjê obliczaj¹c¹ parametr \textit{scales}, czyli poziomy skalowania funkcji falkowej, odpowiadaj¹ce analizowanemu zakresowi czêstotliwoœci (0,03–0,5 Hz). Parametr ten pozwala³ dostosowaæ analizê do wybranych czêstotliwoœci, umo¿liwiaj¹c transformacjê falkow¹ sygna³u i uzyskanie wspó³czynników (\textit{coefficients}), które wskazuj¹, jak mocno sygna³ pasuje do falki w danym momencie i dla danej skali. Na tej podstawie liczona by³a moc sygna³u jako suma kwadratów amplitud:
+Stworzono funkcjê obliczaj¹c¹ parametr \textit{scales}, czyli poziomy
+skalowania funkcji falkowej, odpowiadaj¹ce analizowanemu zakresowi
+czêstotliwoœci (0,03–0,5 Hz). Parametr ten pozwala³ dostosowaæ analizê do
+wybranych czêstotliwoœci, umo¿liwiaj¹c transformacjê falkow¹ sygna³u i
+uzyskanie wspó³czynników (\textit{coefficients}), które wskazuj¹, jak mocno
+sygna³ pasuje do falki w danym momencie i dla danej skali. Na tej podstawie
+liczona by³a moc sygna³u jako suma kwadratów amplitud:
 \[
-|C(a,b)|^2,
+    |C(a,b)|^2,
 \]
 co pozwala³o wizualizowaæ zmiany mocy na skalogramie.
 
 \subsection{Problemy brzegowe i wizualizacja wyników}
-Zawy¿one wartoœci mocy na krañcach dziedziny czasowej wynika³y z efektów brzegowych – falka czêœciowo wykracza³a poza sygna³, co prowadzi³o do zniekszta³ceñ. W celu poprawy widocznoœci zmian na skalogramie przedstawiono zlogarytmowan¹ moc w formie kolorowej mapy w uk³adzie czas-czêstotliwoœæ.
+Zawy¿one wartoœci mocy na krañcach dziedziny czasowej wynika³y z efektów
+brzegowych – falka czêœciowo wykracza³a poza sygna³, co prowadzi³o do
+zniekszta³ceñ. W celu poprawy widocznoœci zmian na skalogramie przedstawiono
+zlogarytmowan¹ moc w formie kolorowej mapy w uk³adzie czas-czêstotliwoœæ.
 
-Program umo¿liwia równie¿ obliczanie mocy sygna³u w wybranych pasmach czêstotliwoœci (np. LF lub HF) oraz wizualizacjê ich zmian, a tak¿e ich stosunku \textit{LF/HF} w czasie. Wszystkie te funkcjonalnoœci dzia³aj¹ zarówno podczas analizy sygna³u w czasie rzeczywistym, jak i podczas analizy danych wczytywanych z pliku.
+Program umo¿liwia równie¿ obliczanie mocy sygna³u w wybranych pasmach
+czêstotliwoœci (np. LF lub HF) oraz wizualizacjê ich zmian, a tak¿e ich
+stosunku \textit{LF/HF} w czasie. Wszystkie te funkcjonalnoœci dzia³aj¹ zarówno
+podczas analizy sygna³u w czasie rzeczywistym, jak i podczas analizy danych
+wczytywanych z pliku.
 
-Ze wzglêdu na specyfikê dzia³ania transformacji falkowej, która mo¿e generowaæ zniekszta³cenia na granicach sygna³u w dziedzinie czasowej, moc obliczana jest dla ca³ego zakresu czasowego jednoczeœnie. Mo¿e to prowadziæ do opóŸnieñ, zw³aszcza w przypadku analizy w czasie rzeczywistym lub przetwarzania sygna³ów o du¿ej d³ugoœci.
+Ze wzglêdu na specyfikê dzia³ania transformacji falkowej, która mo¿e generowaæ
+zniekszta³cenia na granicach sygna³u w dziedzinie czasowej, moc obliczana jest
+dla ca³ego zakresu czasowego jednoczeœnie. Mo¿e to prowadziæ do opóŸnieñ,
+zw³aszcza w przypadku analizy w czasie rzeczywistym lub przetwarzania sygna³ów
+o du¿ej d³ugoœci.
 
 \subsection{Wyniki analizy}
-Na zamieszczonym obrazie przeanalizowano tê sam¹ 5-minutow¹ próbkê zarejestrowan¹ podczas snu, która by³a omówiona w rozdziale dotycz¹cym implementacji FFT. Przedstawione wykresy, wygenerowane za pomoc¹ aplikacji stworzonej w ramach niniejszej pracy, obrazuj¹:
+Na zamieszczonym obrazie przeanalizowano tê sam¹ 5-minutow¹ próbkê
+zarejestrowan¹ podczas snu, która by³a omówiona w rozdziale dotycz¹cym
+implementacji FFT. Przedstawione wykresy, wygenerowane za pomoc¹ aplikacji
+stworzonej w ramach niniejszej pracy, obrazuj¹:
 \begin{itemize}
     \item {Pierwszy rz¹d:} Skalogram, na którym logarytmowana moc sygna³u jest zobrazowana kolorami zgodnie z legend¹, w zale¿noœci od czêstotliwoœci (oœ Y) i czasu (oœ X).
     \item {Drugi rz¹d:} Zmiany mocy w czasie dla pasm HF i LF, oznaczone zgodnie z opisami w legendzie.
@@ -151,8 +266,6 @@ Na zamieszczonym obrazie przeanalizowano tê sam¹ 5-minutow¹ próbkê zarejestrowan
 \end{itemize}
 
 Warto zwróciæ uwagê na zawy¿one wartoœci mocy na krañcach analizowanego okresu.
-
-
 
 \begin{figure}[ht]
     \centering
@@ -164,7 +277,13 @@ Warto zwróciæ uwagê na zawy¿one wartoœci mocy na krañcach analizowanego okresu.
 
 \FloatBarrier
 
-Na kolejnym wycinku zaprezentowano te same wykresy, przybli¿one do zakresu od 30. do 270. sekundy. Przybli¿enie to pozwala wyeliminowaæ zniekszta³cenia spowodowane efektem brzegowym analizy falkowej, co zapewnia bardziej precyzyjn¹ wizualizacjê danych. W analizowanym zakresie zauwa¿alna jest dominacja mocy w przedziale czêstotliwoœci \(0,2\text{--}0,3\ \text{Hz}\) (pasmo HF) w stosunku do pasma LF. Zale¿noœæ tê wyraŸnie pokazuj¹ zarówno skalogram, jak i wykresy mocy obu pasm oraz ich stosunku \ref{fig:wave_zoomed}.
+Na kolejnym wycinku zaprezentowano te same wykresy, przybli¿one do zakresu od
+30. do 270. sekundy. Przybli¿enie to pozwala wyeliminowaæ zniekszta³cenia
+spowodowane efektem brzegowym analizy falkowej, co zapewnia bardziej precyzyjn¹
+wizualizacjê danych. W analizowanym zakresie zauwa¿alna jest dominacja mocy w
+przedziale czêstotliwoœci \(0,2\text{--}0,3\ \text{Hz}\) (pasmo HF) w stosunku
+do pasma LF. Zale¿noœæ tê wyraŸnie pokazuj¹ zarówno skalogram, jak i wykresy
+mocy obu pasm oraz ich stosunku \ref{fig:wave_zoomed}.
 
 \begin{figure}[ht]
     \centering
@@ -177,7 +296,10 @@ Na kolejnym wycinku zaprezentowano te same wykresy, przybli¿one do zakresu od 30
 
 \section{Implementacja i Wizualizacja Œredniej Krocz¹cej}
 
-Na podstawie wykresu \ref{fig:wavePORANEK}, przedstawiaj¹cego rozk³ad mocy w dziedzinie czasu i czêstotliwoœci, wyznaczonego na podstawie sygna³u EKG za pomoc¹ analizy falkowej dla okresu 3,5 godziny, zostanie opisana implementacja i wizualizacja œredniej krocz¹cej.
+Na podstawie wykresu \ref{fig:wavePORANEK}, przedstawiaj¹cego rozk³ad mocy w
+dziedzinie czasu i czêstotliwoœci, wyznaczonego na podstawie sygna³u EKG za
+pomoc¹ analizy falkowej dla okresu 3,5 godziny, zostanie opisana implementacja
+i wizualizacja œredniej krocz¹cej.
 
 \begin{figure}[ht]
     \centering
@@ -188,7 +310,12 @@ Na podstawie wykresu \ref{fig:wavePORANEK}, przedstawiaj¹cego rozk³ad mocy w dzi
 
 \FloatBarrier
 
-W przypadku analizy mocy w pasmach LF i HF oraz ich stosunku w tak d³ugim przedziale czasowym, wykres tych wartoœci mo¿e byæ ma³o czytelny z uwagi na du¿¹ zmiennoœæ mocy w poszczególnych pasmach. W takich sytuacjach, gdy chcemy zobrazowaæ globalne trendy, warto zastosowaæ metodê statystyczn¹, jak¹ jest œrednia krocz¹ca. Na rysunku \ref{fig:lf_avg} przedstawiono moc w paœmie LF dla analizowanego sygna³u.
+W przypadku analizy mocy w pasmach LF i HF oraz ich stosunku w tak d³ugim
+przedziale czasowym, wykres tych wartoœci mo¿e byæ ma³o czytelny z uwagi na
+du¿¹ zmiennoœæ mocy w poszczególnych pasmach. W takich sytuacjach, gdy chcemy
+zobrazowaæ globalne trendy, warto zastosowaæ metodê statystyczn¹, jak¹ jest
+œrednia krocz¹ca. Na rysunku \ref{fig:lf_avg} przedstawiono moc w paœmie LF dla
+analizowanego sygna³u.
 
 \begin{figure}[ht]
     \centering
@@ -199,14 +326,21 @@ W przypadku analizy mocy w pasmach LF i HF oraz ich stosunku w tak d³ugim przedz
 
 \FloatBarrier
 
-Subteln¹, ró¿ow¹ lini¹ zilustrowano wykres mocy w paœmie LF z dok³adnoœci¹ do 0,25 sekundy \ref{fig:lf_avg} . Ze wzglêdu na du¿e wahania mocy w krótkich odstêpach czasu, analiza tego wykresu w d³u¿szej perspektywie jest trudna. Dlatego liniami o ró¿nych kolorach zaprezentowano zastosowanie centralnej œredniej krocz¹cej dla okna o rozmiarze 900 sekund (15 minut). Linie przedstawiaj¹:
+Subteln¹, ró¿ow¹ lini¹ zilustrowano wykres mocy w paœmie LF z dok³adnoœci¹ do
+0,25 sekundy \ref{fig:lf_avg} . Ze wzglêdu na du¿e wahania mocy w krótkich
+odstêpach czasu, analiza tego wykresu w d³u¿szej perspektywie jest trudna.
+Dlatego liniami o ró¿nych kolorach zaprezentowano zastosowanie centralnej
+œredniej krocz¹cej dla okna o rozmiarze 900 sekund (15 minut). Linie
+przedstawiaj¹:
 \begin{itemize}
     \item œredni¹ jednorodn¹ (kolor niebieski),
     \item œredni¹ liniow¹ (kolor zielony),
     \item œredni¹ gaussowsk¹ (kolor czerwony).
 \end{itemize}
 
-W d³u¿szym przedziale czasowym wszystkie te œrednie wykazuj¹ zbli¿one wartoœci, jednak po zmniejszeniu skali mo¿na zaobserwowaæ subtelne ró¿nice, co ilustruje wykres \ref{fig:lf_compare_avg}:
+W d³u¿szym przedziale czasowym wszystkie te œrednie wykazuj¹ zbli¿one wartoœci,
+jednak po zmniejszeniu skali mo¿na zaobserwowaæ subtelne ró¿nice, co ilustruje
+wykres \ref{fig:lf_compare_avg}:
 
 \begin{figure}[ht]
     \centering
@@ -217,9 +351,17 @@ W d³u¿szym przedziale czasowym wszystkie te œrednie wykazuj¹ zbli¿one wartoœci, 
 
 \FloatBarrier
 
-W przypadku œredniej jednorodnej (kolor niebieski) lokalne ekstrema s¹ bardziej wyg³adzone ni¿ w przypadku œredniej liniowej i gaussowskiej, których wartoœci niemal siê pokrywaj¹. Filtr gaussowski zapewnia jednak bardziej naturalne wyg³adzenie, szczególnie przy analizie dynamicznych sygna³ów lub krótszych okien czasowych. Na podstawie tego porównania oraz teoretycznych przes³anek opisanych we wczeœniejszym rozdziale, wybrano œredni¹ gaussowsk¹ jako domyœlny sposób prezentowania zmian w czasie, z mo¿liwoœci¹ dostosowania rozmiaru okna przez u¿ytkownika w pliku konfiguracyjnym.
+W przypadku œredniej jednorodnej (kolor niebieski) lokalne ekstrema s¹ bardziej
+wyg³adzone ni¿ w przypadku œredniej liniowej i gaussowskiej, których wartoœci
+niemal siê pokrywaj¹. Filtr gaussowski zapewnia jednak bardziej naturalne
+wyg³adzenie, szczególnie przy analizie dynamicznych sygna³ów lub krótszych
+okien czasowych. Na podstawie tego porównania oraz teoretycznych przes³anek
+opisanych we wczeœniejszym rozdziale, wybrano œredni¹ gaussowsk¹ jako domyœlny
+sposób prezentowania zmian w czasie, z mo¿liwoœci¹ dostosowania rozmiaru okna
+przez u¿ytkownika w pliku konfiguracyjnym.
 
-Wykres \ref{fig:lf_hf_normal} przedstawia zmiany mocy w pasmach HF i LF w czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa:
+Wykres \ref{fig:lf_hf_normal} przedstawia zmiany mocy w pasmach HF i LF w
+czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa:
 
 \begin{figure}[ht]
     \centering
@@ -230,8 +372,9 @@ Wykres \ref{fig:lf_hf_normal} przedstawia zmiany mocy w pasmach HF i LF w czasie
 
 \FloatBarrier
 
-W przypadku poprawnego zobrazowania zmiennoœci stosunku mocy w pasmach LF/HF mo¿liwe jest zastosowanie ró¿nych podejœæ. Na wykresie \ref{fig:lf_hf_avg_ratio} pokazano zmiany tego stosunku w czasie
-
+W przypadku poprawnego zobrazowania zmiennoœci stosunku mocy w pasmach LF/HF
+mo¿liwe jest zastosowanie ró¿nych podejœæ. Na wykresie
+\ref{fig:lf_hf_avg_ratio} pokazano zmiany tego stosunku w czasie
 
 \begin{figure}[ht]
     \centering
@@ -244,16 +387,29 @@ W przypadku poprawnego zobrazowania zmiennoœci stosunku mocy w pasmach LF/HF mo¿
 
 gdzie:
 \begin{itemize}
-    \item Zielon¹ lini¹ zilustrowano iloraz wartoœci uœrednionej mocy w paœmie LF oraz uœrednionej mocy w paœmie HF dla ka¿dego momentu \( t \).
+    \item Zielon¹ lini¹ zilustrowano iloraz wartoœci uœrednionej mocy w paœmie LF oraz
+          uœrednionej mocy w paœmie HF dla ka¿dego momentu \( t \).
     \item ¯ó³t¹ lini¹ przedstawiono iloraz rzeczywistej wartoœci mocy w paœmie LF do wartoœci mocy w paœmie HF dla chwili \( t \), a nastêpnie wynikow¹ seriê danych poddano uœrednianiu krocz¹cemu.
 \end{itemize}
 
-Widaæ, ¿e stosunek tych dwóch miar jest silniej zale¿ny od chwilowych du¿ych zmian w wartoœciach w drugim podejœciu, co utrudnia analizê trendów w d³u¿szej perspektywie. Dlatego system domyœlnie wykorzystuje pierwsze podejœcie do prezentacji stosunku LF/HF w czasie.
+Widaæ, ¿e stosunek tych dwóch miar jest silniej zale¿ny od chwilowych du¿ych
+zmian w wartoœciach w drugim podejœciu, co utrudnia analizê trendów w d³u¿szej
+perspektywie. Dlatego system domyœlnie wykorzystuje pierwsze podejœcie do
+prezentacji stosunku LF/HF w czasie.
 
-System umo¿liwia implementacjê centralnej œredniej krocz¹cej wy³¹cznie dla danych wczytanych w ca³oœci, np. z pliku CSV. Taka œrednia mo¿e byæ stosowana jedynie do wykresów opartych na kompletnych danych, gdzie dla ka¿dego analizowanego punktu istnieje odpowiednia liczba próbek zarówno z jego lewej, jak i prawej strony. W przypadku analizy danych w czasie rzeczywistym, gdzie przysz³e wartoœci s¹ nieznane, tego rodzaju uœrednianie w tej implementacji nie jest wspierane. W takiej sytuacji stosuje siê œrednie oparte wy³¹cznie na danych historycznych, co powoduje przesuniêcie (tzw. lag) wzglêdem rzeczywistego sygna³u. W d³u¿szym okresie przesuniêcie to ma jednak niewielki wp³yw na ogóln¹ analizê.
+System umo¿liwia implementacjê centralnej œredniej krocz¹cej wy³¹cznie dla
+danych wczytanych w ca³oœci, np. z pliku CSV. Taka œrednia mo¿e byæ stosowana
+jedynie do wykresów opartych na kompletnych danych, gdzie dla ka¿dego
+analizowanego punktu istnieje odpowiednia liczba próbek zarówno z jego lewej,
+jak i prawej strony. W przypadku analizy danych w czasie rzeczywistym, gdzie
+przysz³e wartoœci s¹ nieznane, tego rodzaju uœrednianie w tej implementacji nie
+jest wspierane. W takiej sytuacji stosuje siê œrednie oparte wy³¹cznie na
+danych historycznych, co powoduje przesuniêcie (tzw. lag) wzglêdem
+rzeczywistego sygna³u. W d³u¿szym okresie przesuniêcie to ma jednak niewielki
+wp³yw na ogóln¹ analizê.
 
-Funkcjonalnoœæ obliczania œredniej krocz¹cej, zarówno centralnej, jak i klasycznej, zosta³a równie¿ zaimplementowana w przypadku wizualizacji trendów pulsu oraz interwa³ów RR, z u¿yciem filtra gaussowskiego.
-
-
+Funkcjonalnoœæ obliczania œredniej krocz¹cej, zarówno centralnej, jak i
+klasycznej, zosta³a równie¿ zaimplementowana w przypadku wizualizacji trendów
+pulsu oraz interwa³ów RR, z u¿yciem filtra gaussowskiego.
 
 % \section{}
