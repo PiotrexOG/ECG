@@ -320,7 +320,10 @@ class EcgData:
         path_without_ext = os.path.splitext(path)[0]
         if not save_peaks:
             try:
-                self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
+                if self.__r_peaks_finder.__class__.__name__ == PanTompkinsFinder.__name__:
+                    self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
+                else:
+                    self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
                 self.__loaded_r_peaks_ind = self.__loaded_r_peaks_ind.astype(int)
                 self.__loaded_r_peaks_ind.sort()
             except:
@@ -409,6 +412,7 @@ class EcgData:
         if save_peaks:
             # np.save(path_without_ext, self.__r_peaks_ind)
             np.savetxt(f"{path_without_ext}.txt", self.__r_peaks_ind, fmt="%d")
+
         self.on_data_updated()
 
     def clean_r_peaks(self, sampling_rate=130, threshold_multiplier=1.1):
@@ -488,7 +492,6 @@ class EcgData:
         start_time = timestamps[0]  # Początkowy timestamp
         end_time = timestamps[-1]  # Końcowy timestamp
 
-        # Nowa siatka czasowa z 400 Hz
         new_timestamps = np.arange(0, end_time - start_time, 1 / target_frequency)
         new_timestamps = new_timestamps + start_time
         # Interpolacja
@@ -1760,8 +1763,8 @@ class EcgData:
         for i in range(win_count):
             win_start = i * window_size
             win_end = win_start + window_size
-            # X_train[i] = self.rr_intervals[win_start:win_end]
-            X_train[i] = self.__r_peaks[win_start:win_end, 1]
+            X_train[i] = self.rr_intervals[win_start:win_end, 1]
+            # X_train[i] = self.__r_peaks[win_start:win_end, 1]
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
 
             if "sdnn" in metrics:
@@ -1778,6 +1781,15 @@ class EcgData:
                     y_train[i, metrics.index("hf")] = hf
                 if "lf/hf" in metrics:
                     y_train[i, metrics.index("lf/hf")] = lf / hf
+                    
+            if "lfn" in metrics or "hfn" in metrics:
+                lf, hf = FFT.calc_lf_hf(X_train[i])
+                lfhf = lf + hf
+                if "lfn" in metrics:
+                    y_train[i, metrics.index("lfn")] = lf/lfhf
+                if "hfn" in metrics:
+                    y_train[i, metrics.index("hfn")] = hf/lfhf
+                
 
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
 
@@ -1790,6 +1802,7 @@ class EcgData:
             self.raw_data[:, 1], self.__loaded_r_peaks_ind, 20
         )
         test = self.refined_loaded_peaks_ind
+        # test = self.__loaded_r_peaks_ind
         intersection2 = np.intersect1d(self.__r_peaks_ind, test)
         # print(
         #     f"Correctly classified: {round(intersection2.size / self.__loaded_r_peaks_ind.size * 100, 2)}%"
@@ -1800,22 +1813,30 @@ class EcgData:
         # print(f"TP {TP}")
         # print(f"FP {FP}")
         # print(f"FN {FN}")
-        recall = TP / (TP + FN)
-        prec = TP / (TP + FP)
-        f1 = 2 * prec * recall / (prec + recall)
-        print("Real values comparison")
-        print(f"TP: {TP}")
-        print(f"FP: {FP}")
-        print(f"FN: {FN}")
-        print(f"Recall: {recall}")
-        print(f"Precision: {prec}")
-        print(f"F1-score: {f1}")
-        pass
+        try:
+            recall = TP / (TP + FN)
+            prec = TP / (TP + FP)
+            f1 = 2 * prec * recall / (prec + recall)
+            print("Real values comparison")
+            print(f"TP: {TP}")
+            print(f"FP: {FP}")
+            print(f"FN: {FN}")
+            print(f"Recall: {recall}")
+            print(f"Precision: {prec}")
+            print(f"F1-score: {f1}")
+        except:
+            pass
+        return TP, FP, FN
 
     def compare_with_Pan_Tompkins(self):
         pn_finder = PanTompkinsFinder()
         peaks = pn_finder.find_r_peaks_ind(self.__raw_data[:, 1], self.frequency)
-        intersection = np.intersect1d(self.__r_peaks_ind, peaks)
+        self.__loaded_r_peaks_ind = peaks
+        # self.__
+        refined = self.refined_loaded_peaks_ind
+        test = np.setdiff1d(peaks, self.__r_peaks_ind)
+        print(test)
+        intersection = np.intersect1d(self.__r_peaks_ind, refined)
         TP = intersection.size
         FP = np.setdiff1d(self.__r_peaks_ind, intersection).size
         FN = peaks.size - intersection.size
@@ -1835,12 +1856,13 @@ class EcgData:
         print(f"Recall: {recall}")
         print(f"Precision: {prec}")
         print(f"F1-score: {f1}")
+        return TP, FP, FN
 
     # zwraca liste zaladoweanych peakow ktroe sa w odlegosci maksymalnie 50ms nieuzwyana
     @property
     def refined_loaded_peaks_ind(self):
         max_distance = int(0.03 * self.frequency)
-        distances = []
+        # distances = []
 
         # Refine R peaks indices
         result_indexes = np.array(
@@ -1852,13 +1874,13 @@ class EcgData:
         )
 
         # Calculate distances
-        for val in result_indexes:
-            closest_peak = min(self.loaded_r_peak_ind, key=lambda a1: abs(val - a1))
-            distances.append(abs(val - closest_peak))
+        # for val in result_indexes:
+        #     closest_peak = min(self.loaded_r_peak_ind, key=lambda a1: abs(val - a1))
+        #     distances.append(abs(val - closest_peak))
             # print(distances[-1])
 
         # Compute average distance
-        average_distance = np.mean(distances) if distances else 0
+        # average_distance = np.mean(distances) if distances else 0
         # print(average_distance/self.frequency*1000)
 
         return result_indexes  # , average_distance

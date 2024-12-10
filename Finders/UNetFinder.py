@@ -18,7 +18,6 @@ class UNetFinder(RPeaksFinder):
     def find_r_peaks_ind(self, ecg_signal, frequency: float, threshold=0.5):
         # print(len(ecg_signal) > 256)
         stride = int(6 / 8 * self._win_size)
-        padded_indices, data_windows = self.extract_windows(ecg_signal, stride)
         padded_indices, data_windows = self.extract_windows(ecg_signal, stride, frequency)
         predictions = self._model.predict(data_windows, verbose = 0)
         predictions = mean_preds(

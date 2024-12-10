@@ -59,7 +59,7 @@ class EcgPlotter:
         )
 
         self.ax_detected_r_peaks = self.ax_ecg.scatter(
-            [], [], color="blue", label="Detected R-peaks", marker="x", s=100
+            [], [], color="cyan", label="Detected R-peaks", marker="x", s=100
         )
 
         self.ax_within_spec_r_peaks = self.ax_ecg.scatter(

@@ -282,7 +282,7 @@ def filter_predictions(signal, preds, threshold, frequency):
         peak_inds=above_threshold_idx,
         search_radius=s_radius,#30,
         smooth_window_size=s_radius,#30,
-        peak_dir="up",
+        # peak_dir="up",
     )
 
     filtered_peaks = []

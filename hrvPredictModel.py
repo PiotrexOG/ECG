@@ -68,6 +68,19 @@ def create_hrv_model(input_length, output_len):
     # Warstwa rekurencyjna (LSTM)
     x = LSTM(128, return_sequences=False)(x)
     x = Dropout(0.3)(x)
+    
+    # x = Conv1D(filters=32, kernel_size=3, activation="relu", padding="same")(input_signal)
+    # x = MaxPooling1D(pool_size=2)(x)
+    # x = BatchNormalization()(x)
+
+    # x = Conv1D(filters=64, kernel_size=3, activation="relu", padding="same")(x)
+    # x = MaxPooling1D(pool_size=2)(x)
+    # x = BatchNormalization()(x)
+
+    # x = LSTM(64, return_sequences=False)(x)
+
+    # x = Dense(128, activation="relu")(x)
+    # x = Dropout(0.3)(x)
 
     # Wyjścia dla SDNN i RMSSD
     output = Dense(output_len, activation='linear')(x)  # Wyjścia: SDNN i RMSSD dla okna
@@ -212,10 +225,10 @@ def get_patient_data_mitbih(path, loaded=True):
 def get_patient_data_csv(path, finder, stride):
     data = EcgData(SAMPLING_RATE, finder)
     data.load_csv_data(path)
-    # X_train, y_train = data.extract_hrv_windows_with_detected_peaks(
-    #     input_length, METRICS
-    # )
-    X_train, y_train = data.extract_piotr(input_length, METRICS, stride)#, int(0.8 * input_length))
+    X_train, y_train = data.extract_hrv_windows_with_detected_peaks(
+        input_length, METRICS
+    )
+    # X_train, y_train = data.extract_piotr(input_length, METRICS, stride)#, int(0.8 * input_length))
     return X_train, y_train
 
 
@@ -353,6 +366,7 @@ def create_scatter_line_plots(
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         plt.savefig(file_path, format="png", dpi=300)
 
+    
 
 if __name__ == "__main__":
 
@@ -361,7 +375,6 @@ if __name__ == "__main__":
     METRICS = ["LF", "HF"]#, "RMSSD"]
     input_length = 5*60*130  # Długość sekwencji interwałów RR
     # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
-    # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
     finder = PanTompkinsFinder()
     # model = create_hrv_model(input_length, len(METRICS))
     # model = new_model(input_length, len(METRICS))
@@ -373,43 +386,59 @@ if __name__ == "__main__":
     #     metrics=["mae"],
     # )
 
-    kf = KFold(n_splits=2, shuffle=True)  # 5-krotna walidacja krzyżowa
-
-    # Listy do przechowywania wyników dla każdej iteracji
-    mae_sdnn_list, mse_sdnn_list, rmse_sdnn_list, r2_sdnn_list = [], [], [], []
-    mae_rmssd_list, mse_rmssd_list, rmse_rmssd_list, r2_rmssd_list = [], [], [], []
-
-    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4], csvs[18]], finder)  # , int(0.8*input_length))
-
-    y *= 100
-
-    random_seed = None
+    kf = KFold(n_splits=5, shuffle=True)  # 5-krotna walidacja krzyżowa
+    
+    mae_per_metric_list= [[] for i in range(len(METRICS))]
+    mse_per_metric_list= [[] for i in range(len(METRICS))]
+    rmse_per_metric_list= [[] for i in range(len(METRICS))]
+    r2_per_metric_list = [[] for i in range(len(METRICS))]
+    
+    lfhf_mae, lfhf_mse, lfhf_rmse, lfhf_r2 =[],[],[],[]
+    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4], csvs[24]], finder)  # , int(0.8*input_length))
+    # X, y = get_patients_data_mithbih(MITBIH_PATH, load_all_patient_indexes(f"{MITBIH_PATH}\\RECORDS"))  # , int(0.8*input_length))
+    # X, y = get_patients_data_mithbih(MITBIH_PATH, ["101", "102", "103", "104", "105", "106", "107", "108", "109"])  # , int(0.8*input_length))
+    # X, y = get_patients_data_csv("data", [csvs[24]], finder)  # , int(0.8*input_length))
+    # random_seed = 42
     for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
         print(f"\n### Fold {fold + 1} ###")
 
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.3
-        )
+        # X_train, X_val, y_train, y_val = train_test_split(
+        #     X, y, test_size=0.3, random_state=random_seed
+        # )
+        
+        X_train = X[train_idx]
+        y_train = y[train_idx]
+        X_val = X[val_idx]
+        y_val = y[val_idx]
 
-        # Parametry modelu
-        input_length = X.shape[1]
-        model = new_model(input_length, 2)
+        ##################################################
+        # input_length = X.shape[1]
+        # model = new_model(input_length, len(METRICS))
+        # model.compile(
+        #     optimizer=tf.keras.optimizers.Adam(learning_rate=0.0008),
+        #     loss='mse',
+        #     metrics=['mae']
+        # )
+
+        # model_path = f"models\\{fold}{"_".join(METRICS).replace("\\","").replace("/", "")}_{input_length}_{None}_{finder.__class__.__name__}.keras"
+
+        ###########################################
+        model = create_hrv_model(input_length, len(METRICS))
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
-            loss=custom_loss,  # Użyj własnej funkcji straty
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+            loss='mse',
             metrics=['mae']
         )
-
-        # # model_path = "models\\test.keras"
-        model_path = f"models\\{fold}{"_".join(METRICS).replace("\\","").replace("/", "")}_{input_length}_{random_seed}_{finder.__class__.__name__}.keras"
-        # #model_path = f"models\\siemka.keras"
-
+        
+        model_path = f"models\\RR_{fold}{"_".join(METRICS).replace("\\","").replace("/", "")}_{input_length}_{None}_{finder.__class__.__name__}.keras"
+        ########################
+        
         checkpoint = tf.keras.callbacks.ModelCheckpoint(
             model_path, monitor="loss", verbose=1, save_best_only=True, mode="min"
         )
         callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=65)
 
-        epochs= 250
+        epochs= 500
 
         history = model.fit(
             X_train,
@@ -422,126 +451,52 @@ if __name__ == "__main__":
             callbacks=[checkpoint, callback],
         )
 
-        # X_test = X_val
-        # y_test = y_val
-        #
-        # model.load_weights(model_path)
-        # pred_result = model.predict(X_test)
-        # # pred_result2 = model.predict(X1)
-        #
-        # mae = mean_absolute_error(y_test, pred_result)
-        #
-        # mse = mean_squared_error(y_test, pred_result)
-        #
-        # rmse = np.sqrt(mse)
-        #
-        # r2 = r2_score(y_test, pred_result)
-        #
-        # print(f"MAE: {mae:.2f}")
-        # print(f"MSE: {mse:.2f}")
-        # print(f"RMSE: {rmse:.2f}")
-        # print(f"R^2: {r2:.2f}")
-        #
-        # save_path = None
-        #
-
-
-        # Testowanie modelu
         model.load_weights(model_path)
-        # pred_result = model.predict(X_val)
-        #
-        # # Rozpakowanie wyników
-        # sdnn_pred = pred_result['sdnn']
-        # rmssd_pred = pred_result['rmssd']
-        #
-        # # Prawdziwe wartości
-        # sdnn_test = y_val['sdnn']
-        # rmssd_test = y_val['rmssd']
-        #
-        # # Metryki dla SDNN
-        # mae_sdnn = mean_absolute_error(sdnn_test, sdnn_pred)
-        # mse_sdnn = mean_squared_error(sdnn_test, sdnn_pred)
-        # rmse_sdnn = np.sqrt(mse_sdnn)
-        # r2_sdnn = r2_score(sdnn_test, sdnn_pred)
-        #
-        # # Metryki dla RMSSD
-        # mae_rmssd = mean_absolute_error(rmssd_test, rmssd_pred)
-        # mse_rmssd = mean_squared_error(rmssd_test, rmssd_pred)
-        # rmse_rmssd = np.sqrt(mse_rmssd)
-        # r2_rmssd = r2_score(rmssd_test, rmssd_pred)
-        #
-        # # Wyświetlanie wyników
-        # print("### SDNN ###")
-        # print(f"MAE: {mae_sdnn:.2f}")
-        # print(f"MSE: {mse_sdnn:.2f}")
-        # print(f"RMSE: {rmse_sdnn:.2f}")
-        # print(f"R^2: {r2_sdnn:.2f}")
-        #
-        # print("### RMSSD ###")
-        # print(f"MAE: {mae_rmssd:.2f}")
-        # print(f"MSE: {mse_rmssd:.2f}")
-        # print(f"RMSE: {rmse_rmssd:.2f}")
-        # print(f"R^2: {r2_rmssd:.2f}")
-        #
-        # # # Wizualizacja wyników
 
-        #
-        # # Wywołanie funkcji dla SDNN i RMSSD
-        # Gcreate_plots("SDNN", sdnn_test, sdnn_pred)
-        # Gcreate_plots("RMSSD", rmssd_test, rmssd_pred)
-
-        # Predykcja na zbiorze walidacyjnym
         pred_result = model.predict(X_val)
+        
+        for i in range(len(METRICS)):
+            real = y_val[:, i]
+            pred = pred_result[:, i]
+            mae = mean_absolute_error(real, pred)
+            mse = mean_squared_error(real, pred)
+            rmse = np.sqrt(mse)
+            r2 = r2_score(real, pred)
+            mae_per_metric_list[i].append(mae)
+            mse_per_metric_list[i].append(mse)
+            rmse_per_metric_list[i].append(rmse)
+            r2_per_metric_list[i].append(r2)
+            create_scatter_line_plots(f"{METRICS[i]} - Fold {fold +1}", real, pred, f"hrvPlots\\FOLD{fold+1}")
+        
+        # lfhf_real = y_val[:, 0]/y_val[:, 1]
+        # lfhf_pred = pred_result[:, 0]/pred_result[:, 1]
+        # mae = mean_absolute_error(lfhf_real, lfhf_pred)
+        # mse = mean_squared_error(lfhf_real, lfhf_pred)
+        # rmse = np.sqrt(rmse)
+        # r2 = r2_score(lfhf_real, lfhf_pred)
+        # lfhf_mae.append(mae)
+        # lfhf_mse.append(mse)
+        # lfhf_rmse.append(rmse)
+        # lfhf_r2.append(r2)
+        # create_scatter_line_plots(f"LF/HF - Fold {fold +1}", lfhf_real, lfhf_pred, f"hrvPlots\\FOLD{fold+1}")
+        # break
 
-        # Zakładamy, że model zwraca jeden output w postaci dwóch wartości [sdnn, rmssd]
-        sdnn_pred = pred_result[:, 0]
-        rmssd_pred = pred_result[:, 1]
-
-        # Prawdziwe wartości
-        sdnn_test = y_val[:, 0]
-        rmssd_test = y_val[:, 1]
-
-        # create_scatter_line_plotsc("SDNN", sdnn_test, sdnn_pred)
-        # create_scatter_line_plotsc("RMSSD", rmssd_test, rmssd_pred)
-        create_scatter_line_plots(f"SDNN - Fold {fold + 1}",  sdnn_test, sdnn_pred, f"hrvPlots\\FOLD{fold+1}")
-        create_scatter_line_plots(f"RMSSD - Fold {fold + 1}",  rmssd_test, rmssd_pred, f"hrvPlots\\FOLD{fold+1}")
-
-        # Obliczanie metryk dla SDNN
-        mae_sdnn = mean_absolute_error(sdnn_test, sdnn_pred)
-        mse_sdnn = mean_squared_error(sdnn_test, sdnn_pred)
-        rmse_sdnn = np.sqrt(mse_sdnn)
-        r2_sdnn = r2_score(sdnn_test, sdnn_pred)
-
-        # Obliczanie metryk dla RMSSD
-        mae_rmssd = mean_absolute_error(rmssd_test, rmssd_pred)
-        mse_rmssd = mean_squared_error(rmssd_test, rmssd_pred)
-        rmse_rmssd = np.sqrt(mse_rmssd)
-        r2_rmssd = r2_score(rmssd_test, rmssd_pred)
-
-        # Dodawanie wyników do list
-        mae_sdnn_list.append(mae_sdnn)
-        mse_sdnn_list.append(mse_sdnn)
-        rmse_sdnn_list.append(rmse_sdnn)
-        r2_sdnn_list.append(r2_sdnn)
-
-        mae_rmssd_list.append(mae_rmssd)
-        mse_rmssd_list.append(mse_rmssd)
-        rmse_rmssd_list.append(rmse_rmssd)
-        r2_rmssd_list.append(r2_rmssd)
-
+    
     # Wyświetlanie średnich wyników
     print("\n### Wyniki Średnie ###")
-    print("### SDNN ###")
-    print(f"Średnie MAE: {np.mean(mae_sdnn_list):.2f} ± {np.std(mae_sdnn_list):.2f}")
-    print(f"Średnie MSE: {np.mean(mse_sdnn_list):.2f} ± {np.std(mse_sdnn_list):.2f}")
-    print(f"Średnie RMSE: {np.mean(rmse_sdnn_list):.2f} ± {np.std(rmse_sdnn_list):.2f}")
-    print(f"Średnie R^2: {np.mean(r2_sdnn_list):.2f} ± {np.std(r2_sdnn_list):.2f}")
+    for i in range(len(METRICS)):
+        print(f"### {METRICS[i]}")
+        print(f"Średnie MAE: {np.mean(mae_per_metric_list[i]):.2f} ± {np.std(mae_per_metric_list[i]):.2f}")
+        print(f"Średnie MSE: {np.mean(mse_per_metric_list[i]):.2f} ± {np.std(mse_per_metric_list[i]):.2f}")
+        print(f"Średnie RMSE: {np.mean(rmse_per_metric_list[i]):.2f} ± {np.std(rmse_per_metric_list[i]):.2f}")
+        print(f"Średnie R^2: {np.mean(r2_per_metric_list[i]):.2f} ± {np.std(r2_per_metric_list[i]):.2f}")
 
-    print("### RMSSD ###")
-    print(f"Średnie MAE: {np.mean(mae_rmssd_list):.2f} ± {np.std(mae_rmssd_list):.2f}")
-    print(f"Średnie MSE: {np.mean(mse_rmssd_list):.2f} ± {np.std(mse_rmssd_list):.2f}")
-    print(f"Średnie RMSE: {np.mean(rmse_rmssd_list):.2f} ± {np.std(rmse_rmssd_list):.2f}")
-    print(f"Średnie R^2: {np.mean(r2_rmssd_list):.2f} ± {np.std(r2_rmssd_list):.2f}")
+
+    # print(f"### LF/HF")
+    # print(f"Średnie MAE: {np.mean(lfhf_mae[i]):.2f} ± {np.std(lfhf_mae[i]):.2f}")
+    # print(f"Średnie MSE: {np.mean(lfhf_mse[i]):.2f} ± {np.std(lfhf_mse[i]):.2f}")
+    # print(f"Średnie RMSE: {np.mean(lfhf_rmse[i]):.2f} ± {np.std(lfhf_rmse[i]):.2f}")
+    # print(f"Średnie R^2: {np.mean(lfhf_r2[i]):.2f} ± {np.std(lfhf_r2[i]):.2f}")
     plt.show()
 
     pass

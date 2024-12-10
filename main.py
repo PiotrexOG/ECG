@@ -119,7 +119,7 @@ def run_simulation():
 
 def run_load_CSV(data):
     data.load_csv_data(CSV_PATH, False)
-    # data.compare_with_Pan_Tompkins()
+    data.compare_with_Pan_Tompkins()
     try:
         data.check_detected_peaks()
     except:
@@ -134,10 +134,17 @@ def run_load_qt(data):
     data.check_detected_peaks()
     
 def test_mitbih_patients(finder):
+    overall_TP = 0
+    overall_FP = 0
+    overall_FN = 0
     for patient in MITBIH_PATIENTS:
         data = EcgData(SAMPLING_RATE, finder)
         data.load_data_from_mitbih(f"{MITBIH_PATH}\\{patient}")
-        data.check_detected_peaks()
+        TP, FP, FN = data.check_detected_peaks()
+        overall_TP += TP
+        overall_FP += FP
+        overall_FN += FN
+    return overall_TP, overall_FP, overall_FN
         
 def test_qt_patients(finder):
     for patient in QT_PATIENTS:
@@ -149,10 +156,21 @@ def test_qt_patients(finder):
 if __name__ == "__main__":
     print(WINDOW_SIZE)
     finder = PanTompkinsFinder()
-    # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}{MODEL_SUFFIX}_unet.keras", WINDOW_SIZE)
+    finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}{MODEL_SUFFIX}_unet.keras", WINDOW_SIZE)
     #finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
     
-    # test_mitbih_patients(finder)
+    # TP, FP, FN = test_mitbih_patients(finder)
+    # recall = TP / (TP + FN)
+    # prec = TP / (TP + FP)
+    # f1 = 2 * prec * recall / (prec + recall)
+    # print("Real values comparison")
+    # print(f"TP: {TP}")
+    # print(f"FP: {FP}")
+    # print(f"FN: {FN}")
+    # print(f"Recall: {recall}")
+    # print(f"Precision: {prec}")
+    # print(f"F1-score: {f1}")
+    
     # test_qt_patients(finder)
     # exit()
     
