@@ -76,8 +76,6 @@ jest 2019-01-01T00:00:00Z (599616000000000000 nanosekund). Decyzja ta wynika z
 ograniczeñ pamiêci poprzednich modeli oraz chêci zachowania spójnoœci przez
 producenta.
 
-section{Podsumowanie}
-Czujnik mierzy aktywnoœæ elektryczn¹ serca, która powstaje w wyniku depolaryzacji i repolaryzacji komórek miêœnia sercowego podczas jego pracy. Urz¹dzenie wykorzystuje dwie elektrody, które rejestruj¹ ró¿nice potencja³ów miêdzy punktami na skórze. Napiêcia te, zwykle w mikrowoltach (\textmu{}V), s¹ wzmacniane, filtrowane i digitalizowane, aby stworzyæ sygna³ EKG. Pozyskane dane s¹ nastêpnie przesy³ane do serwera dzia³aj¹cego na osobnej maszynie poprzez sieæ i wykorzystanie protoko³u TCP/IP.
 
 \section{Dodatkowe zbiory danych}
 \subsection{MIT-BIH Arrhythmia Database \cite{MIT-BIH}}
@@ -87,3 +85,6 @@ MIT-BIH Arrhythmia Database to zbiór danych zawieraj¹cy 48 pó³godzinnych zapisów
 MIT-BIH Noise Stress Test Database to zbiór danych stworzony w celu oceny odpornoœci algorytmów analizy EKG na ró¿ne rodzaje zak³óceñ. Zawiera 12 pó³godzinnych zapisów sygna³u EKG oraz 3 pó³godzinne zapisy zak³óceñ typowych dla ambulatoryjnych rejestracji EKG. Zak³ócenia te obejmuj¹ dryft linii bazowej (baseline wander), artefakty miêœniowe (EMG) oraz artefakty ruchu elektrod. Nagrania powsta³y poprzez dodanie zak³óceñ do dwóch czystych zapisów EKG z pierwotnego zbioru MIT-BIH Arrhythmia Database (nagrania 118 i 119).
 
 Zak³ócenia zosta³y wprowadzone w segmentach dwuminutowych, przeplatanych fragmentami czystego sygna³u, z ró¿nymi stosunkami sygna³u do szumu (SNR). Dla ka¿dego nagrania dostêpne s¹ prawid³owe adnotacje pochodz¹ce z oryginalnych czystych zapisów.
+
+\section{Podsumowanie}
+Czujnik mierzy aktywnoœæ elektryczn¹ serca, która powstaje w wyniku depolaryzacji i repolaryzacji komórek miêœnia sercowego podczas jego pracy. Urz¹dzenie wykorzystuje dwie elektrody, które rejestruj¹ ró¿nice potencja³ów miêdzy punktami na skórze. Napiêcia te, zwykle w mikrowoltach (\textmu{}V), s¹ wzmacniane, filtrowane i digitalizowane, aby stworzyæ sygna³ EKG. Pozyskane dane s¹ nastêpnie przesy³ane do serwera dzia³aj¹cego na osobnej maszynie poprzez sieæ i wykorzystanie protoko³u TCP/IP.
