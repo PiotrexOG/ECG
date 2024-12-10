@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+#PLIK DO LICZENIA LF I HF
 
 def fft(intervals):
     # Przykladowe wartości RR (odstępy czasowe w sekundach)

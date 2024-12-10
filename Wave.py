@@ -3,6 +3,7 @@ from scipy.interpolate import interp1d
 import pywt
 import matplotlib.pyplot as plt
 
+#AKTUALNIE NIE UZYWANA
 
 def calculate_scales(f_min, f_max, sampling_rate, f_c):
     delta_t = 1 / sampling_rate

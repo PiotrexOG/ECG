@@ -4,6 +4,7 @@ from collections import deque
 from EcgData import *
 from config import *
 
+#PLIK DO ANALIZOWANIA FFT
 
 class FFTPlotter:
     def __init__(self, title: str, ecg_data: EcgData):
@@ -11,16 +12,16 @@ class FFTPlotter:
         self.fig, self.ax_fft = plt.subplots(1, 1, figsize=(6, 4))
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.2)
 
-        self.ax_fft.set_title(title + " - FFT Spectrum")
-        self.ax_fft.set_ylabel("Amplitude")
-        self.ax_fft.set_xlabel("Frequency (Hz)")
+        self.ax_fft.set_title(title + " Analiza spektralna")
+        self.ax_fft.set_ylabel("PSD [msec^2/Hz]")
+        self.ax_fft.set_xlabel("Częstotliwość (Hz)")
         self.ax_fft.tick_params(axis="x")
         self.ax_fft.tick_params(axis="y")
         self.ax_fft.set_xlim(0, 0.5)
-        self.ax_fft.axvspan(0.15, 0.4, color='lightblue', alpha=0.5, label="Pasmo HF (0.15-0.4 Hz)")
-        self.ax_fft.axvspan(0.04, 0.15, color='lightgray', alpha=0.5, label="Pasmo LF (0.04-0.15 Hz)")
+        self.ax_fft.axvspan(0.15, 0.4, color='lightblue' , label="Pasmo HF (0.15-0.4 Hz)")
+        self.ax_fft.axvspan(0.04, 0.15, color='lightgray', label="Pasmo LF (0.04-0.15 Hz)")
 
-        self.line_fft, = self.ax_fft.plot([], [], color="cyan", label="FFT")
+        self.line_fft, = self.ax_fft.plot([], [], color="green", label="FFT")
         self.ax_fft.legend(loc="upper right")
 
         # Placeholdery na wartości LF, HF i LF/HF
@@ -28,9 +29,16 @@ class FFTPlotter:
             0.01, 0.95, "", transform=self.ax_fft.transAxes, fontsize=10, verticalalignment="top"
         )
 
-        self.timer = self.fig.canvas.new_timer(interval=5000)
-        self.timer.add_callback(self.update_plot)
+        self.timer = self.fig.canvas.new_timer(interval=1000)
+        self.timer.add_callback(self.check_for_data)
         self.timer.start()
+        self.data_handled = False  # Flaga, aby wywołać update_plot tylko raz
+
+    def check_for_data(self):
+        if not self.data_handled and len(self.ecg_data.r_peaks) > 0:
+            self.update_plot()
+            if APP_MODE == AppModeEnum.LOAD_CSV:
+                self.data_handled = True  # Zapobiega kolejnemu wywołaniu
 
     def compute_fft(self, rr_intervals):
         if len(rr_intervals) < 2:

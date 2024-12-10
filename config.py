@@ -1,5 +1,6 @@
 from enum import Enum
 
+#PLIK KONFIGURACYJNY
 
 def load_all_patient_indexes(path):
     with open(path, encoding="utf-8", mode="r") as file:
@@ -13,7 +14,7 @@ VALUES_IN_PACKET_COUNT = 73  # int(SAMPLING_RATE / 2)  # send packet twice a sec
 VALUE_SIZE = 4
 TIMESTAMP_SIZE = 8
 SINGLE_ENTRY_SIZE = VALUE_SIZE + TIMESTAMP_SIZE
-SLEEP_MULTIPLIER = 20
+SLEEP_MULTIPLIER = 5
 
 csvs = {
     1: "24h\\merged.csv",
@@ -30,12 +31,23 @@ csvs = {
     12: "luz0lezedlugie_dane_rsa.csv",
     13: "dlugie_dane_rsa5.csv",
     14: "popoludnie_merged2.csv",
-    15: "nowszy_wieczor.csv"
+    15: "nowszy_wieczor.csv",
+    16: "noc_i_ranek.csv",
+    17: "nowetesty1.csv",
+    18: "druganoc2.csv",
+    19: "24h.csv",
+    20: "NOCGW4.csv",
+    21: "donocy.csv",
+    22: "OSTATNIA_CZESC.csv"
 }
+# Przykład użycia
+BREATH_LENGTH = 2  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
+#CSV_PATH = "data\\" + csvs[22]
+#CSV_PATH = "bledy\\measurement_20241206_085600.csv"
+CSV_PATH = "bledy\\WYNIK.csv"
+#CSV_PATH = f"dataRSA\\plik_wyjściowy_part_{BREATH_LENGTH-1}.csv"
+#CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034915.csv"
 
-CSV_PATH = "data\\" + csvs[15]
-#CSV_PATH = "C:\\Users\\User\\Desktop\\sen\\measurement_20241127_034415.csv"
-#CSV_PATH = "C:\\Users\\User\\Desktop\\popoludnie\\popoludnie_merged1.csv"
 
 
 PRINT_ECG_DATA = True
@@ -49,7 +61,7 @@ class AppModeEnum(Enum):
     LOAD_CSV = 2
     LOAD_MITBIH = 3
     LOAD_QT = 4
-    
+
 class RPeakDetectionAlgorithm(Enum):
     PAN_TOMKINS = 0
     UNET = 1
@@ -83,40 +95,38 @@ QT_PATH = "data\\qt-database"
 QT_PATIENT = "sel30"
 QT_PATIENTS = load_all_patient_indexes(f"{QT_PATH}\\RECORDS")
 
-### Automatyczne mapowanie SIZE, LOW, i HIGH
-breath_length_to_params = {
-    2: {"SIZE": 2, "LOW": 20, "HIGH": 35},
-    #  2: {"SIZE": 2, "LOW": 35, "HIGH": 50},
-    #  2: {"SIZE": 1, "LOW": 16, "HIGH": 50},
-    3: {"SIZE": 4, "LOW": 14, "HIGH": 33},
-    4: {"SIZE": 6, "LOW": 10, "HIGH": 30},
-    5: {"SIZE": 8, "LOW": 8, "HIGH": 25},
-    6: {"SIZE": 10, "LOW": 8, "HIGH": 23},
-    7: {"SIZE": 12, "LOW": 6, "HIGH": 17},
-    8: {"SIZE": 12, "LOW": 3, "HIGH": 14},
-    9: {"SIZE": 14, "LOW": 3, "HIGH": 10},
-    10: {"SIZE": 14, "LOW": 3, "HIGH": 10},
-}
 
 
-def get_params_for_breath_length(breath_length):
-    if breath_length in breath_length_to_params:
-        return breath_length_to_params[breath_length]
-    else:
-        raise ValueError("Invalid breath length. Supported values are from 2 to 10.")
 
 
-# Przykład użycia
-BREATH_LENGTH = 7  # Możesz zmienić wartość na dowolną liczbę od 2 do 10
-params = get_params_for_breath_length(BREATH_LENGTH)
+#CSV_PATH = f"data\\nowe_arkusz_rsa{BREATH_LENGTH}.csv"
 
-SIZE = params["SIZE"]
-LOW = params["LOW"]
-HIGH = params["HIGH"]
 
+central_freq = 1/(BREATH_LENGTH * 2)
+ratio = 2
+#central_freq = 0.0467
+RR_FREQ = 4
+SIZE = BREATH_LENGTH
+LOW = central_freq/ratio
+HIGH = central_freq * ratio
+
+
+GAUSS_WINDOW_SIZE = 900
+GAUSS_WINDOW_SIZEHR = 600
+
+# CSV_PATH = f"data/MECZ1.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"data/01leze.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"data/nowe_arkusz_rsa5.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"data/sen_merged.csv"  # Dynamiczna ścieżka do pliku
+# CSV_PATH = f"nowedane/measurement_20241127_050916.csv"  # Dynamiczna ścieżka do pliku
 
 ### PLOT SETTINGS
 SECONDS_TO_PLOT = 600000
 
 ###
 
+### NN Settings
+#WINDOW_SIZE = (130 * 60 )%64 * 64
+WINDOW_SIZE = 256 * 2
+EPOCHS = 30
+###

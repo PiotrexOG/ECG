@@ -5,6 +5,7 @@ from EcgData import *
 
 from config import *
 
+#NIE UZYWANY
 
 class EcgPlotterFILTERED:
     @property

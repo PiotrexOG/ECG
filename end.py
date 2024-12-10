@@ -22,6 +22,7 @@ from sklearn.model_selection import train_test_split
 # from Finders.CnnFinder import CnnFinder
 import os
 
+#NIE UZYWANY
 
 def get_patient_data_mitbih(path, loaded=True):
     data = EcgData(SAMPLING_RATE, finder)

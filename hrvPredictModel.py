@@ -23,6 +23,7 @@ from sklearn.model_selection import train_test_split
 from EcgPlotter import EcgPlotter
 # from Finders.CnnFinder import CnnFinder
 import os
+from tensorflow.keras import backend as K
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv1D, MaxPooling1D, LSTM, Dense, Dropout, BatchNormalization, Flatten, GlobalAveragePooling1D, MultiHeadAttention, Multiply
@@ -47,6 +48,8 @@ class NormalizeLayer(tf.keras.layers.Layer):
 
     def call(self, inputs):
         return normalize_bound(inputs, lb=self.lb, ub=self.ub)
+
+#PLIK DO PRZEWIDYWANIA MIAR HRV DLA SIECI FEAYTURE BASED Z INTERWALOW RR I MODELU END2END
 
 def create_hrv_model(input_length, output_len):
     input_signal = Input(shape=(input_length, 1))
@@ -98,17 +101,17 @@ def new_model(input_length, output_len):
    # x = BatchNormalization()(x)
    # x = MaxPooling1D(pool_size=10)(x)  # 15000 → 3750
 
-   x = Conv1D(filters=32, kernel_size=15, activation='relu', padding='same')(input_signal)
+   x = Conv1D(filters=32, kernel_size=7, activation='relu', padding='same')(input_signal)
    x = BatchNormalization()(x)
-   x = MaxPooling1D(pool_size=5)(x)
+   x = MaxPooling1D(pool_size=6)(x)
 
-   x = Conv1D(filters=64, kernel_size=11, activation='relu', padding='same')(x)
+   x = Conv1D(filters=64, kernel_size=5, activation='relu', padding='same')(x)
    x = BatchNormalization()(x)
-   x = MaxPooling1D(pool_size=5)(x)
+   x = MaxPooling1D(pool_size=6)(x)
 
-   x = Conv1D(filters=128, kernel_size=9, activation='relu', padding='same')(x)
+   x = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(x)
    x = BatchNormalization()(x)
-   x = MaxPooling1D(pool_size=4)(x)
+   x = MaxPooling1D(pool_size=6)(x)
 
    # Attention Layer
    x_attention = Dense(128, activation='sigmoid')(x)
@@ -290,6 +293,19 @@ def create_line_plot(axs, metric: str, real, pred):
     axs.legend()
     axs.set_title(f"Przebieg czasowy {metric}")
 
+# Custom loss function
+def custom_loss(y_true, y_pred):
+    """
+    Custom loss function:
+    - MSE for LF (first output)
+    - 3 * MSE for HF (second output)
+    """
+    # LF: First column (index 0)
+    mse_lf = K.mean(K.square(y_true[:, 0] - y_pred[:, 0]))
+    # HF: Second column (index 1)
+    mse_hf = K.mean(K.square(y_true[:, 1] - y_pred[:, 1]))
+    # Weighted loss: MSE_LF + 3 * MSE_HF
+    return mse_lf + 3 * mse_hf
 
 def create_scatter_line_plots(
     metric: str, real, pred, save_path: str = "plots\\SDNN_RMSSD_LF_HF2"
@@ -341,7 +357,7 @@ if __name__ == "__main__":
 
     # METRICS = ["SDNN", "RMSSD", "LF", "HF"]
     # METRICS = ["SDNN", "RMSSD", "LF/HF"]
-    METRICS = ["SDNN", "RMSSD"]#, "LF", "HF"]#, "RMSSD"]
+    METRICS = ["LF", "HF"]#, "RMSSD"]
     input_length = 5*60*130  # Długość sekwencji interwałów RR
     # finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_unet.keras", WINDOW_SIZE)
     # finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
@@ -356,13 +372,16 @@ if __name__ == "__main__":
     #     metrics=["mae"],
     # )
 
-    kf = KFold(n_splits=5, shuffle=True)  # 5-krotna walidacja krzyżowa
+    kf = KFold(n_splits=2, shuffle=True)  # 5-krotna walidacja krzyżowa
 
     # Listy do przechowywania wyników dla każdej iteracji
     mae_sdnn_list, mse_sdnn_list, rmse_sdnn_list, r2_sdnn_list = [], [], [], []
     mae_rmssd_list, mse_rmssd_list, rmse_rmssd_list, r2_rmssd_list = [], [], [], []
 
-    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4]], finder)  # , int(0.8*input_length))
+    X, y = get_patients_data_csv("data", [csvs[2], csvs[3], csvs[4], csvs[18]], finder)  # , int(0.8*input_length))
+
+    y *= 100
+
     random_seed = None
     for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
         print(f"\n### Fold {fold + 1} ###")
@@ -375,8 +394,8 @@ if __name__ == "__main__":
         input_length = X.shape[1]
         model = new_model(input_length, 2)
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.0008),
-            loss='mse',
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+            loss=custom_loss,  # Użyj własnej funkcji straty
             metrics=['mae']
         )
 

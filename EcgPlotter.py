@@ -1,10 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import deque
+
+from matplotlib import ticker
+
 from EcgData import *
 from matplotlib.font_manager import FontProperties
 from config import *
 
+#KLASA DO WYSIETLANIA WYKRESU EKG
 
 class EcgPlotter:
     @property
@@ -40,6 +44,10 @@ class EcgPlotter:
             axis="y",
         )
         self.ax_ecg.set_xlabel("Time (s)")
+        self.fig.gca().xaxis.set_major_locator(ticker.MultipleLocator(3600))  # co 3600 sekund (1 godzina)
+        self.fig.gca().xaxis.set_major_formatter(
+            ticker.FuncFormatter(
+                ticker.FuncFormatter(lambda x, _: f'{int(x // 3600 + 19)%24:02d}:{int((x % 3600) // 60):02d}')))
         #self.ax_ecg.set_ylim([-100, 100])
 
         self.ax_r_peaks = self.ax_ecg.scatter(

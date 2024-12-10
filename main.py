@@ -25,6 +25,7 @@ import os
 VERBOSE = False
 PRINT_PACKETS = False
 
+#GLOWNY PUNKT WEJSCIA APLIKACJI
 
 def handle_client_connection(client_socket):
     # try:
@@ -156,11 +157,11 @@ if __name__ == "__main__":
     
     # data = EcgData(SAMPLING_RATE, finder, 360)
     data = EcgData(SAMPLING_RATE, finder)
-    ecg_plotter = EcgPlotter("ECG", data)
+    #ecg_plotter = EcgPlotter("ECG", data)
     #ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
     hr_plotter = HRPlotter("HR", data)
-    fft_plotter = FFTPlotter("FFT", data)
-    wavelet_plotter = WaveletPlotter("FFT", data)
+    #fft_plotter = FFTPlotter("FFT", data)
+    #wavelet_plotter = WaveletPlotter("FFT", data)
 
     if APP_MODE == AppModeEnum.NORMAL:
         run_normal_mode()

@@ -6,6 +6,7 @@ import socket
 
 from config import *
 
+#PLIK DO SYMULOWANIA POBIERANIA DANYCH
 
 def read_csv(path: str):
     data = []

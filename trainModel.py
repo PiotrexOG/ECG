@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from Finders.UNetFinder import UNetFinder
 from Finders.PanTompkinsFinder import PanTompkinsFinder
 
+#UCZY WYBRANY MODEL NA DANYCH
 
 def get_patient_data_mitbih(path, input_length = WINDOW_SIZE):
     data = EcgData(SAMPLING_RATE, PanTompkinsFinder())

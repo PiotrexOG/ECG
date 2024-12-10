@@ -2,6 +2,7 @@ from tensorflow.keras.layers import Conv1D, Dropout, MaxPooling1D, Input, Concat
 from tensorflow.keras.models import Model
 import tensorflow as tf
 
+#IMPLEMENTACJA SIECI UNET I CNN
 
 #_______________________________________________
 # Encoder (Downsampler) 

@@ -1,6 +1,10 @@
 import numpy as np
 import scipy.signal as signal
+from scipy.interpolate import interp1d
 
+from config import RR_FREQ
+
+#PLIK DO ROZPOZNAWANIA SZCZYTOW W SYGNALE
 
 def bandpass_filter(sig, frequency, lowcut: float = 5, highcut: float = 18):
     nyquist = 0.5 * frequency
@@ -111,10 +115,11 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
     integrated_signal = moving_window_integration(squared_signal, window_size)
     
     #threshold = 0.4 * np.max(integrated_signal)
-    threshold = np.mean(integrated_signal) + 0.6 * np.std(integrated_signal)  # Mean + 0.6*std
+    clipped_signal = np.clip(integrated_signal, 0, np.percentile(integrated_signal, 99))
+    threshold = np.mean(clipped_signal) + 0.6 * np.std(clipped_signal)
     
     peaks, _ = signal.find_peaks(
-        integrated_signal, height=threshold, distance=int(0.4 * frequency) # 400 ms
+        integrated_signal, height=threshold, distance=int(0.3 * frequency) # 400 ms
     )
     
     # refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
@@ -122,9 +127,22 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
     
     return refined_peaks
 
-def find_hr_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: float = 18, size: int = 7, isUpright:int = 1):
+def find_hr_peaks(hr_signal, frequency: float, lowcut: float = 5, highcut: float = 18, size: int = 7, isUpright:int = 1):
+    timestamps = hr_signal[:, 0]
+    hr_values = hr_signal[:, 1]
 
-    filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency, lowcut, highcut)
+
+
+
+    # Generowanie nowych timestampów z częstotliwością 4 Hz
+    new_timestamps = np.arange(timestamps[0], timestamps[-1], 1 / frequency)
+
+    # Interpolacja (używamy metody liniowej)
+    interpolator = interp1d(timestamps, hr_values, kind='linear', fill_value="extrapolate")
+    new_hr_values = interpolator(new_timestamps)
+
+
+    filtered_signal = bandpass_filter(new_hr_values, frequency, lowcut, highcut)
 
     filtered_signal = isUpright*filtered_signal
 
@@ -133,17 +151,22 @@ def find_hr_peaks(ecg_signal, frequency: float, lowcut: float = 5, highcut: floa
 
 
     peaks, _ = signal.find_peaks(
-        filtered_signal, height=threshold, distance=int(size * 1.22)  # 400 ms
+        filtered_signal, height=threshold, distance=int(size * RR_FREQ)  # 400 ms
     )
 
+    signal_to_filtered_ratio = (len(new_hr_values)/len(hr_values))
 
+    # Podzielenie indeksów na pół i zaokrąglenie do najbliższej liczby całkowitej
+    peaks = np.floor(peaks / signal_to_filtered_ratio).astype(int)
     if isUpright == -1:
-        refined_peaks = refine_peak_positions(-ecg_signal[:, 1], peaks, search_window=size)
+        refined_peaks = refine_peak_positions(-hr_signal[:, 1], peaks, search_window=size)
     else:
-        refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks, search_window=size)
+        refined_peaks = refine_peak_positions(hr_signal[:, 1], peaks, search_window=size)
 
-    peak_values = ecg_signal[refined_peaks, 1]
-    peak_timestamps = ecg_signal[refined_peaks, 0]
+    #refined_peaks = peaks
+
+    peak_values = hr_signal[refined_peaks, 1]
+    peak_timestamps = hr_signal[refined_peaks, 0]
 
     peaks_with_timestamps = np.column_stack((peak_timestamps, peak_values))
 

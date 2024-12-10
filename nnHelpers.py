@@ -8,6 +8,7 @@ from wfdb import processing
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
+#PLIK ZAWIERAJCY FUNKCJE POMOCNICZE DO FUNKCJONOWANIA SIECI UNET
 
 def calculate_stats(r_ref, r_ans, thr_, fs):
     # Threshold region to consider correct detection. in samples
