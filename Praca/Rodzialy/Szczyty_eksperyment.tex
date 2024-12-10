@@ -1,4 +1,4 @@
-\section{Porównanie zastosowanych metod wykrywania za³amków R}
+\section{Porównanie zastosowanych metod wykrywania za³amków R}\label{sczyty-eksperyment}
 \subsection{Wprowadzenie}
 Celem niniejszego eksperymentu jest ocena skutecznoœci zastosowanych w pracy
 metod wykrywania za³amków R w sygnale EKG w danych pochodz¹cych z urz¹dzenia
@@ -76,7 +76,7 @@ Przyk³ad tego zjawiska zaprezentowano na Rys. \ref{fig/zleEtykietyMit}. Na wykre
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.5]{Rysunki/Unet bledna klasyfikacja.png}
+    \includegraphics[width=\textwidth]{Rysunki/nieprecyzyjne etykiety.png}
     \caption{Przyk³ad nieprecyzyjnych etykiet w zbiorze MIT-BIH.}
     \label{fig/zleEtykietyMit}
 \end{figure}
@@ -116,7 +116,7 @@ wykryte w granicach przyjêtej tolerancji.
 \end{table}
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.5]{Rysunki/unet tolerancja.png}
+    \includegraphics[scale=0.5]{Rysunki/etykiety z tolerancja.png}
     \caption{Wyniki klasyfikacji po wprowadzeniu tolerancji}
     \label{fig/poprawioneEtykietyMit}
 \end{figure}
@@ -173,7 +173,7 @@ radz¹ sobie z sygna³em wysokiej jakoœci.
 \subsection{Analiza danych zaszumionych}
 % W przypadku danych zaszumionych empiryczna ocena wykaza³a liczne nieprawid³owoœci w dzia³aniu algorytmu Pan-Tompkinsa. Przyk³ad b³êdnego dzia³ania algorytmu przedstawiono na Rys. ref{rys1}. Z tego powodu, w celu okreœlenia skutecznoœci algorytmów przeprowadzono rêczne etykietowanie fragmentu danych z czujnika Polar H10. Nale¿y jednak zaznaczyæ, ¿e etykietyzacja nie zosta³a przeprowadzono przez specjalistê, z potwierdzon¹ wiedz¹ medyczn¹, a przez autorów niniejszej pracy, tzn. studentów kierunku informatycznego, co mog³o wp³yn¹c na jakoœæ etykiet.
 
-W przypadku danych zaszumionych empiryczna ocena wykaza³a liczne
+W przypadku danych zaszumionych manualna ocena wykaza³a liczne
 nieprawid³owoœci w dzia³aniu algorytmu Pan-Tompkinsa. Problemy te wynika³y
 g³ównie z obecnoœci zak³óceñ, takich jak szum czy dryft linii izoelektrycznej
 (baseline wander), które znacz¹co utrudnia³y prawid³owe wykrywanie za³amków R.
@@ -183,8 +183,10 @@ szczytów sygna³u.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.5]{Rysunki/faultyPanTompkins.png}
-    \caption{Fragment zaszumionego sygna³u EKG, na którym Algorytm Pan-Tompkins nie wykry³ wszystkich szczytów R}
+    % \includegraphics[scale=0.5]{Rysunki/faultyPanTompkins.png}
+    \includegraphics[width=\textwidth]{Rysunki/pt_unet_comparison.png}
+    % \caption{Fragment zaszumionego sygna³u EKG, na którym Algorytm Pan-Tompkins nie wykry³ wszystkich szczytów R}
+    \caption{Porównanie wykrywania szczytów R na przyk³adzie zaszumionego fragmentu sygna³u EKG, z zastosowaniem algorytmu Pan-Tompkinsa oraz wariantu sieci UNet.}
     \label{fig/zaszumionyTompkins}
 \end{figure}
 

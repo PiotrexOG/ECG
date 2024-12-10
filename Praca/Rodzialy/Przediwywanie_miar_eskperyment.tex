@@ -1,4 +1,4 @@
-\section{Przewidywanie parametrów HRV przy u¿yciu sieci neuronowej opartej na interwa³ach RR}\label{RRsiec}
+\section{Przewidywanie HRV przy u¿yciu sieci neuronowych i danych RR}\label{RRsiec}
 
 \subsection{Wprowadzenie}
 Jako etap poœredni w tworzeniu sieci end-to-end do przewidywania miar HRV i RSA
@@ -132,7 +132,7 @@ rzeczywistoœcia. RMSSD uzyska³o ni¿sze lecz dalej wysokie $R^2 = 0,74 \pm
     0,15$. Ró¿nica miêdzy dopasowaniem tych metryk, mo¿e wynikaæ z wy¿szej
 zmiennoœæi RMSSD w krótszych okresach czasowych. Wariant modelu przewiduj¹cy
 obie te miary jednoczeœnie wykaza³ podobnymi lub lepszymi wynikami wzglêdem
-wariantów z jêdna cech¹ - dla SDNN uzyskano zblizony wynik dopasowania, a dla
+wariantów z jêdna cech¹ - dla SDNN uzyskano zbli¿ony wynik dopasowania, a dla
 RMSSD lepszy ($R^2 = 0,84 \pm 0,12$). Pomimo dobrego ogólnego dopasowania,
 zaobserwowano pogorszenie jakoœci przewidywañ w poszczególnych przypadkach, co
 potwierdzaj¹ wy¿sze wartoœci MAE i MSE.
@@ -179,7 +179,7 @@ znormalizowano do zakresu od -1 do 1. Wartoœci referencyjne miar by³y obliczane
 na podstawie oznaczeñ za³amków R, wytworzonych przez sieæ UNet oraz wzorów
 przedstawionych w podrodziale \ref{MiaryHRV}. Wykorzystano wariant sieci
 przetrenowany na zaszumionym zbiorze, który by³ przedmiotem szerszej analizy w
-poprzednim eksperymencie.
+eksperymencie \ref{sczyty-eksperyment}.
 
 \subsection{Trening oraz metoda ewaluacji skutecznoœci}
 Trening ka¿dego modelu przeprowadzono w jednolitych warunkach: przez 150 epok z
@@ -213,7 +213,7 @@ porównanie wyników miêdzy ró¿nymi konfiguracjami modeli.
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
-        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                       \\ \hline
+        \textbf{Wariant} & \multicolumn{2}{|c|}{\textbf{SDNN i RMSSD}} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                       \\ \hline
         \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                   & \textbf{LF norm} & \textbf{HF norm} \\ \hline
         MAE              & $9,69 \pm 0,56$                    & $8,32 \pm 1,84$                                  & $0,07 \pm 0,01$  & $0,07 \pm 0,01$  \\ \hline
         MSE              & $191,71 \pm 31,69$                 & $141,93 \pm 49,51$                               & $\sim0,01$       & $\sim0,01$       \\ \hline
@@ -262,7 +262,7 @@ wyników.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/RMSSD_2_folds.png}
+    \includegraphics[width=\textwidth]{Rysunki/RMSSD_2_folds.png}
     \caption{Wyniki przewidywañ RMSSD dla dwóch foldów}
     \label{fig/RMSSD_2_folds}
 \end{figure}

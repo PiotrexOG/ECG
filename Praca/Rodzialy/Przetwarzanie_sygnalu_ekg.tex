@@ -5,15 +5,15 @@
 Algorytm Pan-Tomkins jest powszechnie uznawanym narzêdziem do wykrywania
 za³amków R w sygna³ach EKG, zapewniaj¹c przy tym wysok¹ precyzjê. Algorytm
 sk³ada sie z kilku kluczowych etapów przetwarzania sygna³u: filtracja
-œrodkowoprzepustowa, ró¿niczkowanie, kwadratowanie, okno ca³kuj¹ce, ustalenie
-progów i detekcja szczytów R \cite{Fariha-PanTompkins}. Dodatkowo, aby
-dok³adnie dopasowaæ wykryte szczyty do rzeczywistych najwy¿szych wartoœci
+œrodkowoprzepustowa, ró¿niczkowanie, kwadratowanie, okno uœredniaj¹ce,
+ustalenie progów i detekcja szczytów R \cite{Fariha-PanTompkins}. Dodatkowo,
+aby dok³adnie dopasowaæ wykryte szczyty do rzeczywistych najwy¿szych wartoœci
 sygna³u, wprowadzono dodatkowy krok, polegaj¹cy na sprawdzaniu otoczenia
 wykrytego szczytu.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.5]{Rysunki/Pan-Tomkins-scheme.png}
+    \includegraphics[width=\textwidth]{Rysunki/Pan-Tomkins-scheme.png}
     \caption{Schemat algorytmu Pan-Tompkins z dodatkowym krokiem}
     \label{fig/PanTompkinsFlowChart}
 \end{figure}
@@ -27,19 +27,22 @@ realizacji projektu zaobserwowano, ¿e zastosowanie szerszego pasma filtracji
 5-18 Hz, zaproponowanego w pracy \cite{Khan-PanTompkins++}, prowadzi³o do nieco
 lepszych rezultatów.
 
+
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/Pan Tompkins_raw.png}
+    \includegraphics[width=\textwidth]{Rysunki/Pan Tompkins_raw.png}
     \caption{Fragment surowego sygna³u EKG z czujnika Polar H10}
     \label{fig/PanTompkinsRaw}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_5_15.png}
+    \includegraphics[width=\textwidth]{Rysunki/Pan-Tompkins filtered.png}
     \caption{Fragment przefiltrowanego sygna³u EKG z czujnika Polar H10}
     \label{fig/PanTompkinsFiltered}
 \end{figure}
+
+\FloatBarrier
 
 % \subsection{Ró¿niczkowanie}
 Po wstêpnym przefiltrowaniu sygna³ EKG jest poddawany ró¿niczkowaniu, co ma na
@@ -52,10 +55,12 @@ wzmocnieniem bardziej stromych zbocz w kompleksie QRS
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/PanTompkins_derivative.png}
+    \includegraphics[width=\textwidth]{Rysunki/PanTompkins_derivative.png}
     \caption{Fragment sygna³u EKG z czujnika Polar H10 po ró¿niczkowaniu}
     \label{fig/PanTompkinsDerivative}
 \end{figure}
+
+\FloatBarrier
 
 % \subsection{Kwadratowanie}
 Kwadratowanie jest kolejnym etapem, w którym sygna³ uzyskany w poprzednim kroku
@@ -67,18 +72,19 @@ ryzyko fa³szywych wykryæ szczytów R \cite{Fariha-PanTompkins}. \\
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_squared.png}
+    \includegraphics[width=\textwidth]{Rysunki/Pan_tomkins_squared.png}
     \caption{Fragment sygna³u EKG z czujnika Polar H10 po kwadratowaniu}
     \label{fig/PanTompkinsSquared}
 \end{figure}
 
+\FloatBarrier
 % \subsection{Okno ca³kuj¹ce}
-Okno ca³kuj¹ce ma na celu wyg³adzenie i uœrednienie sygna³u w okreœlonym
-przedziale, oknie czasowym. Proces ten polega na obliczaniu sumy wartoœci
+Okno uœredniaj¹ce ma na celu wyg³adzenie i uœrednienie sygna³u w okreœlonym
+przedziale - oknie czasowym. Proces ten polega na obliczaniu œredniej wartoœci
 próbek sygna³u w ramach przesuwaj¹cego sie okna, co prowadzi do uzyskania
 bardziej spójnego i wyg³adzonego sygna³u wyjœciowego. W ten sposób uwypuklane
 s¹ d³ugotrwa³e trendy i zmiany sygna³u, co znacznie u³atwia wykrywanie
-charakterystycznych za³amków QRS. Okno ca³kuj¹ce pomaga równie¿ w eliminacji
+charakterystycznych za³amków QRS. Uœrednianie pomaga równie¿ w eliminacji
 mniejszych zak³óceñ, które mog³yby powodowaæ fa³szywe wykrycia szczytów,
 zwiêkszaj¹c precyzjê i wiarygodnoœæ procesu detekcji. Dziêki zastosowaniu tego
 etapu mo¿liwe jest uzyskanie lepszej separacji szczytów R od pozosta³ych
@@ -88,10 +94,12 @@ okno o szerokoœci 150 ms \cite{Fariha-PanTompkins}, co przek³ada³o siê na oko³o
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_integrated.png}
-    \caption{Fragment sygna³u EKG z czujnika Polar H10 po oknie ca³kuj¹cym}
+    \includegraphics[width=\textwidth]{Rysunki/Pan_tomkins_integrated.png}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po oknie uœredniaj¹cym}
     \label{fig/Pan_tomkins_MWI}
 \end{figure}
+
+\FloatBarrier
 
 % \subsection{Ustalenie progu i detekcja szczytów R}
 Ustalenie progu ma na celu detekcjê szczytów R, przy jednoczesnej minimalizacji
@@ -99,7 +107,7 @@ fa³szywych wykryæ. W tym celu ustalany jest próg na bazie którego podejmowana
 jest decyzja. Próg ten mo¿e byæ wartoœci¹ sta³¹ lub byæ dynamicznie
 dostosowywany, aby uwzglêdniæ zmiany amplitudy w ró¿nych odcinkach sygna³u.
 Podczas oznaczania danych pochodz¹cych z czujnika Polar H10 zastosowano próg
-obliczany jako œrednia wartoœæ sygna³u ca³kowanego powiêkszona o 0,6-krotnoœæ
+obliczany jako œrednia wartoœæ sygna³u z poprzedniego kroku, powiêkszona o 0,6-krotnoœæ
 odchylenia standardowego tego sygna³u.\\
 
 Podczas procesu detekcji wartoœci sygna³u porównywane s¹ z ustalonym progiem.
@@ -111,10 +119,12 @@ odstêp wynosz¹cy 400 ms.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/Pan Tomkins without refining.png}
+    \includegraphics[width=\textwidth]{Rysunki/Pan Tomkins without refining.png}
     \caption{Fragment sygna³u EKG z czujnika Polar H10 po wykryciu szczytów}
     \label{fig/Pan_tomkins_peaks}
 \end{figure}
+
+\FloatBarrier
 
 % \subsection{Doprecyzowanie pozycji szczytów}
 W dodatkowym kroku przeanalizowano otoczenie wykrytych szczytów w pierwotnym
@@ -127,10 +137,12 @@ maksymalnej, zosta³ ustalony na 10 próbek w obu kierunkach.\\
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_final.png}
+    \includegraphics[width=\textwidth]{Rysunki/Pan_tomkins_final.png}
     \caption{Fragment sygna³u EKG z czujnika Polar H10 po doprecyzowaniu pozycji szczytów}
     \label{fig/Pan_tomkins_refined_peaks}
 \end{figure}
+
+\FloatBarrier
 
 \subsection{Sieæ UNet}
 
@@ -158,7 +170,7 @@ publikacji, przedstawiono na Rys \ref{fig/UNet}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.5]{Rysunki/U-net_small.png}
+    \includegraphics[width=\textwidth]{Rysunki/U-net_small.png}
     \caption{Schemat sieci U-Net}
     \label{fig/UNet}
 \end{figure}
@@ -225,7 +237,7 @@ sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
 \vspace{1em}
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=1]{Rysunki/unet-postprocess.png}
+    \includegraphics[width=\textwidth]{Rysunki/unet-postprocess.png}
     \caption{Uproszczony schemat przetworzenia wyników sieci, od otrzymanych map segmentacji z sieci do rozpoznania szczytu}
     \label{fig/UNet-r-preak-identification}
 \end{figure}
@@ -235,8 +247,8 @@ za³amków R — w pierwotnej wersji korekta by³a zawsze wykonywana do wartoœci
 najwy¿szej, natomiast wprowadzone zmiany pozwalaj¹ na korektê do wartoœci
 najbardziej oddalonej od œredniej. Udoskonalenie to umo¿liwi³o poprawne
 rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
-z powodu zamiany polaryzacji elektrod. Metodê wykrywania szczytów obudowano w³asnym interfejsem,
-który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} 
+z powodu zamiany polaryzacji elektrod. Metodê wykrywania szczytów obudowano
+w³asnym interfejsem, który by³ wspomniany w podsekcji \ref{subsec:wykrywacz}
 
 % W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
 % (autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
@@ -259,6 +271,14 @@ bezpoœrednie rozwiniêcie tego modelu. Do implementacji modelu wykorzystano
 wysokopoziomowe API biblioteki \emph{tensorflow} o nazwie \emph{Keras}
 \cite{TensorFlow-Keras}. Schemat modelu poœredniego przedstawiono na Rys.
 \ref{fig/rr_siec}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=1.5]{Rysunki/RR_siec.png}
+    \caption{Schemat modelu wyznaczaj¹cego miary HRV na podstawie interwa³ów RR}
+    \label{fig/rr_siec}
+\end{figure}
+
 
 Model oparto o kaskade trzech bloków przetwarzania, z których ka¿dy zawiera
 jednowymiarowa warstwê splotow¹ (Conv1D), normalizacje wsadow¹
@@ -283,15 +303,9 @@ przewidywania SDNN i RMSSD rozmiar ten wynosi dwa. Warstwa ta wykorzystuje
 liniowa funkcje aktywacji, co pozwala na generowanie ci¹g³ych wartoœci
 wyjsciowych, zgodnych ze skala przewidywanych miar.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=1.5]{Rysunki/RR_siec.png}
-    \caption{Schemat modelu wyznaczaj¹cego miary HRV na podstawie interwa³ów RR}
-    \label{fig/rr_siec}
-\end{figure}
+\FloatBarrier
 
 % \subsection{Model end-to-end do wyznaczania miar HRV}\label{siec-end-to-end}\
-\FloatBarrier
 \subsection{Model end-to-end}\label{siec-end-to-end}
 W ramach pracy opracowano model sieci neuronowej typu end-to-end, bêdacy
 rozwojow¹ wersj¹ prostego modelu opartego o interwa³y RR, opisanego w

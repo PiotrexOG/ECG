@@ -8,8 +8,8 @@
 \begin{document}
 
 \includepdf{meta/StronaTytulowa.pdf}
-\input{meta/Streszczenie.tex}
-\input{meta/Abstract.tex}
+% \input{meta/Streszczenie.tex}
+% \input{meta/Abstract.tex}
 
 \tableofcontents
 
@@ -19,10 +19,15 @@
 \input{Rodzialy/Implementacja_systemu.tex}
 \input{Rodzialy/Eksperymenty.tex}
 
+\input{Rodzialy/Podsumowanie.tex}
 \input{meta/Bibliografia.tex}
 
 \renewcommand{\baselinestretch}{1.0}\normalsize	
 \addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures			
+
+\chapter*{Dodatek A}
+\addcontentsline{toc}{chapter}{Dodatek A}
+\noindent Kod Ÿrod³owy wytworzony w trakcie tworzenia pracy dyplomowej dostêpny jest pod adresem: \href{https://github.com/PiotrexOG/ECG}{https://github.com/PiotrexOG/ECG}
 
 \end{document}

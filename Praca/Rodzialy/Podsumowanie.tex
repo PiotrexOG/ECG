@@ -1,0 +1,44 @@
+\chapter{Podsumowanie oraz dyskusja}
+Celem niniejszej pracy by³o stworzenie frameworka do odbioru i przetwarzania
+danych z czujnika Polar H10 oraz opracowanie modelu typu end-to-end do
+wykrywania wzorców w sygnale EKG.
+
+W ramach pracy zaimplementowano trzy modele sieci neuronowych, z których jedna
+dzia³a³a w pe³ni w modelu end-to-end. W szczególnoœci sieæ U-Net zosta³a
+zastosowana do rozpoznawania za³amków R w sygnale EKG. Wyniki pokaza³y, ¿e
+model ten przewy¿sza klasyczny algorytm Pan-Tompkins, zw³aszcza w przypadku
+analizy danych zaszumionych, które s¹ czêsto spotykane w praktycznych
+zastosowaniach. Dziêki wiêkszej skutecznoœci w takich warunkach, sieæ U-Net
+wydaje siê bardziej obiecuj¹ca w zastosowaniach rzeczywistych
+
+Drugi z modeli, maj¹cy na celu przewidywanie miar HRV na podstawie interwa³ów
+RR, uzyska³ najlepsze rezultaty spoœród testowanych metod, jednak w obecnej
+formie nie znajduje bezpoœredniego zastosowania praktycznego. Niemniej jednak
+sposób dzia³ania tej sieci mo¿e okazaæ siê kluczowy przy opracowywaniu bardziej
+zaawansowanego modelu end-to-end, do którego wykazuje du¿e podobieñstwo.
+
+Najbardziej nowatorskim podejœciem by³a sieæ end-to-end, której celem by³o
+bezpoœrednie przewidywanie miar HRV na podstawie surowego sygna³u EKG. Model
+ten osi¹gn¹³ bardzo dobre wyniki: wspó³czynnik determinacji $R^2$ wynosi³
+0,88 dla SDNN oraz 0,58 dla RMSSD. Chocia¿ trudno porównaæ te wyniki z
+literatur¹ naukow¹ z powodu braku podobnych implementacji, s¹ one obiecuj¹ce i
+pokazuj¹ potencja³ tego podejœcia w dalszym rozwoju analizy sygna³ów EKG.
+
+Warto jednak podkreœliæ, ¿e obecna forma modeli przewiduj¹cych miary HRV nie
+jest jeszcze gotowa do zastosowañ praktycznych. Jedyn¹ sieci¹, która mo¿e
+znaleŸæ zastosowanie w praktyce ju¿ teraz, jest U-Net, który bardzo dobrze
+radzi sobie z detekcj¹ za³amków R.
+
+Dodatkowo, wszystkie modele by³y testowane g³ównie na danych pochodz¹cych od
+jednego pacjenta oraz z jednego urz¹dzenia. Mimo ograniczonego zbioru danych –
+oko³o 50 godzin nagrañ – uda³o siê uzyskaæ satysfakcjonuj¹ce rezultaty.
+Wskazuje to na potencja³ dalszego rozwoju tych metod w przypadku zgromadzenia
+wiêkszej iloœci danych treningowych.
+
+Podsumowuj¹c, przeprowadzone badania wykaza³y, ¿e metody uczenia maszynowego w
+analizie sygna³ów EKG maj¹ znacz¹cy potencja³, choæ wymagaj¹ dalszego rozwoju.
+Szczególnie modelowanie typu end-to-end wydaje siê przysz³oœciowym kierunkiem,
+który mo¿e znacz¹co wp³yn¹æ na sposób analizy danych kardiologicznych.
+Niniejsza praca stanowi solidny punkt wyjœcia dla kolejnych badañ, wskazuj¹c
+zarówno na zalety, jak i na wyzwania zwi¹zane z wykorzystaniem nowoczesnych
+metod w analizie sygna³ów biomedycznych.

@@ -1,6 +1,23 @@
 \section{Aplikacja g³ówna}
+Na potrzeby niniejszej pracy stworzono aplikacjê, która umo¿liwia pobieranie i
+przetwarzanie sygna³ów EKG w czasie rzeczywistym lub na podstawie
+zaimportowanych wczeœniej danych. Aplikacja wykorzystuje zaawansowane narzêdzia
+analityczne do oceny zmiennoœci rytmu serca oraz zmian zwi¹zanych z rytmem
+oddechowym. Wyniki analiz s¹ prezentowane u¿ytkownikowi zarówno w formie
+precyzyjnie obliczonych miar, jak i czytelnych wizualizacji ukazuj¹cych ich
+zmiany w funkcji czasu, co u³atwia ocenê ogólnej zmiennoœci rytmu serca.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/aplikacja.png}
+    \caption{Zrzut ekranu prezentuj¹cy dzia³anie aplikacji w trybie domyœlnym}
+    \label{fig/apli}
+\end{figure}
+
+\FloatBarrier
+
 \subsection{Tryby pracy aplikacji}
-Aplikacja oferuje trzy tryby pracy: normalny, symulacji oraz ³adowania danych z
+Aplikacja oferuje trzy tryby pracy: domyœlny, symulacji oraz ³adowania danych z
 pliku. Niezale¿nie od wybranego trybu, aplikacja zapewnia te same podstawowe
 funkcje. W ka¿dym z trybów odbywa siê rysowanie wykresu sygna³u EKG, wykrywanie
 szczytów R, obliczanie miar HRV oraz prezentacja wyników. Miary czasowe takie
@@ -9,8 +26,8 @@ stosunek s¹ obliczane na podstawie odstêpów RR i wyœwietlane u¿ytkownikowi, a
 wykres sygna³u jest na bie¿¹co aktualizowany lub generowany po zakoñczeniu
 analizy.
 
-\subsection*{Tryb normalny}
-W trybie normalnym aplikacja dzia³a w czasie rzeczywistym, odbieraj¹c dane z
+\subsection*{Tryb domyœlnym}
+W trybie domyœlnym aplikacja dzia³a w czasie rzeczywistym, odbieraj¹c dane z
 urz¹dzenia Polar H10 za poœrednictwem aplikacji poœrednicz¹cej. Po otwarciu
 portu komunikacyjnego kolejne pakiety danych s¹ przetwarzane na bie¿¹co, co
 umo¿liwia rysowanie wykresu sygna³u EKG oraz dynamiczne obliczanie miar HRV w
@@ -29,7 +46,7 @@ kontrolê dostêpu do wspó³dzielonych zmiennych i zasobów. Dziêki zastosowaniu
 tego rozwi¹zania dane s¹ przetwarzane w sposób spójny i bezpieczny.
 
 \subsection*{Tryb symulacji}
-Tryb symulacji dzia³a podobnie do trybu normalnego, z t¹ ró¿nic¹, ¿e dane nie
+Tryb symulacji dzia³a podobnie do trybu domyœlnego, z t¹ ró¿nic¹, ¿e dane nie
 s¹ pobierane z zewnêtrznego Ÿród³a, lecz wczytywane z pliku. Za obs³ugê tego
 procesu odpowiada dedykowany w¹tek aplikacji, który odczytuje sygna³, dzieli go
 na pakiety i przesy³a na odpowiedni port aplikacji.
@@ -80,18 +97,38 @@ fali R, uniemo¿liwiaj¹c algorytmowi poprawne okreœlenie jego maksymalnej
 wartoœci. Takie podejœcie pozwala na uzyskanie wiêkszej precyzji w detekcji
 szczytów i minimalizuje ryzyko b³êdów wynikaj¹cych z niepe³nych danych. Bez
 tego rozwi¹zania zdarza³y siê sytuacje, w których szczyt by³ oznaczany na
-rosn¹cym zboczu za³amka R zamiast na jego w³aœciwym wierzcho³ku. Przyk³ad takiej b³êdnej klasyfikacji przedstawiono na Rys. \ref{fig/zleWykrytySzczyt}
+rosn¹cym zboczu za³amka R zamiast na jego w³aœciwym wierzcho³ku. Przyk³ad
+takiej b³êdnej klasyfikacji przedstawiono na Rys. \ref{fig/zleWykrytySzczyt}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/zleZaznaczonySczyt.png}
+    \includegraphics[width=\textwidth]{Rysunki/zleZaznaczonySczyt.png}
     \caption{Przyk³ad Ÿle zaznaczonego szczytu}
     \label{fig/zleWykrytySzczyt}
 \end{figure}
 
 \subsection{Mechanizm zdarzeñ}
-Aplikacja zosta³a wyposa¿ony w mechanizm zdarzeñ (eventów), który umo¿liwia dynamiczne powiadamianie warstwy prezentacji o zmianach w danych. Gdy wykrywane s¹ nowe szczyty R lub aktualizowane s¹ wartoœci miar HRV, mechanizm zdarzeñ automatycznie wywo³uje odœwie¿enie wykresów oraz wartoœci metryk w interfejsie u¿ytkownika. Pozwala to na p³ynne monitorowanie wyników w czasie rzeczywistym, co jest szczególnie istotne w aplikacjach pracuj¹cych na danych dynamicznie nap³ywaj¹cych. Przy wspó³pracy z urz¹dzeniem Polar H10, wykres œrednio odœwie¿any jest co 73/130 sekundy. Wynika to ze sposobu przesy³ania danych przez urz¹dzenie pomiarowe, które rejestruje sygna³ z czêstotliwoœcia próbkowania 130Hz i wysy³a je w pakietach zawieraj¹cych 73 próbki sygna³u. Mechanizm ka¿dorazowego odœwie¿ania wykresu przy aktualizacji danych mo¿na zast¹piæ odœwie¿aniem co dany okres czasu, poprzez modyfikujcjê pliku konfiguracyjnego.
+Aplikacja zosta³a wyposa¿ony w mechanizm zdarzeñ (eventów), który umo¿liwia
+dynamiczne powiadamianie warstwy prezentacji o zmianach w danych. Gdy wykrywane
+s¹ nowe szczyty R lub aktualizowane s¹ wartoœci miar HRV, mechanizm zdarzeñ
+automatycznie wywo³uje odœwie¿enie wykresów oraz wartoœci metryk w interfejsie
+u¿ytkownika. Pozwala to na p³ynne monitorowanie wyników w czasie rzeczywistym,
+co jest szczególnie istotne w aplikacjach pracuj¹cych na danych dynamicznie
+nap³ywaj¹cych. Przy wspó³pracy z urz¹dzeniem Polar H10, wykres œrednio
+odœwie¿any jest co 73/130 sekundy. Wynika to ze sposobu przesy³ania danych
+przez urz¹dzenie pomiarowe, które rejestruje sygna³ z czêstotliwoœcia
+próbkowania 130Hz i wysy³a je w pakietach zawieraj¹cych 73 próbki sygna³u.
+Mechanizm ka¿dorazowego odœwie¿ania wykresu przy aktualizacji danych mo¿na
+zast¹piæ odœwie¿aniem co dany okres czasu, poprzez modyfikujcjê pliku
+konfiguracyjnego.
 
 \subsection{Mechanizm dzielenia sygna³u na okna}
-W celu u³atwienia analizy i przygotowania danych do treningu modeli uczenia maszynowego zaimplementowano mechanizm dzielenia sygna³u EKG na okna o okreœlonym rozmiarze. Do ka¿dego wyznaczonego okna mo¿na do³¹czyæ dodatkowe informacje odnoœnie jego zawartoœci. Przyk³adowymi informacjami s¹: pozycje szczytów R, wartoœci miar HRV takich jak SDNN, RMSSD, LF, HF, LF/HF czy wektor binarny, który wskazuje, czy dana próbka jest szczytem R (1) czy nie (0). Dane w obrêbie okna mog¹ równie¿ zostaæ znormalizowane do porz¹danego zakresu, na przyk³ad od -1 do 1.
+W celu u³atwienia analizy i przygotowania danych do treningu modeli uczenia
+maszynowego zaimplementowano mechanizm dzielenia sygna³u EKG na okna o
+okreœlonym rozmiarze. Do ka¿dego wyznaczonego okna mo¿na do³¹czyæ dodatkowe
+informacje odnoœnie jego zawartoœci. Przyk³adowymi informacjami s¹: pozycje
+szczytów R, wartoœci miar HRV takich jak SDNN, RMSSD, LF, HF, LF/HF czy wektor
+binarny, który wskazuje, czy dana próbka jest szczytem R (1) czy nie (0). Dane
+w obrêbie okna mog¹ równie¿ zostaæ znormalizowane do porz¹danego zakresu, na
+przyk³ad od -1 do 1.
 
