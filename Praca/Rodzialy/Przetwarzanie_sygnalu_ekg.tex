@@ -68,7 +68,7 @@ ryzyko fa³szywych wykryæ szczytów R \cite{Fariha-PanTompkins}. \\
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.25]{Rysunki/Pan_tomkins_squared.png}
-    \caption{Fragment sygna³u EKG z czujnika Polar H10 po ró¿niczkowaniu}
+    \caption{Fragment sygna³u EKG z czujnika Polar H10 po kwadratowaniu}
     \label{fig/PanTompkinsSquared}
 \end{figure}
 
@@ -153,7 +153,7 @@ elementów: œcie¿ki koduj¹cej i œcie¿ki dekoduj¹cej. Implementacja w projekcie
 in¿ynierskim bazuje na kodzie udostêpnionym przez autorów, jednak zosta³a
 zmodyfikowana i dostosowana do potrzeb projektu. Ca³oœæ zrealizowano przy
 u¿yciu biblioteki TensorFlow oraz jej wysokopoziomowego API o nazwie Keras
-\cite{TensorFlow-Keras}. Sschemat budowy sieci, pochodz¹cy z tej samej
+\cite{TensorFlow-Keras}. Schemat budowy sieci, pochodz¹cy z tej samej
 publikacji, przedstawiono na Rys \ref{fig/UNet}
 
 \begin{figure}[ht]
@@ -220,8 +220,9 @@ sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
     \item Finalne rozpoznanie szczytów R: Jeœli co najmniej piêæ punktów zostanie
           podci¹gniête do tego samego miejsca, punkt ten zostaje zaklasyfikowany jako
           szczyt R.
-\end{enumerate}\
+\end{enumerate}
 
+\vspace{1em}
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=1]{Rysunki/unet-postprocess.png}
@@ -229,15 +230,24 @@ sygna³u do wyników, przebiega w nastêpuj¹cych etapach:
     \label{fig/UNet-r-preak-identification}
 \end{figure}
 
-W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
-(autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
-zastosowanie algorytmu w czasie rzeczywistym. Ponadto zmieniono sposób korekty
+W ramach modyfikacji wzglêdem pierwotnej implementacji zmieniono sposób korekty
 za³amków R — w pierwotnej wersji korekta by³a zawsze wykonywana do wartoœci
 najwy¿szej, natomiast wprowadzone zmiany pozwalaj¹ na korektê do wartoœci
 najbardziej oddalonej od œredniej. Udoskonalenie to umo¿liwi³o poprawne
 rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
-z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
-który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} \FloatBarrier
+z powodu zamiany polaryzacji elektrod. Metodê wykrywania szczytów obudowano w³asnym interfejsem,
+który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} 
+
+% W ramach modyfikacji wzglêdem pierwotnej implementacji zmniejszono rozmiar okna
+% (autorzy zalecali zakres od 5 do 20 sekund) do oko³o 1,5 sekundy, co umo¿liwi³o
+% zastosowanie algorytmu w czasie rzeczywistym. Ponadto zmieniono sposób korekty
+% za³amków R — w pierwotnej wersji korekta by³a zawsze wykonywana do wartoœci
+% najwy¿szej, natomiast wprowadzone zmiany pozwalaj¹ na korektê do wartoœci
+% najbardziej oddalonej od œredniej. Udoskonalenie to umo¿liwi³o poprawne
+% rozpoznawanie za³amków R nawet w przypadku odwrócenia sygna³u EKG, na przyklad
+% z powodu zamiany polaryzacji elektrod. Metodê obudowano w³asnym interfejsem,
+% który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} 
+\FloatBarrier
 \section{Modele neuronowe do wyznaczania miar HRV}
 \subsection{Model oparty o interwa³y RR}\label{rr-based}
 % \subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}
@@ -276,7 +286,7 @@ wyjsciowych, zgodnych ze skala przewidywanych miar.
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=1.5]{Rysunki/RR_siec.png}
-    \caption{Schemat sieci typu feature-based do wyznaczania miar HRV}
+    \caption{Schemat modelu wyznaczaj¹cego miary HRV na podstawie interwa³ów RR}
     \label{fig/rr_siec}
 \end{figure}
 
@@ -294,7 +304,7 @@ wysokopoziomowe API biblioteki \emph{tensorflow} o nazwie \emph{Keras}
 \begin{figure}[!ht]
     \centering
     \includegraphics[scale=1.5]{Rysunki/end-to-end.png}
-    \caption{Schemat sieci end-to-end do wyznaczania miar HRV}
+    \caption{Schemat modelu end-to-end do wyznaczania miar HRV}
     \label{fig/end-to-end}
 \end{figure}
 
