@@ -14,7 +14,7 @@ W celu identyfikacji tych zmian, sygna³ têtna zosta³ przetworzony za pomoc¹ cyfr
 Filtr Butterwortha w konfiguracji pasmowo-przepustowej przepuszcza³ tylko czêstotliwoœci w zakresie okreœlonym parametrami \textit{low} i \textit{high}, znormalizowanym wzglêdem czêstotliwoœci Nyquista (65 Hz dla czêstotliwoœci próbkowania 130 Hz). 
 
 \subsection{Dobór parametrów filtru}
-Na podstawie literatury oraz analizy heurystycznej ustalono, ¿e najlepsze wyniki mo¿na uzyskaæ, stosuj¹c filtr przepuszczaj¹cy czêstotliwoœci w zakresie od po³owy czêstotliwoœci centralnej do dwukrotnoœci tej czêstotliwoœci. Czêstotliwoœæ centraln¹ definiuje siê jako wartoœæ, dla której analizowany sygna³ wykazuje najwiêksz¹ moc.
+Na podstawie literatury \cite{Boashash1992} oraz analizy heurystycznej ustalono, ¿e najlepsze wyniki mo¿na uzyskaæ, stosuj¹c filtr przepuszczaj¹cy czêstotliwoœci w zakresie od po³owy czêstotliwoœci centralnej do dwukrotnoœci tej czêstotliwoœci. Czêstotliwoœæ centraln¹ definiuje siê jako wartoœæ, dla której analizowany sygna³ wykazuje najwiêksz¹ moc.
 
 Przyk³adowo, dla osoby oddychaj¹cej z czêstotliwoœci¹ oko³o 6 oddechów na minutê (co odpowiada 0,1 Hz), optymalne pasmo filtra wynosi od 0,05 Hz do 0,2 Hz. W celu uzyskania takich ustawieñ, parametry filtra \textit{low} i \textit{high} nale¿y ustawiæ odpowiednio na wartoœci 0,05 Hz i 0,2 Hz. Tak dobrany zakres pozwala na uzyskanie wyraŸnych lokalnych ekstremów w przefiltrowanym sygnale têtna, co umo¿liwia precyzyjne okreœlenie faz cyklu oddechowego.
 
@@ -73,7 +73,7 @@ Na podstawie analizy sygna³u aplikacja wyznaczy³a nastêpuj¹ce miary charakteryst
 W celu analizy sygna³u EKG przy u¿yciu szybkiej transformacji Fouriera (FFT) obejmuj¹cej czêstotliwoœci w zakresie 0,04–0,4 Hz, konieczne by³o przekszta³cenie nierównomiernie próbkowanego sygna³u RR w równomierny. W tym celu zastosowano interpolacjê liniow¹ interwa³ów RR z czêstotliwoœci¹ próbkowania 4 Hz. Dziêki temu spe³niono warunek Nyquista, poniewa¿ najwiêksza analizowana czêstotliwoœæ (0,4 Hz) le¿y poni¿ej po³owy czêstotliwoœci próbkowania (2 Hz).
 
 \subsection{Przygotowanie sygna³u do analizy}
-Przed wykonaniem transformacji na sygna³ na³o¿ono okno Hanninga. Okno to redukuje amplitudy na pocz¹tku i koñcu sygna³u, co pozwala na wyg³adzenie danych i minimalizacjê efektów nieci¹g³oœci. Nastêpnie wykonano dyskretn¹ transformacjê Fouriera, która przekszta³ca sygna³ z dziedziny czasu do dziedziny czêstotliwoœci. 
+Przed wykonaniem transformacji na sygna³ na³o¿ono okno Hanninga. Okno to redukuje amplitudy na pocz¹tku i koñcu sygna³u, co pozwala na wyg³adzenie danych i minimalizacjê efektów nieci¹g³oœci. Nastêpnie wykonano dyskretn¹ transformacjê Fouriera, która przekszta³ca sygna³ z dziedziny czasu do dziedziny czêstotliwoœci. \cite{Boashash1992}
 
 W wyniku FFT uzyskano dwa wektory:
 \begin{itemize}
