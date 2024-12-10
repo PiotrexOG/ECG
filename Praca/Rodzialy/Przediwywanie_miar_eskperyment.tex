@@ -38,8 +38,8 @@ Do analizy uzyskanych wyników zastosowano nastêpuj¹ce miary:
 
     \item Wspó³czynnik determinacji ($R^2$): Miara jakoœci dopasowania modelu do danych.
           Reprezentuje jaka czêœæ zmiennoœæi wartoœci w danych jest wyjaœniana przez
-          model. Wartoœæ $R^2$. przyjmuje wartoœci z zakresu od 0 do 1, gdzie 1 oznacza
-          idealne dopasowanie.
+          model. Wartoœæ $R^2$ przyjmuje wartoœci z zakresu od $-\infty$ do 1, gdzie 1 oznacza
+          idealne dopasowanie, a wartoœci poni¿ej 0 œwiadcz¹, ¿e lepiej poradzi³aby sobie zwyk³a œrednia.
 
           \begin{equation}
               R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
@@ -77,23 +77,18 @@ zapisu sygna³u EKG oraz metodê 5-krotnej walidacji krzy¿owej, s³u¿¹cej
 wiarygodnej ocenie jakoœci przewidywañ
 
 \subsection{Wyniki}
-Œrednie wyniki walidacji krzy¿owej dla wybranych modeli przedstawiono w tabelach \ref{wyniki_hrv_pojedyncze_rr} oraz \ref{wyniki_hrv_wiele_rr}.
-
-Najlepsze dopasowanie model osi¹gna³ dla wariantów: przewidywania samej
-wartoœci RMSSD, œredni wynik $R^2$ na poziomie $0,75$ oraz dla SDNN, w
-przypadku przewidywania jednoczeœnie SDNN oraz RMSSD,
-
+Œrednie wyniki walidacji krzy¿owej dla wybranych modeli przedstawiono w tabelach \ref{wyniki_hrv_pojedyncze_rr}, \ref{wyniki_hrv_wiele_rr} oraz \ref{wyniki_hrv_wiele_rr2}.
 \begin{table}[ht]
     \captionsetup{justification=centering}
     \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary.}
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
-        \textbf{Wariant} & \textbf{SDNN}       & \textbf{RMSSD}    \\ \hline
-        MAE              & $18,28 \pm 9,94$    & $7,03 \pm 2,66$   \\ \hline
-        MSE              & $576,03 \pm 537,26$ & $94,28 \pm 67,17$ \\ \hline
-        RMSE             & $21,91 \pm 9,80$    & $9,05 \pm 3,53$   \\ \hline
-        R2               & $0,40 \pm 0,58$     & $0,75 \pm 0,17$   \\ \hline
+        \textbf{Wariant} & \textbf{SDNN}     & \textbf{RMSSD}    \\ \hline
+        MAE              & $6,02 \pm 0,38$   & $6,74 \pm 1,83$   \\ \hline
+        MSE              & $65,07 \pm 16,21$ & $96,73 \pm 62,92$ \\ \hline
+        RMSE             & $8,01 \pm 0,94$   & $9,32 \pm 3,15$   \\ \hline
+        R2               & $0,93 \pm 0,02$   & $0,74 \pm 0,15$   \\ \hline
     \end{tabular}
     \label{wyniki_hrv_pojedyncze_rr}
 \end{table}
@@ -104,16 +99,35 @@ przypadku przewidywania jednoczeœnie SDNN oraz RMSSD,
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
-        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{Znormalizowany LF i HF}}                                     \\ \hline
-        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF}     & \textbf{HF}     \\ \hline
-        MAE              & $11,13 \pm 1,20$                   & $8,32 \pm 1,84$                                       & $0,06 \pm 0,01$ & $0,06 \pm 0,01$ \\ \hline
-        MSE              & $219,73 \pm 31,93$                 & $141,93 \pm 49,51$                                    & $\sim0,01$      & $\sim0,01$      \\ \hline
-        RMSE             & $14,78 \pm 1,10$                   & $11,70 \pm 2,23$                                      & $0,07 \pm 0,01$ & $0,07 \pm 0,01$ \\ \hline
-        R2               & $0,78 \pm 0,05$                    & $0,58 \pm 0,13$                                       & $0,59 \pm 0,14$ & $0,60 \pm 0,13$ \\ \hline
+        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                     \\ \hline
+        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF norm}     & \textbf{HF norm}     \\ \hline
+        MAE              & $7,43 \pm 1,38$                    & $5,09 \pm 1,55$                                       & $\sim0,06$      & $\sim0,06$      \\ \hline
+        MSE              & $92,12 \pm 31,91$                  & $63,32 \pm 62,83$                                     & $\sim0,01$      & $\sim0,01$      \\ \hline
+        RMSE             & $9,46 \pm 1,65$                    & $7,22 \pm 3,35$                                       & $0,08 \pm 0,01$ & $0,08 \pm 0,01$ \\ \hline
+        R2               & $0,91 \pm 0,03$                    & $0,84 \pm 0,12$                                       & $0,52 \pm 0,10$ & $0,52 \pm 0,10$ \\ \hline
     \end{tabular}
     \label{wyniki_hrv_wiele_rr}
 \end{table}
 
+\begin{table}[ht]
+    \captionsetup{justification=centering}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar.}
+    \centering
+    \begin{tabular}{|l|c|c|c|c|c|c|}
+        \hline
+        \textbf{Wariant} & \multicolumn{4}{|c|}{\textbf{SDNN, RMSSD, LF, HF}}                                                                       \\ \hline
+        \textbf{Miara}   & \textbf{SDNN}                                      & \textbf{RMSSD}    & \textbf{LF}             & \textbf{HF}           \\ \hline
+        MAE              & $15,01 \pm 2,22$                                   & $6,85 \pm 0,99$   & $159,79 \pm 22.47$      & $63,08 \pm 5,95$      \\ \hline
+        MSE              & $407,33 \pm 115,64$                                & $89,15 \pm 46,72$ & $60515,62 \pm 24793,08$ & $8725,61 \pm 1682,30$ \\ \hline
+        RMSE             & $19,99 \pm 2,80$                                   & $9,19 \pm 2,18$   & $240,89 \pm 49,86$      & $92,96 \pm 9,16$      \\ \hline
+        R2               & $0,60 \pm 0,08$                                    & $0,76 \pm 0,10$   & $0,78 \pm 0,08$         & $0,68 \pm 0,05$       \\ \hline
+    \end{tabular}
+    \label{wyniki_hrv_wiele_rr2}
+\end{table}
+
+Modele przewiduj¹ce 
+
+\FloatBarrier
 \section{Przewidywanie miar HRV oraz RSA za pomoc¹ sieci typu end-to-end}
 
 \subsection{Wprowadzenie}
@@ -177,8 +191,8 @@ porównanie wyników miêdzy ró¿nymi konfiguracjami modeli.
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
-        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{Znormalizowany LF i HF}}                                     \\ \hline
-        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF}     & \textbf{HF}     \\ \hline
+        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                     \\ \hline
+        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF norm}     & \textbf{HF norm}     \\ \hline
         MAE              & $9,69 \pm 0,56$                    & $8,32 \pm 1,84$                                       & $0,07 \pm 0,01$ & $0,07 \pm 0,01$ \\ \hline
         MSE              & $191,71 \pm 31,69$                 & $141,93 \pm 49,51$                                    & $\sim0,01$      & $\sim0,01$      \\ \hline
         RMSE             & $13,80 \pm 1,17$                   & $11,70 \pm 2,23$                                      & $0,09 \pm 0,01$ & $0,09 \pm 0,01$ \\ \hline
