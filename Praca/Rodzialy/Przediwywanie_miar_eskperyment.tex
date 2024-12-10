@@ -1,4 +1,4 @@
-\section{Przewidywanie parametrów HRV oraz RSA, przy u¿yciu sieci neuronowej opartej na cechach}\label{RRsiec}
+\section{Przewidywanie parametrów HRV oraz RSA przy u¿yciu sieci neuronowej opartej na interwa³ach RR}\label{RRsiec}
 
 \subsection{Wprowadzenie}
 Jako etap poœredni w tworzeniu sieci end-to-end do przewidywania miar HRV i RSA
@@ -38,8 +38,9 @@ Do analizy uzyskanych wyników zastosowano nastêpuj¹ce miary:
 
     \item Wspó³czynnik determinacji ($R^2$): Miara jakoœci dopasowania modelu do danych.
           Reprezentuje jaka czêœæ zmiennoœæi wartoœci w danych jest wyjaœniana przez
-          model. Wartoœæ $R^2$ przyjmuje wartoœci z zakresu od $-\infty$ do 1, gdzie 1 oznacza
-          idealne dopasowanie, a wartoœci poni¿ej 0 œwiadcz¹, ¿e lepiej poradzi³aby sobie zwyk³a œrednia.
+          model. Wartoœæ $R^2$ przyjmuje wartoœci z zakresu od $-\infty$ do 1, gdzie 1
+          oznacza idealne dopasowanie, a wartoœci poni¿ej 0 œwiadcz¹, ¿e lepiej
+          poradzi³aby sobie zwyk³a œrednia.
 
           \begin{equation}
               R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
@@ -77,7 +78,7 @@ zapisu sygna³u EKG oraz metodê 5-krotnej walidacji krzy¿owej, s³u¿¹cej
 wiarygodnej ocenie jakoœci przewidywañ
 
 \subsection{Wyniki}
-Œrednie wyniki walidacji krzy¿owej dla wybranych modeli przedstawiono w tabelach \ref{wyniki_hrv_pojedyncze_rr}, \ref{wyniki_hrv_wiele_rr} oraz \ref{wyniki_hrv_wiele_rr2}.
+Œrednie wyniki uzyskane w ramach walidacji krzy¿owej dla wybranych modeli przedstawiono w tabelach \ref{wyniki_hrv_pojedyncze_rr}, \ref{wyniki_hrv_wiele_rr} oraz \ref{wyniki_hrv_wiele_rr2}.
 \begin{table}[ht]
     \captionsetup{justification=centering}
     \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary.}
@@ -99,12 +100,12 @@ wiarygodnej ocenie jakoœci przewidywañ
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
-        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                     \\ \hline
-        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF norm}     & \textbf{HF norm}     \\ \hline
-        MAE              & $7,43 \pm 1,38$                    & $5,09 \pm 1,55$                                       & $\sim0,06$      & $\sim0,06$      \\ \hline
-        MSE              & $92,12 \pm 31,91$                  & $63,32 \pm 62,83$                                     & $\sim0,01$      & $\sim0,01$      \\ \hline
-        RMSE             & $9,46 \pm 1,65$                    & $7,22 \pm 3,35$                                       & $0,08 \pm 0,01$ & $0,08 \pm 0,01$ \\ \hline
-        R2               & $0,91 \pm 0,03$                    & $0,84 \pm 0,12$                                       & $0,52 \pm 0,10$ & $0,52 \pm 0,10$ \\ \hline
+        \textbf{Wariant} & \multicolumn{2}{|c|}{\textbf{SDNN i RMSSD}} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                       \\ \hline
+        \textbf{Miara}   & \textbf{SDNN}                               & \textbf{RMSSD}                                   & \textbf{LF norm} & \textbf{HF norm} \\ \hline
+        MAE              & $7,43 \pm 1,38$                             & $5,09 \pm 1,55$                                  & $\sim0,06$       & $\sim0,06$       \\ \hline
+        MSE              & $92,12 \pm 31,91$                           & $63,32 \pm 62,83$                                & $\sim0,01$       & $\sim0,01$       \\ \hline
+        RMSE             & $9,46 \pm 1,65$                             & $7,22 \pm 3,35$                                  & $0,08 \pm 0,01$  & $0,08 \pm 0,01$  \\ \hline
+        R2               & $0,91 \pm 0,03$                             & $0,84 \pm 0,12$                                  & $0,52 \pm 0,10$  & $0,52 \pm 0,10$  \\ \hline
     \end{tabular}
     \label{wyniki_hrv_wiele_rr}
 \end{table}
@@ -125,7 +126,28 @@ wiarygodnej ocenie jakoœci przewidywañ
     \label{wyniki_hrv_wiele_rr2}
 \end{table}
 
-Modele przewiduj¹ce 
+Spoœród modeli przewiduj¹cych pojedyncze miary najlepsze wyniki uzyskano dla
+SDNN ($R^2 = 0,93 \pm 0,02$), co wskazuje na wysokie pokrycie z
+rzeczywistoœcia. RMSSD uzyska³o ni¿sze lecz dalej wysokie $R^2 = 0,74 \pm
+    0,15$. Ró¿nica miêdzy dopasowaniem tych metryk, mo¿e wynikaæ z wy¿szej
+zmiennoœæi RMSSD w krótszych okresach czasowych. Wariant modelu przewiduj¹cy
+obie te miary jednoczeœnie wykaza³ podobnymi lub lepszymi wynikami wzglêdem
+wariantów z jêdna cech¹ - dla SDNN uzyskano zblizony wynik dopasowania, a dla
+RMSSD lepszy ($R^2 = 0,84 \pm 0,12$). Pomimo dobrego ogólnego dopasowania,
+zaobserwowano pogorszenie jakoœci przewidywañ w poszczególnych przypadkach, co
+potwierdzaj¹ wy¿sze wartoœci MAE i MSE.
+
+Model przewiduj¹cy cztery miary jednoczeœnie osi¹gn¹³ mieszane wyniki. Dla
+wartoœci LF i RMSSD uzyska³ wspó³czynnik determinacji na poziomie oko³o 0,75,
+natomiast dla pozosta³ych metryk rezultaty by³y mniej zadowalaj¹ce.
+
+\subsection{Wnioski}
+Wiele z analizowanych wariantów modeli wykaza³o dobre dopasowanie do
+rzeczywistych wartoœci. Jednak, maj¹c na uwadze fakt, ¿e modele otrzymywa³y na
+wejœciu interwa³y RR, z których te miary mo¿na obliczyæ w sposób bezpoœredni,
+uzyskane wyniki nie spe³ni³y w pe³ni oczekiwañ. Gdyby jednak uda³o siê
+zintegrowaæ przedstawiony model z sieci¹ UNet w ramach systemu end-to-end,
+uzyskane rezultaty mog³yby zostaæ uznane za satysfakcjonuj¹ce.
 
 \FloatBarrier
 \section{Przewidywanie miar HRV oraz RSA za pomoc¹ sieci typu end-to-end}
@@ -191,12 +213,12 @@ porównanie wyników miêdzy ró¿nymi konfiguracjami modeli.
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
-        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                     \\ \hline
-        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                        & \textbf{LF norm}     & \textbf{HF norm}     \\ \hline
-        MAE              & $9,69 \pm 0,56$                    & $8,32 \pm 1,84$                                       & $0,07 \pm 0,01$ & $0,07 \pm 0,01$ \\ \hline
-        MSE              & $191,71 \pm 31,69$                 & $141,93 \pm 49,51$                                    & $\sim0,01$      & $\sim0,01$      \\ \hline
-        RMSE             & $13,80 \pm 1,17$                   & $11,70 \pm 2,23$                                      & $0,09 \pm 0,01$ & $0,09 \pm 0,01$ \\ \hline
-        R2               & $0,81 \pm 0,04$                    & $0,58 \pm 0,13$                                       & $0,42 \pm 0,07$ & $0,42 \pm 0,07$ \\ \hline
+        \textbf{Wariant} & \multicolumn{2}{|c|}{SDNN i RMSSD} & \multicolumn{2}{|c|}{\textbf{LF norm i HF norm}}                                       \\ \hline
+        \textbf{Miara}   & \textbf{SDNN}                      & \textbf{RMSSD}                                   & \textbf{LF norm} & \textbf{HF norm} \\ \hline
+        MAE              & $9,69 \pm 0,56$                    & $8,32 \pm 1,84$                                  & $0,07 \pm 0,01$  & $0,07 \pm 0,01$  \\ \hline
+        MSE              & $191,71 \pm 31,69$                 & $141,93 \pm 49,51$                               & $\sim0,01$       & $\sim0,01$       \\ \hline
+        RMSE             & $13,80 \pm 1,17$                   & $11,70 \pm 2,23$                                 & $0,09 \pm 0,01$  & $0,09 \pm 0,01$  \\ \hline
+        R2               & $0,81 \pm 0,04$                    & $0,58 \pm 0,13$                                  & $0,42 \pm 0,07$  & $0,42 \pm 0,07$  \\ \hline
     \end{tabular}
     \label{wyniki_hrv_wiele}
 \end{table}
@@ -235,8 +257,8 @@ zale¿noœci od testowanych danych. Przyk³ad ogromnej ró¿nicy miêdzy dwoma
 foldami przedstawiono na Rys. \ref{fig/RMSSD_2_folds}
 
 W ramach ekperymentu, testowano równie¿ warianty sieci przewiduj¹ce wiêksz¹
-liczbê miar ni¿ dwie, jednak ¿aden z tych modeli nie osi¹gn¹³ wyników
-porównywalnych do wariantów przedstawionych w tej sekcji.
+liczbê miar ni¿ dwie, jednak ¿aden z tych modeli nie osi¹gn¹³ zadowalaj¹cych
+wyników.
 
 \begin{figure}[ht]
     \centering
