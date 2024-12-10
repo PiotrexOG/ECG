@@ -150,7 +150,7 @@ Przed wykonaniem transformacji na sygna³ na³o¿ono okno Hanninga. Okno to
 redukuje amplitudy na pocz¹tku i koñcu sygna³u, co pozwala na wyg³adzenie
 danych i minimalizacjê efektów nieci¹g³oœci. Nastêpnie wykonano dyskretn¹
 transformacjê Fouriera, która przekszta³ca sygna³ z dziedziny czasu do
-dziedziny czêstotliwoœci.\cite{Boashash1992}
+dziedziny czêstotliwoœci \cite{Boashash1992}.
 
 W wyniku FFT uzyskano dwa wektory:
 \begin{itemize}
@@ -215,12 +215,11 @@ sygna³u. Do analizy wykorzystano sinusoidaln¹ falkê Morleta, która jest
 szczególnie dobrze dopasowana do sygna³ów harmonicznych, takich jak RSA.
 
 \subsection{Parametry analizy falkowej}
-Falka Morleta, zaimplementowana przy u¿yciu biblioteki PyWavelets, umo¿liwia
-precyzyjn¹ analizê w interesuj¹cym zakresie czêstotliwoœci. Kluczowe parametry
-falki zosta³y dostosowane w nastêpuj¹cy sposób:
+Falka Morleta, wykorzystana do analizy sygna³u przy u¿yciu biblioteki PyWavelets, zosta³a zastosowana w celu wykonania Ci¹g³ej Transformacji Falkowej (CWT ang. \textit{Continuous wavelet transform}). Jest to falka oparta na funkcji noœnej sinusoidalnej, modulowanej przez funkcjê Gaussa, co czyni j¹ szczególnie odpowiedni¹ do analizy sygna³ów biologicznych o charakterze oscylacyjnym, takich jak RSA. Kluczowe parametry falki zosta³y dostosowane w nastêpuj¹cy sposób:
+
 \begin{itemize}
-    \item \textbf{Szerokoœæ pasma:} \(B = 15\), co dziêki stosunkowo wysokiej wartoœci zwiêksza precyzjê w dziedzinie czêstotliwoœci, jednoczeœnie zachowuj¹c odpowiedni kompromis z rozdzielczoœci¹ czasow¹,
-    \item \textbf{Czêstotliwoœæ centralna:} \(C = 0.22\), która skupia energiê falki na kluczowym dla analizy przedziale czêstotliwoœci.
+    \item \textbf{Szerokoœæ pasma:} \(B = 15\) — stosunkowo wysoka wartoœæ, która zwiêksza precyzjê w dziedzinie czêstotliwoœci, zachowuj¹c jednoczeœnie odpowiedni kompromis z rozdzielczoœci¹ czasow¹,
+    \item \textbf{Czêstotliwoœæ centralna:} \(C = 0.22\) — parametr ten skupia energiê falki na kluczowym dla analizy przedziale czêstotliwoœci, zapewniaj¹c precyzyjn¹ reprezentacjê sygna³u.
 \end{itemize}
 
 \subsection{Wyznaczanie mocy sygna³u}
