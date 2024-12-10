@@ -1,0 +1,188 @@
+\section{Eksperymentalna ocena mocy zjawiska RSA}
+
+W pierwszym eksperymencie zaprezentowano metody oceny wielkoœci efektu RSA oraz omówiono zwi¹zane z tym wyzwania, które uwidacznia³y siê w przypadku znacznej niestacjonarnoœci sygna³u, wynikaj¹cej ze zmian rytmu oddechowego na przestrzeni ca³ego zarejestrowanego sygna³u. Przeanalizowano równie¿, która miara najdok³adniej opisuje efekt RSA oraz z jak¹ precyzj¹ mo¿na okreœliæ czêstotliwoœæ oddechu na podstawie sygna³u EKG. Wszystkie analizy przeprowadzono z wykorzystaniem narzêdzi opracowanych na potrzeby niniejszej pracy.
+
+\subsection{Sposób przeprowadzenia badania}
+
+Na podstawie 18-minutowego badania, podczas którego osoba badana le¿a³a w pozycji poziomej i oddycha³a ze sta³ym tempem zmieniaj¹cym siê co 2 minuty w nastêpuj¹cy sposób: pocz¹tkowo wdech i wydech trwa³y po 2 sekundy (ca³y cykl: 4 sekundy, 0.25 Hz), a nastêpnie stopniowo zwalnia³y – kolejno do 3, 4, 5... a¿ do 10 sekund, co odpowiada³o cyklowi trwaj¹cemu 20 sekund (0.05 Hz). W ten sposób zrealizowano badanie, w którym pacjent oddycha równomiernie w ka¿dym etapie, przy zmiennym tempie od 15 do 3 cykli oddechowych na minutê.
+
+\subsection{Analiza czasowo-czêstotliwoœciowa efektu RSA}
+
+Na Rys. \ref{fig/rsa_eksp/3} przedstawiono wynik dzia³ania aplikacji jako fragment przydatny do analizy efektu RSA, korzystaj¹c z metod czêstotliwoœciowo-czasowych.
+ 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/rsa_eksp/image3.png}
+    \caption{Skalogram rozk³adu mocy w dziedzinie czasowo-czêstotliwoœciowej oraz wykresy mocy w pasmach LF i HF i ich stosunku przy zastosowaniu œredniej centralnej z filtrem Gaussa o oknie 120 sekund.}
+    \label{fig/rsa_eksp/3}
+\end{figure}
+
+\FloatBarrier
+
+Na skalogramie przedstawiono zmiany mocy dominuj¹cych pasm w zale¿noœci od czêstotliwoœci i czasu.  Przerywanymi pionowymi liniami zaznaczono kolejne 9 etapów badania, a poziom¹ lini¹ oznaczono czêstotliwoœæ oddechu opart¹ na za³o¿onej czêstotliwoœci mierzonej stoperem. Widoczne jest, ¿e dla ka¿dego etapu najwiêksza moc koncentruje siê w s¹siedztwie odpowiadaj¹cej mu przerywanej linii, a im czêstotliwoœæ oddechu jest mniejsza, tym zjawisko to jest bardziej wyraŸne. Wynika to z faktu, ¿e dla szybszych oddechów du¿o trudniej jest utrzymaæ sta³¹ czêstotliwoœæ w okresie badania. Przyk³adowo, skrócenie lub wyd³u¿enie jednego pe³nego cyklu o 1 sekundê powoduje zmianê czêstotliwoœci z 0.25 Hz do zakresu 0.2-0.33 Hz dla cyklu trwaj¹cego 4 sekundy. Natomiast w przypadku cyklu trwaj¹cego 20 sekund, zmiana ta mieœci siê w wê¿szym zakresie, od 0.047 Hz do 0.052 Hz, zamiast sta³ego 0.05 Hz.
+
+Analiza skalogramu potwierdza tak¿e wyzwania zwi¹zane z ocen¹ efektu RSA jedynie przy pomocy okreœlenia stosunku mocy w paœmie HF do LF. Na wykresie tego stosunku, widocznym w drugim rzêdzie, przedstawiono wartoœci mocy w tych pasmach z zastosowaniem centralnej œredniej krocz¹cej z filtrem Gaussa o oknie 120 sekund. Zauwa¿ono, ¿e moc w paœmie HF by³a znacznie wiêksza dla pierwszych dwóch etapów badania, czyli gdy oddech by³ brany z czêstotliwoœci¹ 0.25 Hz oraz 0.16 Hz, czyli w zakresie pasma HF (0.15–0.4 Hz).
+
+W nastêpnych etapach badania zaobserwowano wzrost mocy w paœmie LF, a tym samym stosunek LF/HF osi¹ga³ bardzo wysokie, dwucyfrowe wartoœci. By³o to wynikiem przesuniêcia czêstotliwoœci oddechu do zakresu charakterystycznego dla pasma LF. W zwi¹zku z tym, pomimo zastosowania analizy czêstotliwoœciowo-czasowej, która prezentuje zmiany mocy w czasie, ocena efektu RSA wy³¹cznie na podstawie stosunku LF/HF mog³aby prowadziæ do myl¹cych wniosków. Mog³yby one sugerowaæ nadmiern¹ aktywnoœæ uk³adu wspó³czulnego, objawiaj¹c¹ siê m.in. wysokim stresem, zamiast wskazywaæ na intensywny efekt RSA
+
+\subsection{Analiza FFT efektu RSA}
+
+Na Rys. \ref{fig/rsa_eksp/4} zaprezentowano wizualizacjê rozk³adu mocy w zakresie czêstotliwoœci dla ca³ego badania, uzyskan¹ za pomoc¹ FFT. Widoczna jest du¿a nieregularnoœæ w rozk³adzie mocy, wynikaj¹ca z niestacjonarnego charakteru oddechów. Pionowymi liniami zaznaczono czêstotliwoœci oddechu dla poszczególnych etapów badania i widoczne jest, ¿e wartoœci tej mocy, szczytuj¹ w³aœnie w pobli¿u tych nominalnych czêstotliwoœci.
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/rsa_eksp/image4.png}
+    \caption{Analiza spektralna ca³ego sygan³u przy u¿yciu FFT z zaznaczonymi czêstotliwoœciami oddechu dla kolejnych etapów badania.}
+    \label{fig/rsa_eksp/4}
+\end{figure}
+
+\FloatBarrier
+
+Dla FFT przeprowadzonego na ca³ym sygnale jednoczeœnie uzyskano wyniki, które równie¿ nie napawaj¹ optymizmem w kontekœcie efektu RSA: 
+\[
+\text{LF} = 31158, \quad \text{HF} = 2279, \quad \text{Stosunek LF/HF} = 13.67
+\]
+
+
+
+Z tego powodu przeprowadzono analizê FFT dla ka¿dego 2-minutowego etapu badania oddzielnie, a jej wyniki przedstawiono na Rys. \ref{fig/rsa_eksp/5}. Kolorowe linie obrazuj¹ rozk³ad gêstoœci mocy i odpowiadaj¹ poszczególnym etapom. WyraŸne piki mocy, widoczne dla okreœlonych czêstotliwoœci oddechu, pojawiaj¹ siê wy³¹cznie w ich bezpoœrednim s¹siedztwie, co oznaczono przerywanymi, pionowymi liniami w odpowiadaj¹cych kolorach. Analiza ta, wymaga³a jednak, podzielenia sygna³u na 9 odrêbnych fragmentów i przeprowadzenia FFT dla ka¿dego z nich osobno.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/rsa_eksp/image5.png}
+    \caption{Analiza spektralna fragmentów sygan³u przy u¿yciu FFT z zaznaczonymi czêstotliwoœciami oddechu dla kolejnych etapów badania.}
+    \label{fig/rsa_eksp/5}
+\end{figure}
+
+\FloatBarrier
+
+W tabeli \ref{tab:fft_analysis} przedstawiono wartoœci mocy w paœmie LF i HF oraz ich stosunku dla ka¿dego etapu badania po kolei. Wartoœci te koreluj¹ z wynikami analizy czasowo-czêstotliwoœciowej, jednak ich uzyskanie wymaga³o dodatkowego nak³adu pracy zwi¹zanego z podzia³em sygna³u na fragmenty. Bez uwzglêdnienia szczegó³owego kontekstu badania, takie wyniki mog³yby zostaæ b³êdnie zinterpretowane jako obecnoœæ istotnych artefaktów w sygnale lub jako wskaŸnik bardzo wysokiego poziomu stresu.
+
+\begin{table}[h!]
+\centering
+\resizebox{\textwidth}{!}{%
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{Czêstotliwoœæ (Hz)} & \textbf{0.25} & \textbf{0.167} & \textbf{0.125} & \textbf{0.1} & \textbf{0.083} & \textbf{0.071} & \textbf{0.063} & \textbf{0.056} & \textbf{0.05} \\
+\hline
+LF & 24 & 30 & 274 & 325 & 411 & 428 & 438 & 293 & 422 \\
+\hline
+HF & 100 & 283 & 23 & 19 & 20 & 18 & 12 & 29 & 25 \\
+\hline
+LF norm & 19.5 & 9.7 & 92.1 & 94.5 & 95.3 & 95.9 & 97.2 & 90.8 & 94.3 \\
+\hline
+HF norm & 80.5 & 90.3 & 7.9 & 5.5 & 4.7 & 4.1 & 2.8 & 9.2 & 5.7 \\
+\hline
+LF/HF & 0.24 & 0.10 & 11.74 & 17.11 & 20.49 & 23.44 & 34.22 & 9.80 & 16.57 \\
+\hline
+\end{tabular}%
+}
+\caption{Wyniki analizy FFT dla fragmentów o ró¿nych czêstotliwoœciach oddechu}
+\label{tab:fft_analysis}
+\end{table}
+
+\FloatBarrier
+
+
+    
+\subsection{Analiza parametrów czasowych sygna³u EKG}
+
+Podobny problem wystêpuje równie¿ podczas próby analizy ca³ego sygna³u jednoczeœnie, z wykorzystaniem metryk z dziedziny czasowej, których wartoœci wynosz¹ odpowiednio:
+\[
+\text{Mean RR} = 922.64 \, \text{ms}, \quad 
+\text{SDNN} = 104.29 \, \text{ms}, \quad 
+\text{RMSSD} = 69.25 \, \text{ms}, \quad 
+\text{PNN50} = 36.26\%.
+\]
+
+Jednak¿e podzia³ sygna³u, na poszczególne etapy i wykonanie analizy w dziedzinie czasu dla ka¿dego z tych fragmentów z osobna, umo¿liwi³o uzyskanie bardziej przejrzystych i ³atwiejszych w interpretacji wyników.
+
+Analizê ka¿dego etapu przeprowadzono indywidualnie, definiuj¹c w pliku konfiguracyjnym czêstotliwoœæ oddechu. Ta wartoœæ by³a wykorzystywana do wyznaczenia czêstotliwoœci centralnej, wzglêdem której sygna³ zosta³ przefiltrowany. Dziêki temu mo¿liwe by³o precyzyjne wykrycie momentów wdechu i wydechu. Nastêpnie obliczono RSA index jako œredni¹ ró¿nicê w d³ugoœci interwa³ów RR pomiêdzy tymi wyznaczonymi momentami. 
+
+Wyniki przedstawiono na Rys. \ref{fig/rsa_eksp/6}: niebieskie punkty oznaczaj¹ wartoœci RSA indexu, po³¹czone lini¹ dla lepszej wizualizacji. Czerwona linia ilustruje uœrednion¹ wartoœæ RSA indexu, wyliczon¹ przy u¿yciu œredniej krocz¹cej z filtrem Gaussa o oknie o rozmiarze 7. Zielona pozioma linia przedstawia œredni¹ wartoœæ RSA indexu dla ca³ego badania, natomiast pionowe fioletowe linie oznaczaj¹ momenty przejœcia do kolejnych etapów oddechowych.
+Mo¿na zauwa¿yæ, ¿e RSA index, który jest najdok³adniejsz¹ miar¹ w ocenie tego efektu, poniewa¿ bezpoœrednio okreœla, jak bardzo zmienia siê rytm pracy serca pomiêdzy momentem wdechu i wydechu, tendencyjnie roœnie wraz ze wzrostem d³ugoœci cyklu oddechowego.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/rsa_eksp/image6.png}
+    \caption{Wartoœci RSA Index w czasie dla poszczególnych etapów badania.}
+    \label{fig/rsa_eksp/6}
+\end{figure}
+
+\FloatBarrier
+
+Na Rys. \ref{fig/rsa_eksp/2} przedstawiono zmiany wybranych charakterystyk sygna³u EKG, takich jak SDNN, RMSSD, pNN50 oraz Mean RR, dla poszczególnych etapów badania. Dla ka¿dego okna obliczono œrednie wartoœci tych parametrów, a nastêpnie po³¹czono je, aby zobrazowaæ wystêpuj¹ce trendy.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/rsa_eksp/image2.png}
+    \caption{Wartoœci SDNN, RMSSD, PNN50, Mean RR w czasie dla poszczególnych etapów badania.}
+    \label{fig/rsa_eksp/2}
+\end{figure}
+
+\FloatBarrier
+
+Widaæ na nim, ¿e wartoœæ SDNN roœnie, co wynika ze zwiêkszenia ogólnej zmiennoœci interwa³ów RR, podobnie jak w przypadku RSA indexu. Z kolei krótkoterminowa zmiennoœæ oraz ró¿nice miêdzy kolejnymi interwa³ami RR malej¹ wraz ze spadkiem czêstotliwoœci oddechu, co odzwierciedlaj¹ odpowiednio miary RMSSD i pNN50.
+
+Porównuj¹c Rys. \ref{fig/rsa_eksp/2} z Rys. \ref{fig/rsa_eksp/1}, mo¿na zaobserwowaæ, ¿e SDNN jest skorelowane z ca³kowit¹ moc¹ w sygnale (HF + LF), co potwierdza tezy omówione w czêœci teoretycznej. Jednoczeœnie znormalizowana wartoœæ HF maleje w sposób zbli¿ony do RMSSD. Oba spadki wynikaj¹ ze zmniejszaj¹cej siê czêstotliwoœci oddechu.
+
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/rsa_eksp/image1.png}
+    \caption{Wartoœci HF norm oraz ogólnej mocy sygan³u w czasie dla poszczególnych etapów badania.}
+    \label{fig/rsa_eksp/1}
+\end{figure}
+
+\FloatBarrier
+
+W tabeli \ref{tab:respiratory_analysis} przedstawiono porównanie wartoœci poszczególnych charakterystyk sygna³u EKG dla ka¿dego etapu z osobna.
+
+\begin{table}[h!]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    \textbf{D³ugoœæ fazy oddechu (s)} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} \\
+    \hline
+    SDNN & 77.69 & 88.98 & 86.87 & 102.23 & 104.69 & 112.35 & 113.32 & 108.08 & 116.42 \\
+    \hline
+    RMSSD & 84.57 & 85.09 & 65.57 & 72.38 & 64.71 & 63.14 & 65.46 & 62.67 & 51.07 \\
+    \hline
+    pNN50 & 65.41 & 54.07 & 37.41 & 34.06 & 31.11 & 24.26 & 30.43 & 24.46 & 26.43 \\
+    \hline
+    Œrednie RR & 89.83 & 89.65 & 88.91 & 90.64 & 94.18 & 94.38 & 94.48 & 95.58 & 92.48 \\
+    \hline
+    RSA Index & 0.16 & 0.215 & 0.217 & 0.265 & 0.28 & 0.309 & 0.325 & 0.324 & 0.337 \\
+    \hline
+    D³ugoœæ wdechu (s) & 2.05 & 3.50 & 4.52 & 6.04 & 7.14 & 8.03 & 8.85 & 9.45 & 10.74 \\
+    \hline
+    D³ugoœæ wydechu (s) & 1.95 & 2.33 & 3.19 & 3.78 & 4.56 & 5.89 & 6.44 & 8.37 & 8.36 \\
+    \hline
+    D³ugoœæ oddechu (s) & 4.00 & 5.83 & 7.71 & 9.82 & 11.70 & 13.92 & 15.29 & 17.82 & 19.10 \\
+    \hline
+    B³¹d wzg. wdechu (\%) & 2.50 & -12.50 & 13.00 & 20.80 & 19.00 & 14.71 & 10.63 & 5.00 & 7.40 \\
+    \hline
+    B³¹d wzgl. wydechu (\%) & -2.50 & -22.00 & -20.25 & -24.40 & -24.00 & -15.86 & -19.50 & -7.00 & -16.40 \\
+    \hline
+    B³¹d wzgl. oddechu (\%) & 0.00 & -2.83 & -3.62 & -1.80 & -2.50 & -0.57 & -4.44 & -1.00 & -4.50 \\
+    \hline
+    \end{tabular}%
+    }
+    \caption{Wyniki analizy pracy serca dla ró¿nych czêstotliwoœci oddechu}
+    \label{tab:respiratory_analysis}
+    \end{table}
+    
+    \FloatBarrier
+
+\subsection{Wnioski dotycz¹ce oceny wielkoœci efektu RSA}
+
+Na podstawie analizy efektu RSA w przypadku tak specyficznego sygna³u mo¿na stwierdziæ, ¿e nie istnieje jedna sprawdzona i uniwersalna miara, któr¹ mo¿na zastosowaæ bez wczeœniejszego zrozumienia specyfiki badania. Dopiero posiadanie solidnych podstaw teoretycznych, odpowiednich narzêdzi analitycznych oraz pe³nej znajomoœci metody przeprowadzania badania pozwala na precyzyjne okreœlenie wielkoœci efektu RSA w danym sygnale. Warto jednak zauwa¿yæ, ¿e nawet w takich warunkach obserwacja tego zjawiska w ró¿nych fragmentach sygna³u mo¿e byæ utrudniona i niejednoznaczna.
+
+Choæ RSA Index jest miar¹ bezpoœrednio okreœlaj¹c¹ wielkoœæ tego zjawiska, jej skutecznoœæ zale¿y od wystêpowania wolniejszego i regularnego oddechu, który rzadko pojawia siê w naturalnym, dziennym funkcjonowaniu. Alternatyw¹ jest zastosowanie narzêdzia umo¿liwiaj¹cego synchronizacjê rytmu serca i rytmu oddechowego.
+
+W przypadku okreœlania d³ugoœci cyklu oddechowego na podstawie sygna³u EKG, przy za³o¿eniu równomiernego i g³êbokiego oddechu u osób z wysokim RSA, na bazie wyników zaprezentowanych w tabeli \ref{tab:respiratory_analysis} uzyskano bardzo wysok¹ dok³adnoœæ (95.5–100\%). Jednak¿e precyzja w okreœlaniu d³ugoœci trwania poszczególnych faz oddechu by³a ni¿sza, wynosz¹c od oko³o 75 do 97\%. Nale¿y równie¿ podkreœliæ, ¿e wartoœci te zosta³y wyznaczone na podstawie bardzo ma³ej próby, wiêc s³u¿¹ one raczej zwróceniu uwagi na pewne zale¿noœci ni¿ dok³adnemu okreœleniu skutecznoœci metody.

@@ -26,25 +26,27 @@ Opisywany algorytm wykazywa³ jednak pewne ograniczenia, szczególnie w przypadku 
 
 Do identyfikacji lokalnych szczytów w sygnale wykorzystano funkcjê \texttt{find\_peaks} z biblioteki \texttt{scipy.signal}. W parametrach funkcji zdefiniowano próg (\textit{threshold}) jako œredni¹ wartoœæ przefiltrowanego sygna³u powiêkszon¹ o 10\% odchylenia standardowego, co okreœla³o minimalny poziom, powy¿ej którego poszukiwano szczytów. Dodatkowo, ustawiono minimaln¹ odleg³oœæ (\textit{distance}) miêdzy kolejnymi szczytami jako liczbê próbek odpowiadaj¹c¹ czasowi trwania po³owy jednego cyklu oddechowego. 
 
-W celu detekcji do³ków sygna³ zosta³ odwrócony poprzez zmianê znaku wszystkich próbek, a nastêpnie zastosowano te same procedury co w przypadku wykrywania szczytów. Proces detekcji uzupe³niono o autorski algorytm korekcji pozycji wykrytych ekstremów wzglêdem sygna³u nieprzefiltrowanego, co opisano szczegó³owo w Rozdziale 2 w kontekœcie algorytmu Pan-Tompkinsa.
+W celu detekcji do³ków sygna³ zosta³ odwrócony poprzez zmianê znaku wszystkich próbek, a nastêpnie zastosowano te same procedury co w przypadku wykrywania szczytów. Proces detekcji uzupe³niono o autorski algorytm korekcji pozycji wykrytych ekstremów wzglêdem sygna³u nieprzefiltrowanego, co opisano szczegó³owo w Rozdziale \ref{P-Tomkins}.
 
 Wyznaczone ekstrema oznaczono na wykresie têtna kolorami: minima jako zielone punkty, a maksima jako czerwone punkty. Na podstawie wykrytych ekstremów zaimplementowano algorytm identyfikuj¹cy momenty trwania poszczególnych wdechów i wydechów. Wdech zdefiniowano jako fragment sygna³u rozpoczynaj¹cy siê w minimum wykresu têtna i koñcz¹cy siê w kolejnym maksimum, pod warunkiem, ¿e pomiêdzy tymi punktami nie wystêpowa³y dodatkowe minima. Analogicznie, wydech okreœlono jako fragment rozpoczynaj¹cy siê w maksimum i koñcz¹cy w kolejnym minimum.
 
 Przyjête podejœcie zapewnia odpornoœæ na sytuacje, w których algorytm nie wykry³by niektórych minimów lub maksimów. Na przyk³ad brak detekcji koñca fazy oddechowej móg³by prowadziæ do sztucznego wyd³u¿enia czasu jej trwania. Dziêki zdefiniowanym regu³om minimalizowano wp³yw takich przypadków na wyniki analizy.
 
-Na podstawie wykrytych wdechów i wydechów obliczono kluczowe wskaŸniki. Pierwszym z nich jest RSA Index, zdefiniowany jako ró¿nica miêdzy najd³u¿szym a najkrótszym interwa³em RR w ca³ym sygnale. Drugim wskaŸnikiem jest œrednia ró¿nica w d³ugoœci interwa³u RR miêdzy pocz¹tkiem a koñcem zarówno wdechu, jak i wydechu. WskaŸnik ten jest kluczowym parametrem opisuj¹cym si³ê efektu RSA.
+Na podstawie wykrytych wdechów i wydechów obliczono wskaŸnik RSA Index – kluczow¹ miarê opisuj¹c¹ si³ê efektu RSA. WskaŸnik ten okreœla œredni¹ ró¿nicê w d³ugoœci interwa³u RR pomiêdzy pocz¹tkiem a koñcem zarówno wdechu, jak i wydechu.
 
 
 
 \subsection{Przyk³ad zastosowania algorytmu}
-Na rysunku przedstawiono wyniki analizy sygna³u EKG zarejestrowanego na odcinku 118 sekund, podczas którego osoba oddycha³a ze sta³¹ czêstotliwoœci¹ 0,07 Hz (œrednio 14 sekund na cykl oddechowy). Wykresy zosta³y wygenerowane przy u¿yciu opisywanej aplikacji i uporz¹dkowane w czterech rzêdach:
+Na Rys. \ref{fig/oddechy} przedstawiono wyniki analizy sygna³u EKG zarejestrowanego na odcinku 118 sekund, podczas którego osoba oddycha³a ze sta³¹ czêstotliwoœci¹ 0,07 Hz (œrednio 14 sekund na cykl oddechowy). Wykresy zosta³y wygenerowane przy u¿yciu opisywanej aplikacji i uporz¹dkowane w czterech rzêdach:
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/oddechy.png}
+    \includegraphics[width=\textwidth]{Rysunki/oddechy.png}
     \caption{Analiza sygna³u EKG: wykryte szczyty R, ró¿nice interwa³ów RR, przebieg têtna i jego przefiltrowany sygna³.}
     \label{fig/oddechy}
 \end{figure}
+
+\FloatBarrier
 
 \begin{itemize}
     \item Pierwszy rz¹d: Wartoœci napiêcia (w \textmu{}V) dla wykrytych szczytów R w czasie, wyznaczone za pomoc¹ algorytmu Pan-Tompkinsa.
@@ -63,8 +65,6 @@ Na podstawie analizy sygna³u aplikacja wyznaczy³a nastêpuj¹ce miary charakteryst
     \item {Mean RR Interval Difference}: Œrednia ró¿nica d³ugoœci interwa³ów RR miêdzy pocz¹tkiem a koñcem faz oddechu wynosi³a 0,35 s,
     \item Œrednia d³ugoœæ pe³nego cyklu oddechowego: 14,24 s.
 \end{itemize}
-
-Wyniki wskazuj¹ na wyraŸn¹ przewagê d³ugoœci wdechu nad d³ugoœci¹ wydechu. Zjawisko to zosta³o dok³adniej opisane w kolejnym rozdziale.
 
 
 \section{Analiza sygna³u EKG za pomoc¹ transformacji Fouriera}
@@ -96,21 +96,25 @@ Poni¿ej zamieszczono wynik szybkiej transformaty Fouriera który zosta³ wygenerow
 
 
 \subsection{Wizualizacja wyników}
-Na wykresie uwidoczniono wartoœci mocy w poszczególnych pasmach czêstotliwoœci: LF, HF oraz stosunek LF/HF. Zauwa¿alna jest dominuj¹ca moc w paœmie ULF (Ultra-Low Frequency, poni¿ej 0,003 Hz).
-\begin{figure}
+Na wykresie \ref{fig:fft_psd}, uwidoczniono wartoœci mocy w poszczególnych pasmach czêstotliwoœci: LF, HF oraz stosunek LF/HF. Zauwa¿alna jest dominuj¹ca moc w paœmie ULF (Ultra-Low Frequency, poni¿ej 0,003 Hz).
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/fftFAR.png}
+    \includegraphics[width=\textwidth]{Rysunki/fftFAR.png}
     \caption{Widmowa gêstoœæ mocy (PSD) dla 5-minutowego badania.}
     \label{fig:fft_psd}
 \end{figure}
 
-Na kolejnym wykresie, bêd¹cym przybli¿eniem rozk³adu gêstoœci mocy tego samego sygna³u, widoczne s¹ lokalne wzrosty mocy w paœmie czêstotliwoœci \(0,28\ \text{Hz}\) (HF) oraz mniejszy, ale wyraŸny wzrost dla czêstotliwoœci \(0,09\ \text{Hz}\) (LF).
-\begin{figure}
+\FloatBarrier
+
+Na wykresie \ref{fig:fft_zoomed}, bêd¹cym przybli¿eniem rozk³adu gêstoœci mocy tego samego sygna³u, widoczne s¹ lokalne wzrosty mocy w paœmie czêstotliwoœci \(0,28\ \text{Hz}\) (HF) oraz mniejszy, ale wyraŸny wzrost dla czêstotliwoœci \(0,09\ \text{Hz}\) (LF).
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/fftCLOSE.png}
+    \includegraphics[width=\textwidth]{Rysunki/fftCLOSE.png}
     \caption{Przybli¿enie rozk³adu gêstoœci mocy w pasmach LF i HF.}
     \label{fig:fft_zoomed}
 \end{figure}
+
+\FloatBarrier
 
 
 \section{Analiza czasowo-czêstotliwoœciowa}
@@ -148,79 +152,95 @@ Na zamieszczonym obrazie przeanalizowano tê sam¹ 5-minutow¹ próbkê zarejestrowan
 
 Warto zwróciæ uwagê na zawy¿one wartoœci mocy na krañcach analizowanego okresu.
 
-\begin{figure}
+
+
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/waveFAR.png}
+    \includegraphics[width=\textwidth]{Rysunki/waveFAR.png}
     \caption{Wyniki analizy czasowo-czêstotliwoœciowej dla 5-minutowej próbki sygna³u.}
 
     \label{fig:wave_normal}
 \end{figure}
 
-Na kolejnym wycinku zaprezentowano te same wykresy, przybli¿one do zakresu od 30. do 270. sekundy. Przybli¿enie to pozwala wyeliminowaæ zniekszta³cenia spowodowane efektem brzegowym analizy falkowej, co zapewnia bardziej precyzyjn¹ wizualizacjê danych. W analizowanym zakresie zauwa¿alna jest dominacja mocy w przedziale czêstotliwoœci \(0,2\text{--}0,3\ \text{Hz}\) (pasmo HF) w stosunku do pasma LF. Zale¿noœæ tê wyraŸnie pokazuj¹ zarówno skalogram, jak i wykresy mocy obu pasm oraz ich stosunku.
+\FloatBarrier
 
-\begin{figure}
+Na kolejnym wycinku zaprezentowano te same wykresy, przybli¿one do zakresu od 30. do 270. sekundy. Przybli¿enie to pozwala wyeliminowaæ zniekszta³cenia spowodowane efektem brzegowym analizy falkowej, co zapewnia bardziej precyzyjn¹ wizualizacjê danych. W analizowanym zakresie zauwa¿alna jest dominacja mocy w przedziale czêstotliwoœci \(0,2\text{--}0,3\ \text{Hz}\) (pasmo HF) w stosunku do pasma LF. Zale¿noœæ tê wyraŸnie pokazuj¹ zarówno skalogram, jak i wykresy mocy obu pasm oraz ich stosunku \ref{fig:wave_zoomed}.
+
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.25]{Rysunki/waveCLOSE.png}
+    \includegraphics[width=\textwidth]{Rysunki/waveCLOSE.png}
     \caption{Przybli¿enie analizy czasowo-czêstotliwoœciowej w ograniczonym zakresie czasu, bez widocznych efektów brzegowych.}
     \label{fig:wave_zoomed}
 \end{figure}
 
+\FloatBarrier
 
 \section{Implementacja i Wizualizacja Œredniej Krocz¹cej}
 
-Na podstawie poni¿szego wykresu, przedstawiaj¹cego rozk³ad mocy w dziedzinie czasu i czêstotliwoœci, wyznaczonego na podstawie sygna³u EKG za pomoc¹ analizy falkowej dla okresu 3,5 godziny, zostanie opisana implementacja i wizualizacja œredniej krocz¹cej.
+Na podstawie wykresu \ref{fig:wavePORANEK}, przedstawiaj¹cego rozk³ad mocy w dziedzinie czasu i czêstotliwoœci, wyznaczonego na podstawie sygna³u EKG za pomoc¹ analizy falkowej dla okresu 3,5 godziny, zostanie opisana implementacja i wizualizacja œredniej krocz¹cej.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{Rysunki/wavePORANEK.png}
+    \includegraphics[width=\textwidth]{Rysunki/wavePORANEK.png}
     \caption{Skalogram przedstawiaj¹cy rozk³ad mocy w dziedzinie czasu i czêstotliwoœci dla sygna³u EKG uzyskany za pomoc¹ analizy falkowej.}
     \label{fig:wavePORANEK}
 \end{figure}
 
-W przypadku analizy mocy w pasmach LF i HF oraz ich stosunku w tak d³ugim przedziale czasowym, wykres tych wartoœci mo¿e byæ ma³o czytelny z uwagi na du¿¹ zmiennoœæ mocy w poszczególnych pasmach. W takich sytuacjach, gdy chcemy zobrazowaæ globalne trendy, warto zastosowaæ metodê statystyczn¹, jak¹ jest œrednia krocz¹ca. Na rysunku poni¿ej przedstawiono moc w paœmie LF dla analizowanego sygna³u.
+\FloatBarrier
 
-\begin{figure}
+W przypadku analizy mocy w pasmach LF i HF oraz ich stosunku w tak d³ugim przedziale czasowym, wykres tych wartoœci mo¿e byæ ma³o czytelny z uwagi na du¿¹ zmiennoœæ mocy w poszczególnych pasmach. W takich sytuacjach, gdy chcemy zobrazowaæ globalne trendy, warto zastosowaæ metodê statystyczn¹, jak¹ jest œrednia krocz¹ca. Na rysunku \ref{fig:lf_avg} przedstawiono moc w paœmie LF dla analizowanego sygna³u.
+
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{Rysunki/lf_avg.png}
+    \includegraphics[width=\textwidth]{Rysunki/lf_avg.png}
     \caption{Zastosowanie ró¿nych metod œredniej krocz¹cej do wyg³adzania mocy w paœmie LF, przedstawiaj¹ce ich wp³yw na odwzorowanie trendów w d³u¿szej perspektywie czasowej.}
     \label{fig:lf_avg}
 \end{figure}
 
-Subteln¹, ró¿ow¹ lini¹ zilustrowano wykres mocy w paœmie LF z dok³adnoœci¹ do 0,25 sekundy. Ze wzglêdu na du¿e wahania mocy w krótkich odstêpach czasu, analiza tego wykresu w d³u¿szej perspektywie jest trudna. Dlatego liniami o ró¿nych kolorach zaprezentowano zastosowanie centralnej œredniej krocz¹cej dla okna o rozmiarze 900 sekund (15 minut). Linie przedstawiaj¹:
+\FloatBarrier
+
+Subteln¹, ró¿ow¹ lini¹ zilustrowano wykres mocy w paœmie LF z dok³adnoœci¹ do 0,25 sekundy \ref{fig:lf_avg} . Ze wzglêdu na du¿e wahania mocy w krótkich odstêpach czasu, analiza tego wykresu w d³u¿szej perspektywie jest trudna. Dlatego liniami o ró¿nych kolorach zaprezentowano zastosowanie centralnej œredniej krocz¹cej dla okna o rozmiarze 900 sekund (15 minut). Linie przedstawiaj¹:
 \begin{itemize}
     \item œredni¹ jednorodn¹ (kolor niebieski),
     \item œredni¹ liniow¹ (kolor zielony),
     \item œredni¹ gaussowsk¹ (kolor czerwony).
 \end{itemize}
 
-W d³u¿szym przedziale czasowym wszystkie te œrednie wykazuj¹ zbli¿one wartoœci, jednak po zmniejszeniu skali mo¿na zaobserwowaæ subtelne ró¿nice, co ilustruje poni¿szy wykres:
+W d³u¿szym przedziale czasowym wszystkie te œrednie wykazuj¹ zbli¿one wartoœci, jednak po zmniejszeniu skali mo¿na zaobserwowaæ subtelne ró¿nice, co ilustruje wykres \ref{fig:lf_compare_avg}:
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{Rysunki/lf_compare_avg.png}
+    \includegraphics[width=\textwidth]{Rysunki/lf_compare_avg.png}
     \caption{Ró¿nice w wyg³adzaniu mocy w paœmie LF dla metod jednorodnej, liniowej i gaussowskiej, przy mniejszej skali czasowej.}
     \label{fig:lf_compare_avg}
 \end{figure}
 
+\FloatBarrier
+
 W przypadku œredniej jednorodnej (kolor niebieski) lokalne ekstrema s¹ bardziej wyg³adzone ni¿ w przypadku œredniej liniowej i gaussowskiej, których wartoœci niemal siê pokrywaj¹. Filtr gaussowski zapewnia jednak bardziej naturalne wyg³adzenie, szczególnie przy analizie dynamicznych sygna³ów lub krótszych okien czasowych. Na podstawie tego porównania oraz teoretycznych przes³anek opisanych we wczeœniejszym rozdziale, wybrano œredni¹ gaussowsk¹ jako domyœlny sposób prezentowania zmian w czasie, z mo¿liwoœci¹ dostosowania rozmiaru okna przez u¿ytkownika w pliku konfiguracyjnym.
 
-Poni¿szy wykres przedstawia zmiany mocy w pasmach HF i LF w czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa:
+Wykres \ref{fig:lf_hf_normal} przedstawia zmiany mocy w pasmach HF i LF w czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa:
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{Rysunki/lf_hf_normal.png}
+    \includegraphics[width=\textwidth]{Rysunki/lf_hf_normal.png}
     \caption{Wykres zmian mocy w pasmach LF i HF w czasie, z zastosowaniem œredniej krocz¹cej z filtrem Gaussa.}
     \label{fig:lf_hf_normal}
 \end{figure}
 
-W przypadku poprawnego zobrazowania zmiennoœci stosunku mocy w pasmach LF/HF mo¿liwe jest zastosowanie ró¿nych podejœæ. Na wykresie poni¿ej pokazano zmiany tego stosunku w czasie
+\FloatBarrier
 
-\begin{figure}
+W przypadku poprawnego zobrazowania zmiennoœci stosunku mocy w pasmach LF/HF mo¿liwe jest zastosowanie ró¿nych podejœæ. Na wykresie \ref{fig:lf_hf_avg_ratio} pokazano zmiany tego stosunku w czasie
+
+
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{Rysunki/lf_hf_avg_ratio.png}
+    \includegraphics[width=\textwidth]{Rysunki/lf_hf_avg_ratio.png}
     \caption{Porównanie dwóch podejœæ do prezentacji stosunku mocy w pasmach LF i HF.}
     \label{fig:lf_hf_avg_ratio}
 \end{figure}
+
+\FloatBarrier
 
 gdzie:
 \begin{itemize}

@@ -1,0 +1,273 @@
+\section{Eksperymentalna ocena ca³odobowego HRV}
+
+W kolejnym eksperymencie oceniono zmiennoœæ pracy serca (HRV) w ci¹gu doby, ze szczególnym uwzglêdnieniem ró¿nic pomiêdzy snem a codziennymi aktywnoœciami. W tym celu osoba badana nosi³a czujnik Polar H10 przez 24 godziny. W pierwszej czêœci analizy skupiono siê na zmianach zachodz¹cych podczas snu.
+
+\subsection{Zebranie próbek sygan³u EKG podczas snu}
+
+Aby zbadaæ HRV w poszczególnych fazach snu, pacjent korzysta³ równie¿ z wielofunkcyjnego zegarka Galaxy Watch 4 firmy Samsung. Urz¹dzenie umo¿liwia ci¹g³e monitorowanie têtna oraz detekcjê faz snu. Na zrzutcie ekranu \ref{fig/hrv_exp/10} przedstawiono dane dotycz¹ce faz snu zarejestrowane przez zegarek.\\ 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image10.png}
+    \caption{Fazy snu z podzia³em w czasie zarejestrowane przez Galaxy watch 4 w aplikacji Samsung Health.}
+    \label{fig/hrv_exp/10}
+\end{figure}
+
+\FloatBarrier
+
+Na wykresie \ref{fig/hrv_exp/10} uwzglêdniono nastêpuj¹ce fazy: fazy wybudzenia oznaczono kolorem pomarañczowym, fazy REM kolorem akwamarynowym, fazy snu p³ytkiego - b³êkitnym, a fazy snu g³êbokiego - granatowym.
+Warto podkreœliæ, ¿e fazy snu zosta³y rozpoznane na podstawie zmian têtna rejestrowanego przez zegarek, a nie czujnik Polar H10. Niemniej jednak zegarek cechuje siê porównywaln¹ precyzj¹ pomiaru rytmu serca. \cite{} Zegarek wyposa¿ony jest równie¿ w akcelerometr, który rejestruje ruchy nadgarstka, co u³atwia detekcjê poszczególnych faz snu.
+
+Aplikacja ta wyœwietla fazy snu jedynie w formie statycznego obrazu, bez wskazania dok³adnych momentów przejœæ pomiêdzy nimi. W zwi¹zku z tym, na potrzeby tego eksperymentu odwzorowano te przejœcia w formie t³a, które zosta³o na³o¿one na wykresy stworzone w dedykowanej aplikacji opracowanej w ramach niniejszej pracy. Na Rys. \ref{fig/hrv_exp/11} przedstawiono wizualne potwierdzenie precyzyjnego odwzorowania tych przejœæ. Wyciête fragmenty t³a wykresów zosta³y dopasowane do odpowiednich kolorów wyœwietlanych w aplikacji.
+
+Dziêki takiemu podejœciu mo¿liwa by³a dok³adniejsza i wygodniejsza analiza zmiennoœci poszczególnych metryk, z uwzglêdnieniem konkretnych faz snu w odpowiednich momentach czasu.
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image11.png}
+    \caption{Potwierdzenie dok³adnoœci odwzorowania momentów przejœæ pomiêdzy fazami snu, przy pomocy na³o¿enia na siebie fragmentów rysowanego wykresu i wyniku prezentowanego w aplikacji.}
+    \label{fig/hrv_exp/11}
+\end{figure}
+
+\FloatBarrier
+
+Warto zaznaczyæ, ¿e smartwatch wykry³ sen w przedziale czasowym od godziny 4:11 do 12:21, co pokrywa siê ze spadkiem têtna zarejestrowanym przez czujnik Polar H10. Tak póŸne godziny snu s¹ zgodne z rzeczywistym harmonogramem i nie s¹ b³êdem.
+
+\subsection{Wizualizacja zmiennoœci metryk HRV w dziedzinie czasu}
+
+Dok³adniejsza analiza wartoœci poszczególnych metryk oraz ich korelacji z fazami snu zosta³a przedstawiona po zwizualizowaniu kolejnych wykresów, ró¿ni¹cych siê zarówno prezentowanymi metrykami, jak i stopniem ich uœrednienia w czasie. Wykresy mocno uœrednione \ref{fig/hrv_exp/14}  \ref{fig/hrv_exp/5}  \ref{fig/hrv_exp/3} pozwalaj¹ na ukazanie trendów w d³u¿szych okresach, natomiast te, gdzie œrednia obejmowa³a niewielk¹ liczbê próbek \ref{fig/hrv_exp/8}  \ref{fig/hrv_exp/12}  \ref{fig/hrv_exp/2}  \ref{fig/hrv_exp/9}  \ref{fig/hrv_exp/1}  \ref{fig/hrv_exp/7}, uwidaczniaj¹ niemal¿e bezpoœrednie wartoœci dla okreœlonych momentów w czasie, u³atwiaj¹c wykrycie przejœæ pomiêdzy fazami snu. Dziêki temu mo¿na zobrazowaæ, ¿e w przypadku niektórych faz kluczowe znaczenie ma nie tylko ogólny poziom danej metryki, ale równie¿ ich krótkookresowa dynamika.
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image8.png}
+    \caption{Skalogram rozk³adu mocy w dziedzinie czasowo-czêstotliwoœciowej dla ca³ego przebiegu badania w nocy.}
+    \label{fig/hrv_exp/8}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image12.png}
+    \caption{Wartoœci têtna (kolorem niebieskim), oraz ich uœrednienie przy u¿yciu filtru Gaussa z oknem 30 sekund (kolorem czerwonym).}
+    \label{fig/hrv_exp/12}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image14.png}
+    \caption{Uœrednione wartoœci têtna przy u¿yciu filtru Gaussa z oknem 120 sekund.}
+    \label{fig/hrv_exp/14}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image2.png}
+    \caption{Wartoœci mocy w pasmach LF i HF przy zastosowaniu œredniej centralnej z filtrem Gaussa o oknie 30 sekund.}
+    \label{fig/hrv_exp/2}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image9.png}
+    \caption{Wartoœci stosunku mocy w pasmach LF do HF przy zastosowaniu œredniej centralnej z filtrem Gaussa o oknie 30 sekund.}
+    \label{fig/hrv_exp/9}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image1.png}
+    \caption{Wykresy mocy w pasmach LF i HF i ich stosunku przy zastosowaniu œredniej centralnej z filtrem Gaussa o oknie 600 sekund.}
+    \label{fig/hrv_exp/1}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image5.png}
+    \caption{Wykresy mocy w pasmach LF i HF i ich stosunku dla œredniej centralnej z filtrem Gaussa o oknie 3600 sekund.}
+    \label{fig/hrv_exp/5}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image3.png}
+    \caption{Wartoœci RMSSD i SDNN dla okna 5 minutowego, uœrednione przy pomocy filtru Gaussa o oknie 3 sekund.}
+    \label{fig/hrv_exp/3}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image7.png}
+    \caption{Wartoœci RMSSD i SDNN dla okna 2 minutowego, uœrednione przy pomocy filtru Gaussa o oknie 9 sekund.}
+    \label{fig/hrv_exp/7}
+\end{figure}
+
+\FloatBarrier
+
+W przypadku wykresów \ref{fig/hrv_exp/3} i \ref{fig/hrv_exp/7} warto wspomnieæ, ¿e zosta³y one wygenerowane na podstawie miar RMSSD i SDNN, które obliczono dla okien o rozmiarach odpowiednio 5 i 2 minut, z filtrem uœredniaj¹cym o rozmiarze kolejno 3 i 9 wartoœci. Kolejne okna by³y przesuwane w obu przypadkach co sekundê.
+
+Dla lepszego zrozumienia: w pierwszym przypadku, z ca³ego nagrania snu trwaj¹cego 8 godzin i 3 minuty (483 minuty = 28 980 sekund), obliczono obie miary, rozpoczynaj¹c od 2,5 minuty (150 sekundy). U¿yto okna o d³ugoœci 5 minut, obejmuj¹cego zakres od 1 do 300 sekundy. Nastêpnie obliczano obie miary dla ka¿dego okna którego œrodkiem by³a ka¿da kolejna sekunda w ca³ym zakresie, uzyskuj¹c ³¹cznie 28 680 wartoœci o stosunkowo ³agodnym przebiegu, które nastêpnie zosta³y uœrednione za pomoc¹ filtru Gaussa z oknem obejmuj¹cym 3 kolejne próbki.
+
+\subsection{Ocena korelacji metryk HRV z fazami snu}
+
+Na podstawie charakterystyk HRV które zosta³y zaprezentowane wczeœniej, dokonano opisu korelacji pomiêdzy zaobserwowanymi zmianami a faz¹ snu.
+
+\subsubsection{Faza snu g³êbokiego (NREM, faza 3/4)}
+W fazie snu g³êbokiego zaobserwowano obni¿one i stabilne têtno. Stosunek LF/HF by³ niski i stabilny przez ca³y okres trwania tej fazy. Zarówno moc w paœmie HF, LF, jak i wskaŸniki RMSSD oraz SDNN by³y stosunkowo niskie. Mog³o to byæ wynikiem zmniejszonego efektu RSA spowodowanego p³ytkim, choæ regularnym oddechem. P³ytki oddech niwelowa³ amplitudê interwa³ów pomiêdzy kolejnymi fazami oddechowymi, co wp³ynê³o na obni¿enie analizowanych wskaŸników HRV.
+
+\subsubsection{Faza snu p³ytkiego (NREM, faza 1/2)}
+Podczas snu p³ytkiego têtno by³o nieco wy¿sze i bardziej zmienne ni¿ w fazie snu g³êbokiego. Stosunek LF/HF by³ œrednio wy¿szy, jednak wci¹¿ ogólnie niski i wykazywa³ wiêksz¹ zmiennoœæ w krótkich okresach czasu. Moc w paœmie HF oraz RMSSD w niektórych etapach osi¹ga³y wartoœci wy¿sze ni¿ w fazie g³êbokiej, a w innych by³y ni¿sze.
+
+\subsubsection{Faza REM (Rapid Eye Movement)}
+W fazie REM zaobserwowano znaczne nieregularnoœci w têtnie, a jego poziom by³ wyraŸnie wy¿szy ni¿ w innych fazach. Moc w paœmie LF i HF bardzo szybko siê zmienia³a w trakcie tej fazy, jednak ich stosunek utrzymywa³ siê na sta³ym, doœæ wysokim poziomie, wynosz¹cym oko³o 2. Równie¿ pozosta³e wskaŸniki, takie jak RMSSD czy SDNN, charakteryzowa³y siê du¿¹ zmiennoœci¹. Du¿e wahania tych parametrów odzwierciedlaj¹ dynamiczn¹ równowagê pomiêdzy wspó³czulnym a przywspó³czulnym uk³adem nerwowym w tej fazie snu.
+
+\subsubsection{Przebudzenia}
+W momentach przebudzenia têtno osi¹ga³o bardzo nieregularne, jednak najwy¿sze wartoœci w porównaniu z innymi fazami snu. Moc w paœmie HF oraz RMSSD by³y umiarkowane i relatywnie stabilne, natomiast moc w paœmie LF oraz SDNN by³y wysokie, ale wykazywa³y znaczne wahania. Odzwierciedla³o to nag³e zmiany w stanie fizjologicznym organizmu podczas przejœcia z fazy snu do czuwania.
+
+\subsection{Wnioski dotycz¹ce etapu snu}
+Analizuj¹c tê rejestracjê snu jako ca³oœæ, nale¿y zauwa¿yæ ogólnie niski poziom mocy w paœmie HF oraz stosunek LF/HF wynosz¹cy 2,3. Wskazuje to na nisk¹ aktywnoœæ uk³adu przywspó³czulnego oraz s³aby efekt RSA, wynikaj¹cy z doœæ p³ytkiego oddechu. Mimo tego aplikacja Samsung Health oceni³a ogólny wynik snu na 86/100 punktów, g³ównie dziêki w³aœciwej d³ugoœci zarówno ca³ego snu, jak i poszczególnych faz, a tak¿e odpowiedniej liczbie pe³nych cykli snu.
+
+Opisanie tych prostych, ale wyraŸnych zmian w rytmie pracy serca i ich korelacji pomiêdzy konkretnymi fazami cyklu snu, wskazuje ¿e rejestracja pracy serca mo¿e pomóc w okreœleniu ogólnej kondycji snu na podstawie jego struktury. Nale¿y jednak pamiêtaæ, ¿e ich dok³adne wyznaczenie jest zadaniem trudnym i czêsto wymagaj¹cym wykorzystania dodatkowych narzêdzi, takich jak m.in. czujniki ruchu, dŸwiêku czy temperatury, dla zwiêkszenia precyzji wyników.
+
+\subsection{Zmiany rytmu serca na przestrzeni ca³odobowej}
+
+Po dok³adnym przedstawieniu zmian w HRV w kontekœcie etapu snu, zostan¹ opisane zmiany w rytmie bicia serca na przestrzeni ca³ego 24-godzinnego zapisu. Na rysunkach: \ref{fig/hrv_exp/13}, \ref{fig/hrv_exp/6}, \ref{fig/hrv_exp/15}, \ref{fig/hrv_exp/4} przedstawiono ró¿ne wizualizacje ilustruj¹ce zmiany badanych metryk na ró¿nych poziomach uœrednienia. Szczegó³owa interpretacja tych wyników znajduje siê po prezentacji ostatniego z nich \ref{fig/hrv_exp/4}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image13.png}
+    \caption{Wartoœci têtna, oraz ich uœrednienie przy u¿yciu filtru Gaussa o rozmiarze okna równym 600.}
+    \label{fig/hrv_exp/13}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image6.png}
+    \caption{Skalogram mocy w zale¿noœci od pasma i wartoœci mocy w pasamch HF i LF, oraz ich stosunek, uœredniane filtrem Gaussa o rozmiarze okna równym 3600.}
+    \label{fig/hrv_exp/6}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image15.png}
+    \caption{Wartoœci mocy w pasamch HF i LF, oraz ich stosunek, uœredniane filtrem Gaussa o rozmiarze okna równym 900.}
+    \label{fig/hrv_exp/15}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Rysunki/hrv_exp/image4.png}
+    \caption{Wartoœci SDNN i RMSSD dla okna 5 minutowego, z próbek zbieranych co sekundê, uœredniane filtrem Gaussa o rozmiarze okna równym 60.}
+    \label{fig/hrv_exp/4}
+\end{figure}
+
+\FloatBarrier
+
+
+
+
+
+W przypadku analizy ca³odobowej zmiennoœci rytmu serca skupiono siê na porównaniu poszczególnych miar w trzech okresach: ca³ej 24-godzinnej próbki, okresu snu (8 godzin) oraz œredniej z okresów dziennej aktywnoœci (8 godzin). 
+Jako ¿e w ramach ca³odobowej rejestracji druga czêœæ dnia (po pobudce) ró¿ni³a siê dynamik¹ oraz wartoœciami analizowanych charakterystyk w porównaniu do pierwszej fazy dnia, postanowiono uœredniæ wartoœci tych dwóch próbek, zachowuj¹c jednak tê sam¹ d³ugoœæ analizy, co w przypadku snu (8 godzin).
+
+Problemem w osi¹gniêciu tego celu by³a krótsza d³ugoœæ rejestracji drugiej czêœci dnia (6 godzin i 40 minut). Aby uwzglêdniæ tê ró¿nicê, konieczne by³o znormalizowanie wartoœci miar tej fazy wzglêdem d³u¿szej, pierwszej czêœci dnia. Proces normalizacji zosta³ przeprowadzony zgodnie z regu³ami opisanymi poni¿ej:
+
+\subsection{Sposób normalizacji}
+SDNN, mierz¹ce ca³kowit¹ zmiennoœæ rytmu serca, oraz SDANN, odnosz¹ce siê do zmiennoœci miêdzyokresowej i fluktuacji w czasie, s¹ proporcjonalne do pierwiastka kwadratowego d³ugoœci próbki. Tak wiêc ka¿da z wartoœci tych miar zosta³a przemno¿ona o pierwiastek z ilorazu d³ugoœci próbek.
+
+Miary takie jak RMSSD oraz SDNN Index okreœlaj¹ œredni¹ zmiennoœæ w krótkich okresach czasu, dlatego nie wymagaj¹ przeskalowania, o ile próbka jest wystarczaj¹co d³uga.
+
+W przypadku œredniej wielkoœci interwa³ów RR, œredniego pulsu czy te¿ pNN50 miary te s¹ proporcjonalne i nie zale¿¹ od d³ugoœci próby, o ile jest ona wystarczaj¹co d³uga.
+
+Moc w paœmie LF i HF roœnie proporcjonalnie wraz ze wzrostem d³ugoœci próbki, jednak analizowano ich wartoœci znormalizowane oraz wzajemny stosunek, który nie zmienia siê przy nieznacznym zwiêkszeniu rozmiaru próbki.
+
+
+W tabeli \ref{tab:full_day_comparison} przedstawiono wartoœci tych miar dla pierwszej 8-godzinnej próbki, drugiej, krótszej rejestracji, nastêpnie jej wartoœæ przeskalowan¹ zgodnie z opisanym schematem, a tak¿e wynikow¹ wartoœæ œredni¹ dla 8-godzinnej próbki w ci¹gu dnia.
+
+
+\begin{table}[h!]
+    \centering
+    \caption{Porównanie danych dziennych HRV (pe³ne)}
+    \begin{tabular}{|l|c|c|c|c|}
+    \hline
+    \textbf{WskaŸnik} & \textbf{8h (dzieñ)} & \textbf{6h 40min (dzieñ)} & \textbf{8h (dzieñ, skalowane)} & \textbf{8h (œrednia dnia)} \\ \hline
+    Mean RR (ms) & 930.56 & 735.85 & 735.85 & 833.21 \\ \hline
+    HR (bpm) & 66.00 & 83.77 & 83.77 & 74.89 \\ \hline
+    SDNN (ms) & 141.91 & 122.85 & 138.82 & 140.37 \\ \hline
+    SDANN (ms) & 96.34 & 84.83 & 95.86 & 96.10 \\ \hline
+    SDNN Index (ms) & 99.60 & 84.85 & 95.88 & 97.74 \\ \hline
+    RMSSD (ms) & 71.66 & 48.88 & 48.88 & 60.27 \\ \hline
+    pNN50 (\%) & 41.83 & 21.13 & 21.13 & 31.48 \\ \hline
+    LF Norm (\%) & 74.60 & 76.89 & 76.89 & 75.57 \\ \hline
+    HF Norm (\%) & 25.40 & 23.11 & 23.11 & 24.43 \\ \hline
+    LF/HF Ratio & 2.93 & 3.32 & 3.32 & 3.13 \\ \hline
+    \end{tabular}
+    \label{tab:full_day_comparison}
+    \end{table}
+
+    \FloatBarrier
+
+    \subsection{Porównanie miar HRV w kontekœcie doby, dnia i nocy}
+
+    Uœrednione w ten sposób wartoœci miar dla etapu dziennej aktywnoœci zaprezentowano w tabeli \ref{tab:full_summary_comparison}. Przedstawiono w niej porównanie tych samych wskaŸników HRV w kontekœcie analizy ca³odobowej oraz 8-godzinnej próbki nocnej.
+    
+    
+    \begin{table}[h!]
+    \centering
+    \caption{Podsumowanie danych ca³odobowych HRV (pe³ne)}
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    \textbf{WskaŸnik} & \textbf{24h (ca³odobowe)} & \textbf{8h (noc)} & \textbf{8h (œrednia dnia)} \\ \hline
+    Mean RR (ms) & 920.05 & 1133.55 & 833.21 \\ \hline
+    HR (bpm) & 68.70 & 53.70 & 74.89 \\ \hline
+    SDNN (ms) & 205.20 & 123.85 & 140.37 \\ \hline
+    SDANN (ms) & 177.00 & 69.79 & 96.10 \\ \hline
+    SDNN Index (ms) & 91.00 & 89.44 & 97.74 \\ \hline
+    RMSSD (ms) & 66.80 & 78.55 & 60.27 \\ \hline
+    pNN50 (\%) & 35.60 & 46.01 & 31.48 \\ \hline
+    LF Norm (\%) & 72.49 & 69.69 & 75.57 \\ \hline
+    HF Norm (\%) & 27.51 & 30.31 & 24.43 \\ \hline
+    LF/HF Ratio & 2.63 & 2.30 & 3.13 \\ \hline
+    \end{tabular}
+    \label{tab:full_summary_comparison}
+    \end{table}
+
+    \FloatBarrier
+    
+\subsection{Wnioski dotycz¹ce ca³odobowej analizy HRV}
+Na podstawie tak zebranych danych mo¿liwe by³o sforumu³owanie nastêpuj¹cych wniosków:
+
+W nocy \textit{Mean RR} jest najd³u¿szy, co odpowiada najni¿szemu têtnu (HR) i wskazuje na dominacjê aktywnoœci przywspó³czulnej. W ci¹gu dnia \textit{Mean RR} jest krótsze, a têtno wy¿sze, co oznacza przewagê uk³adu wspó³czulnego. Ró¿nice pomiêdzy wartosciami dniem a noc¹ s¹ wyraŸne i wskazuj¹ na prawid³ow¹ modulacjê autonomiczn¹.
+
+\textit{SDNN}, które ocenia ca³kowit¹ zmiennoœæ HRV, oraz \textit{SDANN}, opisuj¹ce d³ugoterminow¹ zmiennoœæ, s¹ stosunkowo wysokie, co jest zjawiskiem korzystnym dla zdrowia. Wartoœci te s¹ wy¿sze w ci¹gu dnia, co wynika z wiêkszej ró¿norodnoœci aktywnoœci w tym okresie. W nocy, gdy rytm staje siê bardziej regularny, zmiennoœæ ta maleje.
+
+Wartoœci \textit{SDNN Index}, mierz¹cego krótkoterminow¹ zmiennoœæ HRV, s¹ porównywalne na przestrzeni ca³ego dnia, z niewielk¹ przewag¹ w ci¹gu dnia.
+
+W przypadku \textit{RMSSD} i \textit{pNN50} wy¿sze wartoœci w nocy odzwierciedlaj¹ przewagê aktywnoœci uk³adu przywspó³czulnego. W ci¹gu dnia te wartoœci s¹ ni¿sze, co wskazuje na wzrost aktywnoœci wspó³czulnej. Ró¿nice te s¹ wyraŸnie widoczne i zgodne z fizjologi¹ rytmu dobowego.
+
+\textit{HF Power}, zwi¹zane z aktywnoœci¹ przywspó³czuln¹, osi¹ga najwy¿sze wartoœci w nocy, a w ci¹gu dnia spada na korzyœæ \textit{LF Power}, co potwierdza znaczenie snu dla regeneracji. Jednoczeœnie stosunek \textit{LF/HF} jest wy¿szy w ci¹gu dnia, co sugeruje dominacjê aktywnoœci wspó³czulnej.
+
+\subsection{Podsumwoanie}
+Na podstawie powy¿szych wniosków mo¿na sformu³owaæ tezê, ¿e dziêki wykorzystaniu czujnika Polar H10 oraz dedykowanej aplikacji stworzonej na potrzeby tej pracy, która umo¿liwia precyzyjn¹ analizê szeregu charakterystyk opisuj¹cych zmiennoœæ pracy serca zarówno w ci¹gu dnia, jak i nocy, mo¿liwe jest szczegó³owe badanie wybranych fragmentów dobowej aktywnoœci. Aplikacja, dziêki wizualizacji danych na czytelnych wykresach oraz odpowiednio dobranym rozmiarom okien uœredniaj¹cych, mo¿e stanowiæ bardzo przydatne narzêdzie w rêkach osoby posiadaj¹cej niezbêdn¹ wiedzê medyczn¹, u³atwiaj¹c jej ocenê kondycji serca pacjenta.

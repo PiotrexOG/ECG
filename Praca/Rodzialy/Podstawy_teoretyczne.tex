@@ -66,7 +66,7 @@ sercowo-naczyniowego badanej osoby.
 
 \subsection{Odstêpy RR i puls}
 
-Jednym z kluczowych parametrów opisuj¹cych sygna³ EKG jest czas up³ywaj¹cy pomiêdzy kolejnymi szczytami R, wyra¿any w milisekundach (ms). Parametr ten bywa nazywany \textit{odstêpem RR} (ang. \textit{RR interval}). Jego analiza pozwala bezpoœrednio okreœliæ inn¹ istotn¹ metrykê, jak¹ jest puls, czyli \textit{HR} (ang. \textit{heart rate}), który oznacza liczbê uderzeñ serca na minutê. Ka¿demu skurczowi serca towarzyszy charakterystyczny wzrost potencja³u elektrycznego, rejestrowany jako szczyt $R$ na wykresie EKG.
+Jednym z kluczowych parametrów opisuj¹cych sygna³ EKG jest czas up³ywaj¹cy pomiêdzy kolejnymi szczytami R, wyra¿any w milisekundach (ms). Parametr ten bywa nazywany \textit{odstêpem RR} (ang. \textit{RR interval}). Jego analiza pozwala bezpoœrednio okreœliæ inn¹ istotn¹ metrykê, jak¹ jest puls, czyli \textit{HR} (ang. \textit{heart rate}), który oznacza liczbê uderzeñ serca na minutê. Ka¿demu skurczowi serca towarzyszy charakterystyczny wzrost potencja³u elektrycznego, rejestrowany jako szczyt $R$ na wykresie EKG \cite{Zhan-RWave}.
 
 Chwilowe têtno w chwili \( t_{R_n} \), czyli w momencie wyst¹pienia \( n \)-tego szczytu \( R \), mo¿na wyraziæ za pomoc¹ wzoru:
 
@@ -92,7 +92,7 @@ Wielkoœæ ró¿nic pomiêdzy kolejnymi odstêpami RR (tzw. \textit{RR variability}) j
 Metody analizy czasowej opieraj¹ siê na bezpoœrednim pomiarze odstêpów RR w sygnale EKG, które reprezentuj¹ czas miêdzy kolejnymi skurczami serca. Poni¿ej przedstawiono podstawowe miary analizy czasowej:
 
 \subsubsection{SDNN}
-SDNN, czyli odchylenie standardowe wszystkich odstêpów RR w badanym okresie, jest jedn¹ z podstawowych miar zmiennoœci rytmu serca. Wartoœæ SDNN odzwierciedla ca³kowit¹ zmiennoœæ sygna³u rytmu serca, poniewa¿ wariancja sygna³u, bêd¹ca kwadratem odchylenia standardowego, jest równa sumie mocy w ca³ym zakresie czêstotliwoœci. SDNN jest prost¹ miar¹ do obliczenia, jednak nie jest dobrze zdefiniowan¹ zmienn¹ statystyczn¹, poniewa¿ jej wartoœæ zale¿y od d³ugoœci badania. Wielkoœæ SDNN wzrasta wraz z czasem trwania rejestracji, dlatego porównywanie wyników miêdzy badaniami o ró¿nej d³ugoœci wymaga wczeœniejszej normalizacji do okreœlonych okresów, np. do nominalnych zapisów 24-godzinnych lub krótkoterminowych trwaj¹cych 5 minut.
+SDNN, czyli odchylenie standardowe wszystkich odstêpów RR w badanym okresie, jest jedn¹ z podstawowych miar zmiennoœci rytmu serca. Wartoœæ SDNN odzwierciedla ca³kowit¹ zmiennoœæ sygna³u rytmu serca, poniewa¿ wariancja sygna³u, bêd¹ca kwadratem odchylenia standardowego, jest równa sumie mocy w ca³ym zakresie czêstotliwoœci. \cite{} SDNN jest prost¹ miar¹ do obliczenia, jednak nie jest dobrze zdefiniowan¹ zmienn¹ statystyczn¹, poniewa¿ jej wartoœæ zale¿y od d³ugoœci badania. Wielkoœæ SDNN wzrasta wraz z czasem trwania rejestracji, dlatego porównywanie wyników miêdzy badaniami o ró¿nej d³ugoœci wymaga wczeœniejszej normalizacji do okreœlonych okresów, np. do nominalnych zapisów 24-godzinnych lub krótkoterminowych trwaj¹cych 5 minut.
 
 \[
 \text{SDNN} = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} \left( RR_i - \overline{RR} \right)^2}
@@ -174,55 +174,6 @@ gdzie:
   \item \(\overline{RR}_j\) to œrednia wartoœæ odstêpów RR w \(j\)-tym segmencie.
 \end{itemize}
 
-\subsubsection{SDSD}
-SDSD, czyli odchylenie standardowe ró¿nic pomiêdzy kolejnymi odstêpami RR, jest miar¹ podobn¹ do RMSSD, ale bardziej precyzyjnie podkreœla krótkoterminowe zmiany rytmu serca. Dziêki temu SDSD jest u¿ywane w sytuacjach, w których szczegó³owa analiza krótkoterminowej zmiennoœci jest kluczowa:
-\[
-\text{SDSD} = \sqrt{\frac{1}{N-2} \sum_{i=1}^{N-1} \left( \Delta RR_i - \overline{\Delta RR} \right)^2}
-\]
-
-gdzie:
-
-\begin{itemize}
-  \item \(N\) to liczba odstêpów RR, u¿ywanych w analizie, czyli ca³kowita liczba interwa³ów RR w analizowanym okresie czasu,
-  \item \(\Delta RR_i = RR_{i+1} - RR_i\) to ró¿nica miêdzy kolejnymi odstêpami RR, obliczona dla \(i\)-tego interwa³u,
-  \item \(\overline{\Delta RR}\) to œrednia wartoœæ tych ró¿nic \(\Delta RR_i\) w ca³ym zbiorze.
-\end{itemize}
-
-Dane:  
-\[
-RR = [850, 870, 840, 860, 855]
-\]
-
-\textbf{\(\Delta RR_i = RR_{i+1} - RR_i\):}  
-\[
-\Delta RR_1 = 870 - 850 = 20, \quad \text{analogicznie dla pozosta³ych}
-\]
-\[
-\Delta RR = [20, -30, 20, -5]
-\]
-
-\textbf{\(\overline{\Delta RR}\):}  
-\[
-\overline{\Delta RR} = \frac{20 - 30 + 20 - 5}{4} = \frac{5}{4} = 1.25 \, \text{ms}
-\]
-
-\textbf{\((\Delta RR_i - \overline{\Delta RR})^2\):}  
-\[
-(20 - 1.25)^2 = 351.56, \quad \text{analogicznie dla pozosta³ych}
-\]
-\[
-[(\Delta RR - \overline{\Delta RR})^2] = [351.56, 976.56, 351.56, 39.06]
-\]
-
-\textbf{Œrednia kwadratów ró¿nic:}  
-\[
-\text{Œrednia} = \frac{351.56 + 976.56 + 351.56 + 39.06}{4 - 1} = \frac{1718.74}{3} = 572.91
-\]
-
-\textbf{SDSD:}  
-\[
-\text{SDSD} = \sqrt{572.91} \approx 23.94 \, \text{ms}
-\]
 
 \subsection{Analiza w domenie czêstotliwoœciowej}
 
@@ -328,13 +279,12 @@ Do oceny HRV mo¿na wykorzystaæ miary podzielone na dwie grupy w zale¿noœci od ro
 \begin{itemize}
     \item \textbf{S³u¿¹ce do ogólnej oceny zmiennoœci rytmu serca:}
     \begin{itemize}
-        \item SDNN 
+        \item SDNN,
         \item ró¿nica miêdzy najd³u¿szym a najkrótszym odstêpem RR.
     \end{itemize}
     \item \textbf{S³u¿¹ce do oceny d³ugoterminowych zmiennoœci HRV, wynikaj¹cych m.in. z ró¿nic podczas cyklu dobowego czy aktywnoœci fizycznej:}
     \begin{itemize}
-        \item SDANN,
-        \item SDNN Index.
+        \item SDANN.
     \end{itemize}
 \end{itemize}
 
@@ -343,7 +293,7 @@ Do oceny HRV mo¿na wykorzystaæ miary podzielone na dwie grupy w zale¿noœci od ro
     \item \textbf{S³u¿¹ce do oceny krótkoterminowych zmiennoœci HRV, czêsto u¿ywane do oceny aktywnoœci przywspó³czulnej:}
     \begin{itemize}
         \item RMSSD,
-        \item SDS,
+        \item SDNN Index,
         \item pNN50.
     \end{itemize}
 \end{itemize}
@@ -372,7 +322,7 @@ HRV jest bardzo wra¿liwe na artefakty w zapisie EKG (np. b³êdy detekcji R-R lub 
 
 \subsection{Zale¿noœæ HRV od czynników demograficznych i zdrowotnych}
 
-Warto podkreœliæ, ¿e HRV silnie zale¿y od takich czynników jak wiek, p³eæ czy stan zdrowia. Na przyk³ad d³ugoterminowa zmiennoœæ HRV (\textit{SDNN}) spada z wiekiem, a ró¿nice miêdzy p³ciami mog¹ wynikaæ z odmiennej aktywnoœci uk³adu autonomicznego. Interpretacja wyników powinna zawsze uwzglêdniaæ te konteksty.
+Warto podkreœliæ, ¿e HRV silnie zale¿y od takich czynników jak wiek, p³eæ czy stan zdrowia. Na przyk³ad ogólna zmiennoœæ HRV (\textit{SDNN}) spada z wiekiem, a ró¿nice miêdzy p³ciami mog¹ wynikaæ z odmiennej aktywnoœci uk³adu autonomicznego. Interpretacja wyników powinna zawsze uwzglêdniaæ te konteksty.
 
 \subsection{Interpretacja wyników}
 W celu rzetelnej oceny zmiennoœci rytmu serca w dziedzinie czasu nale¿y interpretowaæ jednoczeœnie wyniki opisuj¹ce ogóln¹ zmiennoœæ (np. SDNN) oraz sk³adniki krótkoterminowe i d³ugoterminowe (odpowiednio RMSSD i SDANN). Analogicznie, w analizie czêstotliwoœciowej oraz czasowo-czêstotliwoœciowej kluczowe znaczenie maj¹ miary mocy w ró¿nych pasmach widmowych (np. HF i LF). Nic nie stoi na przeszkodzie, aby analizowaæ poszczególne sk³adniki z perspektywy ró¿nych metod.
@@ -424,12 +374,12 @@ Analiza czasowo-czêstotliwoœciowa pozwala na dodatkowe uwzglêdnienie dynamiki zm
 Jako ¿e zjawisko RSA polega na dostosowywaniu siê rytmu serca do rytmu oddechowego, mo¿na obliczyæ wspó³czynnik korelacji pomiêdzy zmiennoœci¹ rytmu serca a zmiennoœci¹ rytmu oddechowego. Wymaga to jednak zastosowania narzêdzi takich jak spirometr czy pletzymograf, które precyzyjnie okreœlaj¹ objêtoœæ oddechow¹ i tempo oddechu. W niniejszej pracy nie u¿ywano takich urz¹dzeñ – tempo oddechu by³o kontrolowane za pomoc¹ stopera.
 
 W takich sytuacjach, gdy badanie nie posiada bezpoœredniego pomiaru oddechu przy pomocy wy¿ej wymienionych narzêdzi, rytm oddechowy mo¿e zostaæ estymowany na podstawie tachogramu, czyli wykresu przedstawiaj¹cego zmianê czêstotliwoœci skurczów serca w czasie. W przypadku rytmu serca o czêstotliwoœci zbli¿onej do rytmu oddechowego, momenty pocz¹tku wdechu mo¿na aproksymowaæ jako lokalne minima na wykresie têtna, a momenty wydechu - jako lokalne maksima.
-Pozwala to obliczyæ œredni¹ ró¿nicê lub œredni¹ kwadratow¹ ró¿nic w odstêpach RR pomiêdzy wdechem a wydechem i u¿ywaæ ich jako wskaŸników RSA. Im bardziej wyraŸne jest zjawisko RSA, tym dok³adniej mo¿na okreœliæ jego moc.
+Pozwala to obliczyæ œredni¹ ró¿nicê w odstêpach RR pomiêdzy wdechem a wydechem i u¿ywaæ ich jako wskaŸników RSA - RSA Index. Im bardziej wyraŸne jest zjawisko RSA, tym dok³adniej mo¿na okreœliæ jego moc.
 
 
 \subsection {Zale¿noœæ RSA od czêstotliwoœci oddechów}
 
-W badaniach, które znalaz³em i których wyniki w tej pracy uda³o siê powtórzyæ, wykazano, ¿e efekt RSA jest maksymalny dla czêstotliwoœci 6 oddechów na minutê (0.1 Hz), co odpowiada cyklowi oddechowemu trwaj¹cemu 10 sekund (5 sekund wdech, 5 sekund wydech). Takie tempo oddychania powoduje rezonans w uk³adzie sercowo-naczyniowym, wynikaj¹cy z synchronizacji rytmu oddechowego z naturalnymi oscylacjami ciœnienia krwi w paœmie LF (~0.1 Hz), które s¹ regulowane przez barorefleksjê. Ten rezonans wzmacnia efekt RSA, czyni¹c go bardziej wyraŸnym. \cite{Bartsch-PhaseTransitions}.
+W badaniach, wykazano, ¿e efekt RSA jest maksymalny dla czêstotliwoœci 6 oddechów na minutê (0.1 Hz), co odpowiada cyklowi oddechowemu trwaj¹cemu 10 sekund (5 sekund wdech, 5 sekund wydech). Takie tempo oddychania powoduje rezonans w uk³adzie sercowo-naczyniowym, wynikaj¹cy z synchronizacji rytmu oddechowego z naturalnymi oscylacjami ciœnienia krwi w paœmie LF (~0.1 Hz), które s¹ regulowane przez barorefleksjê. Ten rezonans wzmacnia efekt RSA, czyni¹c go bardziej wyraŸnym. \cite{Bartsch-PhaseTransitions}.
 
 
 \subsection {Problemy w interpretacji RSA w analizie FFT}
@@ -452,7 +402,9 @@ W kontekœcie ogólnej zmiennoœci rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, sz
     \item \textbf{Œrednia krocz¹ca centralna:} wykorzystywana do analizy danych w pe³ni dostêpnych (np. po zakoñczeniu akwizycji). Uwzglêdnia dane z obu stron analizowanego punktu, tj. próbki z lewej i prawej strony. Dziêki symetrycznemu uœrednianiu œrednia centralna nie wykazuje efektu przesuniêcia (lagu).
 \end{itemize}
 
+
 Œrednia krocz¹ca polega na zastosowaniu filtra, który okreœla wagi przypisane poszczególnym próbkach w oknie uœredniania, a nastêpnie na wykonaniu operacji konwolucji sygna³u z tym filtrem. Wybór odpowiednich wag zale¿y od rodzaju zastosowanej œredniej. Najczêœciej stosowane s¹ nastêpuj¹ce typy filtrów:
+
 
 \subsection{Rodzaje œrednich krocz¹cych}
 \begin{itemize}
@@ -468,6 +420,7 @@ W kontekœcie ogólnej zmiennoœci rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, sz
         \item $x_i$ to odleg³oœæ próbki od œrodka okna.
     \end{itemize}
 \end{itemize}
+
 
 W projekcie zdecydowano siê na zastosowanie œredniej gaussowskiej, poniewa¿ najlepiej nadaje siê ona do analizy sygna³ów takich jak EKG, gdzie zmiennoœæ sygna³u ma kluczowe znaczenie, a jednoczeœnie wymagane jest p³ynne odwzorowanie globalnych trendów.
 
