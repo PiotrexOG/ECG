@@ -13,7 +13,7 @@ maszynowego, które automatyzuj¹ analizê i zwiêkszaj¹ jej skutecznoœæ
 Do rozpoznawania arytmii wykorzystuje siê szeroki zakres metod uczenia
 maszynowego, obejmuj¹cych zarówno klasyczne podejœcia uczenia nadzorowanego,
 jak i techniki uczenia nienadzorowanego. Wœród klasycznych algorytmów
-nadzorowanych popularne s¹ SVM (Support Vector Machines), KNN (K-Nearest
+nadzorowanych popularne s¹ SVM (ang. Support Vector Machines), KNN (ang. K-Nearest
 Neighbors), klasyfikatory Bayesowskie, drzewa decyzyjne oraz lasy losowe.
 Metody uczenia nienadzorowanego równie¿ odgrywaj¹ istotn¹ rolê, wspieraj¹c
 proces eksploracji danych i in¿ynierii cech, co mo¿e znacz¹co poprawiæ
@@ -51,7 +51,7 @@ Metodê klasyfikacji, nie opart¹ o sieci neuronowe przedstawiono w publikacji
 umo¿liwiaj¹cy przypisanie sygna³u do jednej z czterech klas: migotania
 przedsionków (AF), normalnego rytmu zatokowego, innych rytmów lub sygna³ów zbyt
 zak³óconych do analizy. Proces ten opiera³ siê na wykorzystaniu klasyfikatora
-opartego o las losowy (Random Forest) zarówno do selekcji cech, jak i do
+opartego o las losowy (ang. Random Forest) zarówno do selekcji cech, jak i do
 finalnej klasyfikacji, co pozwoli³o na efektywne przetwarzanie i analizê du¿ej
 liczby parametrów.
 
@@ -79,7 +79,7 @@ jak algorytm Pan-Tompkins, mimo swojej popularnoœci, czêsto okazuj¹ siê podatne
 na szumy i zak³ócenia w sygnale, co ogranicza ich skutecznoœæ w trudnych
 warunkach. W odpowiedzi na te wyzwania coraz czêœciej stosuje siê metody
 uczenia maszynowego, takie jak splotowe sieci neuronowe (CNN) czy sieci LSTM
-(Long Short-Term Memory), które s¹ bardziej odporne na zak³ócenia i lepiej
+(ang. Long Short-Term Memory), które s¹ bardziej odporne na zak³ócenia i lepiej
 radz¹ sobie z analiz¹ z³o¿onych wzorców sygna³u.
 
 Przyk³ad zastosowania sieci LSTM w detekcji szczytów R przedstawiono w pracy
@@ -178,7 +178,7 @@ zbiorów danych medycznych.
 
 Temat zastosowania uczenia maszynowego do diagnozy COVID-19 poruszyli autorzy
 publikacji \cite{Irungu-EcgCovid}. Zastosowali oni takie algorytmy jak KNN
-(K-Nearest Neighbors), SVM (Support Vector Machine) oraz las losowy (Random
+(K-Nearest Neighbors), SVM (ang. Support Vector Machines) oraz las losowy (Random
 Forest) do budowy modeli klasyfikacyjnych. Zastosowanie tych algorytmów
 wymaga³o wczeœniejszego usuniêcia zak³óceñ z sygna³u EKG i wyodrebnienia cech w
 domenach takich jak czasowa, czestotliwosciowa czy czasowo-czestotliwosciowa.
@@ -192,7 +192,7 @@ monitorowania pracy serca.
 
 Rozwi¹zanie typu end-to-end, niewymagaj¹ce wczeœniejszego wyodrebniania cech z
 sygna³u EKG przedstawiono w pracy \cite{SAKR2023324}. Autorzy opracowali trzy
-ró¿ne modele oparte na konwolucyjnych sieciach neuronowych (CNN) w celu oceny
+ró¿ne modele oparte na splotowych sieciach neuronowych (CNN) w celu oceny
 ich wydajnoœci w klasyfikacji sygna³ów EKG i wybrali najbardziej obiecuj¹cy z
 nich. Modele te pracowa³y w trybie end-to-end, co oznacza³o, ¿e obrazy EKG by³y
 bezpoœrednio podawane do sieci bez koniecznoœci stosowania dodatkowych etapów
@@ -213,7 +213,7 @@ Najlepsze wyniki osi¹gn¹³ drugi model, uzyskuj¹c dok³adnoœæ, precyzjê, czu³oœæ
 i wynik F1 na poziomie równym 98,81\% dla ka¿dej z wymienionych miar. Model ten
 zosta³ oceniony równie¿ przy u¿yciu walidacji krzy¿owej na zbiorze
 zniekszta³conym przez szum gaussowski, osi¹gaj¹c œredni¹ dok³adnoœæ 98,49\% w
-5-fold cross-validation i 94,91\% w 10-fold cross-validation, co wskazuje na
+piêciokrotnej walidacji krzy¿owej i 94,91\% w dziesiêciokrotnej, co wskazuje na
 niewielki wp³yw szumu na skutecznoœæ. Dziêki wysokiej efektywnoœci i odpornoœci
 na zak³ócenia, drugi model zosta³ uznany za najbardziej obiecuj¹ce narzêdzie do
 analizy sygna³ów EKG w diagnostyce COVID-19.
@@ -300,7 +300,7 @@ tym zjawiskiem.
 
 Autorzy publikacji \cite{Morales-RSASVM} podjêli próbê zbadania zale¿noœci
 miêdzy RSA a HRV, wykorzystuj¹c metody uczenia maszynowego. Zastosowali model
-SVM (Support Vector Machine) do przewidywania przysz³ych wartoœci HRV na
+SVM (ang. Support Vector Machines) do przewidywania przysz³ych wartoœci HRV na
 podstawie sygna³ów oddechowych, co pozwoli³o na ocenê wp³ywu oddechu na
 zmiennoœæ rytmu serca. Dziêki zastosowaniu dwóch funkcji j¹dra – liniowego i
 radialnego (RBF) – model umo¿liwi³ analizê zarówno prostych (liniowych), jak i
