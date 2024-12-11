@@ -12,26 +12,20 @@ Na Rys. \ref{fig/polarh10} przedstawiono wygl¹d czujnika Polar H10.
     \label{fig/polarh10}
 \end{figure}
 
-Polar H10 oferuje równie¿ otwarty kod Ÿród³owy aplikacji do ³¹czenia z
-urz¹dzeniem mobilnym, co pozwala na ³atwe u¿ycie najwa¿niejszych
-funkcjonalnoœci we w³asnej aplikacji. Zestaw narzêdzi wykorzystywanych przez
-programistów do tworzenia aplikacji (SDK) oraz regu³ i protoko³ów
-umo¿liwiaj¹cych wspó³dzia³anie ró¿nych komponentów (API) jest bardzo dobrze
-udokumentowana i udostêpniona na licencji umo¿liwiaj¹cej wykorzystanie zarówno
-do celów prywatnych, jak i komercyjnych \cite{Polar-BLE-SDK}.
+Polar H10 oferuje równie¿ otwarty kod Ÿród³owy aplikacji do ³¹czenia z urz¹dzeniem mobilnym, co pozwala na ³atwe u¿ycie najwa¿niejszych funkcjonalnoœci we w³asnej aplikacji. Zestaw narzêdzi wykorzystywanych przez programistów do tworzenia aplikacji (\textit{SDK} (ang. \textit{Software Development Kit})) oraz regu³ i protoko³ów umo¿liwiaj¹cych wspó³dzia³anie ró¿nych komponentów (\textit{API} (ang. \textit{Application Programming Interface})) jest bardzo dobrze udokumentowany i udostêpniony  na licencji umo¿liwiaj¹cej wykorzystanie zarówno do celów prywatnych, jak i komercyjnych \cite{Polar-BLE-SDK}.
 
 \section{Optymalizacja miejsca mocowania czujnika \small{(autor: Piotr Weso³owski)}}
 W ramach badañ eksperymentalnych wyznaczono optymalne miejsce na ciele do zamocowania czujnika Polar H10 oraz zoptymalizowano sposób jego u³o¿enia. Zgodnie z zaleceniami producenta \cite{Polar-HR-FAQ}, prawid³owe umieszczenie czujnika jest kwesti¹ indywidualn¹ i mo¿e zale¿eæ od czynników takich jak: kszta³t klatki piersiowej, anatomiczne po³o¿enia serca czy poziomu tkanki t³uszczowej. Miejsce mocowania zosta³o dobrane w taki sposób, aby rejestrowany sygna³ mo¿liwie najbardziej przypomina³ wzorcowy wykres EKG, z wyraŸnie widocznymi za³amkami P, Q, R, S, T, stabiln¹ wartoœci¹ linii izoelektrycznej oraz ich prawid³owymi proporcjami.
 Nale¿y równie¿ pamiêtaæ o odpowiedniej orientacji czujnika w pionie, aby unikn¹æ generowania danych o przeciwnym potencjale z powodu trzymania czujnika obróconego „do góry nogami”. Dodatkowe kryteria obejmowa³y minimalizacjê szumów oraz maksymalizacjê potencja³u elektrycznego, co zwiêksza³o dominacjê sygna³u wzglêdem ewentualnych zak³óceñ.
 
-\subsection{Szczegó³y praktyczne}
-Dla osoby badanej na potrzeby tej pracy rejestrator znajdowa³ siê na wysokoœci mostka, pod lewym wiêkszym miêœniem piersiowym. Producent zaleca dodatkowe nawil¿enie elektrod wod¹, a tak¿e podkreœla, ¿e naturalnie wystêpuj¹cy podczas æwiczeñ pot mo¿e korzystnie wp³yn¹æ na przewodnictwo elektryczne ze wzglêdu na zawartoœæ soli. W zwi¹zku z tym, w niniejszej pracy elektrody oraz skóra by³y nawil¿ane roztworem wodnym z dodatkiem soli.
+\subsection{Szczegó³y Praktyczne}
+Dla osoby badanej na potrzeby tej pracy rejestrator znajdowa³ siê na wysokoœci mostka, pod lewym wiêkszym miêœniem piersiowym. Producent zaleca dodatkowe nawil¿enie elektrod wod¹, a tak¿e podkreœla, ¿e naturalnie wystêpuj¹cy podczas æwiczeñ pot mo¿e korzystnie wp³yn¹æ na przewodnictwo elektryczne ze wzglêdu na zawartoœæ soli \cite{Polar-HR-FAQ}. W zwi¹zku z tym, w niniejszej pracy elektrody oraz skóra by³y nawil¿ane roztworem wodnym z dodatkiem soli.
 
 \section{Przygotowanie zbioru danych do analizy EKG \small{(autor: Piotr Weso³owski)}}
 Na potrzeby testowania aplikacji stworzonej w ramach niniejszej pracy, a tak¿e w celach treningowych i walidacyjnych modeli neuronowych, konieczne by³o zgromadzenie reprezentatywnej próby danych. W tym celu przeprowadzono szereg pomiarów, w wyniku których uzyskano zbiór obejmuj¹cy ponad 50 godzin sygna³ów EKG, z czego wiêkszoœæ stanowi³y kilkugodzinne pomiary, w tym dwa ca³odobowe. Ponadto zarejestrowano ponad 5 godzin krótszych badañ, trwaj¹cych od kilku do kilkunastu minut, które charakteryzowa³y siê du¿¹ ró¿norodnoœci¹. Zebrane dane ró¿ni³y siê w zale¿noœci od takich czynników jak tempo i regularnoœæ oddechu, pozycja cia³a (pionowa lub pozioma), momenty wysi³ku fizycznego i zwi¹zany z nimi wzrost têtna, lokalizacja czujnika, a tak¿e obecnoœæ zak³óceñ, w tym celowych, wywo³anych gwa³townymi ruchami miêœni lub wprowadzeniem dodatkowej rezystancji miêdzy elektrodami a skór¹.
 
-\section{Aplikacje i protokó³ BLE \small{(autor: Piotr Weso³owski)}}
-Obecnie dostêpne s¹ aplikacje umo¿liwiaj¹ce po³¹czenie z czujnikiem Polar H10,
+\section{Aplikacje i Protokó³ BLE}
+Obecnie (stan na 10.12.2024) dostêpne s¹ aplikacje umo¿liwiaj¹ce po³¹czenie z czujnikiem Polar H10,
 które mo¿na pobraæ z oficjalnych Ÿróde³ dla urz¹dzeñ mobilnych. Aplikacje te,
 takie jak Polar Beat od producenta czy ECG Logger for Polar H10 od zewnêtrznych
 twórców, pozwalaj¹ na korzystanie z protoko³u BLE (Bluetooth Low Energy) do
@@ -42,13 +36,26 @@ funkcji udostêpnionych przez producenta w celu pozyskiwania danych EKG do
 dalszego przetwarzania. Aplikacja umo¿liwia wprowadzanie takich danych, jak:
 identyfikator czujnika EKG, adres IP serwera docelowego, na który przesy³ane
 bêd¹ pobrane dane, oraz nazwê pliku przeznaczonego do zapisu rejestrowanych
-danych. Dane te s¹ przechowywane w pamiêci urz¹dzenia.
+danych. Dane te s¹ przechowywane w pamiêci urz¹dzenia. Na Rys. \ref{subfig:1} przedstawiono wygl¹d menu g³ównego zaimplementowanej aplikacji, a na Rys. \ref{subfig:1} efekt dzia³ania funkcjonalnoœci wyœwietlania sygna³u EKG w formie wykresu w czasie rzeczywistym.
 
-\subsection{Funkcjonalnoœci dedykowanej aplikacji}
-Aplikacja zosta³a opracowana na podstawie przyk³adowego szkieletu dostarczonego przez producenta, który zawiera³ wstêpnie zaimplementowane funkcje, takie jak: wyœwietlanie wykresu sygna³u EKG z automatycznym przesuwaniem w czasie, obliczanie i wyœwietlanie miar, takich jak czas ostatnich interwa³ów RR czy têtno, a tak¿e dodatkowe informacje, np. poziom na³adowania baterii. Gotowa by³a równie¿ logika zarz¹dzania po³¹czeniem z czujnikiem za poœrednictwem BLE oraz odbierania pakietów z danymi EKG \cite{Polar-BLE-SDK}. Na potrzeby tej pracy dodano funkcjonalnoœæ obs³ugi po³¹czenia z serwerem, na który przesy³ane by³y dane EKG, przetworzone wczeœniej do postaci bajtowej zgodnie z wymaganiami okreœlonymi w kontrakcie serwera. Dodatkowo stworzono mechanizm zapisywania danych do plików, umo¿liwiaj¹cy utrwalenie zebranych próbek w celu ich dalszej analizy. Domyœlnie próbki zapisywane s¹ w plikach obejmuj¹cych 5-minutowe interwa³y, które s¹ oznaczane nazwami zgodnymi z aktualnym czasem. W przypadku d³u¿szego pomiaru aplikacja automatycznie generuje kolejne pliki dla kolejnych 5-minutowych okresów.Takie podejœcie minimalizuje ewentualne straty danych w przypadku utraty po³¹czenia z czujnikiem lub b³êdu zapisu do pliku. W celu usprawnienia analizy d³u¿szych odcinków sygna³u zaimplementowano funkcjonalnoœæ umo¿liwiaj¹c¹ po³¹czenie wybranych plików w odpowiedniej kolejnoœci. Kolejnoœæ ta jest okreœlana na podstawie nazw plików, a wynikowy plik CSV zawiera scalone dane w jednolitym formacie.
+\begin{figure}[h!]
+    \centering
+    \subfloat[Menu g³ówne\label{subfig:1}]
+    {\includegraphics[width=.48\linewidth]{Rysunki/polargraphMENU.jpg}}
+    \hspace{0.5cm} % Odstêp poziomy miêdzy zdjêciami
+    \subfloat[Zak³adka analizy EKG\label{subfig:2}]
+    {\includegraphics[width=.48\linewidth]{Rysunki/polargraph_ekg.jpg}}
+    \vspace{0.5cm} % Odstêp poziomy miêdzy zdjêciami
+    \caption{Efekt dzia³ania aplikacji do po³¹czenia z czujnikiem Polar H10.\label{fig:main}}
+\end{figure}
 
-\section{Opis paczek danych \small{(autor: Piotr Weso³owski)}}
-Funkcja w kodzie korzysta z API Polar, aby pobieraæ dane EKG w czasie rzeczywistym. Dane s¹ przesy³ane w paczkach, z których ka¿da zawiera oko³o 73 próbki. Liczba ta wynika z implementacji API producenta i jest optymalizowana pod k¹tem efektywnoœci transmisji oraz niskiego opóŸnienia w technologii BLE. Ka¿da próbka sk³ada siê z wartoœci potencja³u elektrycznego w mikrovoltach (voltage) oraz znacznika czasowego (timestamp). Czujnik wysy³a dane sk³adaj¹ce siê z timestampu, który mierzy liczbê nanosekund, jakie up³ynê³y od pewnego momentu w czasie. Domyœlnie, zgodnie z UNIX, tym momentem jest 1970-01-01T00:00:00Z. Jednak w przypadku tego urz¹dzenia punktem odniesienia jest 2019-01-01T00:00:00Z (599616000000000000 nanosekund). Decyzja ta wynika z ograniczeñ pamiêci poprzednich modeli oraz chêci zachowania spójnoœci przez producenta \cite{Polar-BLE-SDK}.
+\FloatBarrier
+
+\subsection{Funkcjonalnoœci Dedykowanej Aplikacji}
+Aplikacja zosta³a opracowana na podstawie przyk³adowego szkieletu dostarczonego przez producenta, który zawiera³ wstêpnie zaimplementowane funkcje, takie jak: wyœwietlanie wykresu sygna³u EKG z automatycznym przesuwaniem w czasie, obliczanie i wyœwietlanie miar, takich jak czas ostatnich interwa³ów RR czy têtno, a tak¿e dodatkowe informacje, np. poziom na³adowania baterii. Gotowa by³a równie¿ logika zarz¹dzania po³¹czeniem z czujnikiem za poœrednictwem BLE oraz odbierania pakietów z danymi EKG \cite{Polar-BLE-SDK}. Na potrzeby tej pracy dodano funkcjonalnoœæ obs³ugi po³¹czenia z serwerem, na który przesy³ane by³y dane EKG, przetworzone wczeœniej do postaci bajtowej zgodnie z wymaganiami okreœlonymi w kontrakcie serwera. Dodatkowo stworzono mechanizm zapisywania danych do plików, umo¿liwiaj¹cy utrwalenie zebranych próbek w celu ich dalszej analizy. Domyœlnie próbki zapisywane s¹ w plikach obejmuj¹cych 5-minutowe interwa³y, które s¹ oznaczane nazwami zgodnymi z aktualnym czasem. W przypadku d³u¿szego pomiaru aplikacja automatycznie generuje kolejne pliki dla kolejnych 5-minutowych okresów. Takie podejœcie minimalizuje ewentualne straty danych w przypadku utraty po³¹czenia z czujnikiem lub b³êdu zapisu do pliku. W celu usprawnienia analizy d³u¿szych odcinków sygna³u zaimplementowano funkcjonalnoœæ umo¿liwiaj¹c¹ po³¹czenie wybranych plików w odpowiedniej kolejnoœci. Kolejnoœæ ta jest okreœlana na podstawie nazw plików, a wynikowy plik CSV zawiera scalone dane w jednolitym formacie.
+
+\section{Opis Paczek Danych}
+Funkcjonalnoœci zaimplementowane w kodzie, korzystaj¹ z interfejsu API Polar, aby w czasie rzeczywistym pobieraæ dane z czujnika EKG. Dane s¹ przesy³ane w paczkach, z których ka¿da zawiera oko³o 73 próbki. Liczba ta wynika z implementacji API producenta i jest optymalizowana pod k¹tem efektywnoœci transmisji oraz niskiego opóŸnienia w technologii BLE. Ka¿da próbka sk³ada siê z wartoœci potencja³u elektrycznego w mikrovoltach (\textmu{}V) (ang. \textit{Voltage}) oraz znacznika czasowego (ang. \textit{Timestamp}). Czujnik wysy³a dane sk³adaj¹ce siê z timestampu, który mierzy liczbê nanosekund, jakie up³ynê³y od pewnego momentu w czasie. Domyœlnie, zgodnie z UNIX, tym momentem jest 1970-01-01T00:00:00Z. Jednak w przypadku tego urz¹dzenia punktem odniesienia jest 2019-01-01T00:00:00Z (599616000000000000 nanosekund). Decyzja ta wynika z ograniczeñ pamiêci poprzednich modeli oraz chêci zachowania spójnoœci przez producenta \cite{Polar-BLE-SDK}.
 
 \section{Podsumowanie \small{(autor: Piotr Weso³owski)}}
 Czujnik mierzy aktywnoœæ elektryczn¹ serca, która powstaje w wyniku depolaryzacji i repolaryzacji komórek miêœnia sercowego podczas jego pracy. Urz¹dzenie wykorzystuje dwie elektrody, które rejestruj¹ ró¿nice potencja³ów miêdzy punktami na skórze. Napiêcia te, zwykle w mikrowoltach (\textmu{}V), s¹ wzmacniane, filtrowane i digitalizowane, aby stworzyæ sygna³ EKG. Pozyskane dane s¹ nastêpnie przesy³ane do serwera dzia³aj¹cego na osobnej maszynie poprzez sieæ i wykorzystanie protoko³u TCP/IP.
