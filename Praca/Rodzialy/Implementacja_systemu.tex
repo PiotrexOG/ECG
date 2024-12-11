@@ -2,7 +2,7 @@
 
 \input{Rodzialy/Aplikacja_glowna.tex}
 \input{Rodzialy/Przetwarzanie_sygnalu_ekg.tex}
-\section{Analiza faz cyklu oddechowego na podstawie wykresu têtna}
+\section{Analiza faz cyklu oddechowego na podstawie wykresu têtna \small{(autor: Piotr Weso³owski)}}
 
 \subsection{Wprowadzenie}
 System zaprojektowano do okreœlania faz oddechu na podstawie zmian w têtnie.
@@ -134,7 +134,7 @@ charakterystyczne:
     \item Œrednia d³ugoœæ pe³nego cyklu oddechowego: 14,24 s.
 \end{itemize}
 
-\section{Analiza sygna³u EKG za pomoc¹ transformacji Fouriera}
+\section{Analiza sygna³u EKG za pomoc¹ transformacji Fouriera \small{(autor: Piotr Weso³owski)}}
 
 \subsection{Interpolacja i spe³nienie warunku Nyquista}
 W celu analizy sygna³u EKG przy u¿yciu szybkiej transformacji Fouriera (FFT)
@@ -162,9 +162,9 @@ W wyniku FFT uzyskano dwa wektory:
 Moc sygna³u w okreœlonych pasmach, takich jak LF czy HF, obliczono jako ca³kê z
 kwadratu modu³u amplitud \(|FFT|^2\) w odpowiednim przedziale czêstotliwoœci. W
 praktyce odpowiada to sumie wartoœci mocy przypisanych do tych czêstotliwoœci:
-\[
+\begin{equation}
     \text{Power} = \int_{f_1}^{f_2} |FFT(f)|^2 df.
-\]
+\end{equation}
 Dziêki temu mo¿liwe by³o zwizualizowanie mocy w ca³ym zakresie czêstotliwoœci,
 jak równie¿ w wybranych pasmach, a tak¿e obliczanie stosunku LF/HF.
 
@@ -207,7 +207,7 @@ tego samego sygna³u, widoczne s¹ lokalne wzrosty mocy w paœmie czêstotliwoœci
 
 \FloatBarrier
 
-\section{Analiza czasowo-czêstotliwoœciowa}
+\section{Analiza czasowo-czêstotliwoœciowa \small{(autor: Piotr Weso³owski)}}
 
 W analizie czasowo-czêstotliwoœciowej, równie¿ zastosowano interpolacjê
 interwa³ów RR do czêstotliwoœci 4 Hz, aby zapewniæ równomierne próbkowanie
@@ -230,9 +230,9 @@ wybranych czêstotliwoœci, umo¿liwiaj¹c transformacjê falkow¹ sygna³u i
 uzyskanie wspó³czynników (\textit{coefficients}), które wskazuj¹, jak mocno
 sygna³ pasuje do falki w danym momencie i dla danej skali. Na tej podstawie
 liczona by³a moc sygna³u jako suma kwadratów amplitud:
-\[
+\begin{equation}
     |C(a,b)|^2,
-\]
+\end{equation}
 co pozwala³o wizualizowaæ zmiany mocy na skalogramie.
 
 \subsection{Problemy brzegowe i wizualizacja wyników}
@@ -293,7 +293,7 @@ mocy obu pasm oraz ich stosunku \ref{fig:wave_zoomed}.
 
 \FloatBarrier
 
-\section{Implementacja i Wizualizacja Œredniej Krocz¹cej}
+\section{Implementacja i wizualizacja œredniej krocz¹cej \small{(autor: Piotr Weso³owski)}}
 
 Na podstawie wykresu \ref{fig:wavePORANEK}, przedstawiaj¹cego rozk³ad mocy w
 dziedzinie czasu i czêstotliwoœci, wyznaczonego na podstawie sygna³u EKG za
