@@ -1,7 +1,8 @@
 \chapter{Podstawy teoretyczne}
 Rozdzia³ ten stanowi wprowadzenie teoretyczne do tematyki pracy, omawiaj¹c
 podstawowe pojêcia i kluczowe aspekty zwi¹zane z analiz¹ sygna³ów EKG, które s¹
-istotne dla zrozumienia dalszych czêœci opracowania. Przedstawiono tutaj ogólne za³o¿enia dzia³ania elektrokardiografii, opis kluczowych sk³adowych sygna³u EKG oraz podstawowe parametry wykorzystywane w analizie zmiennoœci rytmu serca.
+istotne dla zrozumienia dalszych czêœci opracowania. Przedstawiono tutaj ogólne za³o¿enia dzia³ania elektrokardiografii, opis kluczowych sk³adowych sygna³u EKG oraz podstawowe parametry wykorzystywane w analizie zmiennoœci rytmu serca. Dokonano równie¿ przegl¹du metod uczenia maszynowego wykorzystywych w literaturze
+naukowej do analizy sygna³ów EKG.
 
 \section{Elektrokardiografia \small{(autor: Jakub Wojtalewicz)}}
 
@@ -182,9 +183,9 @@ gdzie:
 \subsection{Analiza w domenie czêstotliwoœciowej}
 
 Analiza czêstotliwoœciowa pozwala przekszta³ciæ sygna³ z dziedziny czasu na dziedzinê czêstotliwoœci, co umo¿liwia ocenê mocy sygna³u w ró¿nych pasmach. Kluczowym narzêdziem tej analizy jest transformacja Fouriera, która identyfikuje obecne w sygnale czêstotliwoœci oraz przypisan¹ im moc. Dok³adna dekompozycja sygna³u jest operacj¹ bardzo z³o¿on¹ obliczeniowo i czasowo, dlatego w praktyce stosuje siê {FFT} (ang. \textit{Fast Fourier Transform}), czyli szybk¹ transformacjê Fouriera, która umo¿liwia efektywn¹ analizê mocy widmowej ({PSD} (ang. \textit{Power Spectral Density})), nale¿y jednak pamiêtaæ ¿e uzyskany w ten sposób wynik to jedynie oszacowanie rzeczywistej mocy. Analiza ta zak³ada stacjonarnoœæ sygna³u w badanym przedziale czasowym, co mo¿e byæ problematyczne w przypadku sygna³ów biologicznych, takich jak rytm serca czy oddech. Z tego powodu FFT najlepiej sprawdza siê w badaniach, gdzie sygna³y s¹ wzglêdnie stabilne, np. podczas spokojnego oddychania. W sytuacjach, gdy wystêpuj¹ zmiany w rytmie oddechowym i têtnie (np. w wyniku dzia³ania stresora), analiza FFT mo¿e wykazaæ umiarkowan¹ moc w szerokim zakresie czêstotliwoœci, co utrudnia identyfikacjê dominuj¹cych pasm. Dlatego analizy czêstotliwoœciowe s¹ najczêœciej wykonywane na sygna³ach trwaj¹cych oko³o 5 minut \cite{TaskForce1996}.
-\[
-\text{PSD}(f) = \left| \int_{-\infty}^{\infty} x(t) e^{-j 2 \pi f t} dt \right|^2
-\]
+\begin{equation}  
+  \text{PSD}(f) = \left| \int_{-\infty}^{\infty} x(t) e^{-j 2 \pi f t} dt \right|^2
+\end{equation}
 
 gdzie:
 
@@ -221,10 +222,11 @@ Powszechnie analizowane pasma to \cite{Malik-HRV}:
 
 W analizie czêstotliwoœciowej stosuje siê równie¿ wskaŸniki znormalizowane, takie jak \textit{LF norm} i \textit{HF norm}, które pozwalaj¹ oceniæ moc w poszczególnych pasmach w odniesieniu do ca³kowitej mocy sygna³u:
 
-\[
-\text{LF}_{\text{norm}} = \frac{\text{LF}}{\text{LF} + \text{HF}} \cdot 100, \quad
-\text{HF}_{\text{norm}} = \frac{\text{HF}}{\text{LF} + \text{HF}} \cdot 100\\
-\]
+\begin{equation}
+  \text{LF}_{\text{norm}} = \frac{\text{LF}}{\text{LF} + \text{HF}} \cdot 100, \quad
+  \text{HF}_{\text{norm}} = \frac{\text{HF}}{\text{LF} + \text{HF}} \cdot 100\\
+\end{equation}
+
 
 Dodatkowo, wskaŸnik \textit{LF/HF} jest powszechnie stosowany jako miara równowagi miêdzy uk³adem wspó³czulnym a przywspó³czulnym, choæ jego interpretacja mo¿e byæ niejednoznaczna:
 
@@ -419,9 +421,9 @@ W kontekœcie ogólnej zmiennoœci rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, sz
     \item \textbf{Prosta (jednorodna):} Wszystkie próbki w oknie uœredniania maj¹ tê sam¹ wagê. Jeœli d³ugoœæ okna wynosi $n$, ka¿da próbka w oknie ma wagê $1/n$. Jest to podstawowa metoda, odpowiednia do sygna³ów o umiarkowanej zmiennoœci i w przypadku mniej krytycznych zastosowañ.
     \item \textbf{Liniowa:} Wagi w oknie uœredniania zmniejszaj¹ siê liniowo wraz z odleg³oœci¹ od centralnej próbki. Jest to u¿yteczne w przypadkach, gdy próbki bli¿sze analizowanemu punktowi powinny mieæ wiêkszy wp³yw na wynik.
     \item \textbf{Gaussowska:} \label{gauss} Wagi s¹ obliczane na podstawie rozk³adu normalnego (gaussowskiego). Jest najlepsza w przypadku dynamicznych sygna³ów lub danych, gdzie wa¿ne jest uzyskanie naturalnego wyg³adzenia. Wartoœæ wagi dla próbki $x_i$ zale¿y od odleg³oœci od centralnej próbki $x_c$ i jest wyra¿ona wzorem:
-    \[
-    w_i = \frac{1}{\sqrt{2\pi}\sigma} \cdot e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
-    \]
+    \begin{equation}
+      w_i = \frac{1}{\sqrt{2\pi}\sigma} \cdot e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
+    \end{equation}
     gdzie:
     \begin{itemize}
         \item $\sigma$ to odchylenie standardowe okreœlaj¹ce szerokoœæ rozk³adu,
