@@ -1,8 +1,9 @@
-\section{Metody uczenia maszynowego do analizy EKG \small{(Jakub Wojtalewicz)}}
+\section{Metody uczenia maszynowego do analizy EKG \small{(autor: Jakub Wojtalewicz)}}
 
 Ten podrozdzia³ ma na celu dodanie kontekstu do metod zastosowanych w
 niniejszej pracy. Opisuje rodzaje problemów, które rozwi¹zywano przy pomocy
-uczenia maszynowego we wszelakich Ÿród³ach naukowych.
+uczenia maszynowego w literaturze naukowej.
+
 \subsection{Rozpoznawanie arytmii}
 Wspó³czesna diagnostyka serca coraz czêœciej korzysta z nowoczesnych metod
 analizy sygna³ów EKG, aby szybko i dok³adnie wykrywaæ arytmie oraz inne
@@ -19,16 +20,16 @@ proces eksploracji danych i in¿ynierii cech, co mo¿e znacz¹co poprawiæ
 skutecznoœæ modeli klasyfikacyjnych. W tym zakresie stosuje siê algorytmy takie
 jak K-means, fuzzy c-means clustering, grupowanie hierarchiczne oraz Gaussian
 Mixture Models. Ponadto coraz czêœciej wykorzystuje siê g³êbokie sieci
-neuronowe, w tym splotowe sieci neuronowe (CNN) oraz sieci LSTM
-(Long Short-Term Memory) \cite{Kavya-shockableArthytmiaDetection}.
+neuronowe, w tym splotowe sieci neuronowe (Convolutional Neural Networks, CNN) oraz sieci LSTM (Long
+Short-Term Memory) \cite{Kavya-shockableArthytmiaDetection}.
 
 Ribeiro i wspó³autorzy \cite{ribeiro2020automatic} opracowali g³êbok¹ sieæ
-neuronow¹ (Deep Neural Network, DNN) do automatycznej klasyfikacji nieprawid³owoœci w krótkotrwa³ych
-(7-10 s), 12-odprowadzeniowych zapisach EKG. Algorytm zosta³ wytrenowany na
-zbiorze danych obejmuj¹cym ponad 2,3 miliona zapisów EKG. Architektura DNN
-opiera³a siê na sieci rezydualnej przystosowanej do analizy sygna³ów
-jednowymiarowych, z warstwami konwolucyjnymi i po³¹czeniami skip dla
-zwiêkszenia efektywnoœci treningu.
+neuronow¹ (Deep Neural Network, DNN) do automatycznej klasyfikacji
+nieprawid³owoœci w krótkotrwa³ych (7-10 s), 12-odprowadzeniowych zapisach EKG.
+Algorytm zosta³ wytrenowany na zbiorze danych obejmuj¹cym ponad 2,3 miliona
+zapisów EKG. Architektura DNN opiera³a siê na sieci rezydualnej przystosowanej
+do analizy sygna³ów jednowymiarowych, z warstwami konwolucyjnymi i po³¹czeniami
+skip dla zwiêkszenia efektywnoœci treningu.
 
 DNN zosta³a wytrenowana do wykrywania szeœciu nieprawid³owoœci: bloku
 przedsionkowo-komorowego I stopnia, bloku prawej odnogi pêczka Hisa, bloku
@@ -97,7 +98,7 @@ LSTM osi¹gnê³o wysokie wyniki, osi¹gaj¹c wyniik F1 na poziomie znacznie powy¿ej
 0.90, nawet przy niskim stosunku sygna³u do szumu (SNR 0.1). Zaproponowane
 rozwi¹zanie wykaza³o sie lepszymi rezultatami ni¿ tradycyjne metody nie
 korzystaj¹ce z dorobku uczenia maszynowego (Hamilton, Christov, Engzee,
-Pan-Tomkins). Autorzy wskazali plany na rozwiniêcie owej architektury do modelu
+Pan-Tompkins). Autorzy wskazali plany na rozwiniêcie owej architektury do modelu
 end-to-end.
 
 W pracy \cite{MUzairZahid-UNET} autorzy przedstawili model wykorzystuj¹cy

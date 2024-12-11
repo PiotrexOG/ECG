@@ -1,14 +1,18 @@
 \chapter{Podstawy teoretyczne}
 Rozdzia³ ten stanowi wprowadzenie teoretyczne do tematyki pracy, omawiaj¹c
 podstawowe pojêcia i kluczowe aspekty zwi¹zane z analiz¹ sygna³ów EKG, które s¹
-istotne dla zrozumienia dalszych czêœci opracowania. Przedstawiono tutaj ogólne za³o¿enia dzia³ania elektrokardiografii, opis kluczowych sk³adowych sygna³u EKG oraz podstawowe parametry wykorzystywane w analizie zmiennoœci rytmu serca.
+istotne dla zrozumienia dalszych czêœci opracowania. Przedstawiono tutaj ogólne
+za³o¿enia dzia³ania elektrokardiografii, opis kluczowych sk³adowych sygna³u EKG
+oraz podstawowe parametry wykorzystywane w analizie zmiennoœci rytmu serca.
+Dokonano równie¿ przegl¹du metod uczenia maszynowego wykorzystywych w literaturze
+naukowej do analizy sygna³ów EKG.
 
 \section{Elektrokardiografia \small{(autor: Jakub Wojtalewicz)}}
 
 Elektrokardiografia, w skrócie EKG, to badanie polegaj¹ce na rejestracji
 aktywnoœci elektrycznej serca. Zazwyczaj przyjmuje formê graficznego wykresu,
 przedstawiaj¹cego zmiany potencja³ów elektrycznych serca w czasie
-\cite{Lilly-Pathophysiology}. Rejestracja odbywa sie za pomoc¹ elektrod 
+\cite{Lilly-Pathophysiology}. Rejestracja odbywa sie za pomoc¹ elektrod
 umieszczonych na ciele pacjenta w okreœlonych miejscach, takich jak klatka
 piersiowa oraz koñczyny, co pozwala na wychwycenie sygna³ów bioelektrycznych
 generowanych przez miêsieñ sercowy podczas jego pracy \cite{Romano-ECG}.
@@ -25,16 +29,16 @@ nieprawid³owoœci, które mog¹ byæ spowodowane wszelakimi schorzeniami
 
 Sygna³ EKG sk³ada siê z cyklicznie powtarzaj¹cych siê fal i segmentów, które
 odzwierciedlaj¹ ró¿ne fazy pracy serca. Typowo segmenty te s¹ oznaczane kolejno
-jako \textbf{P-QRS-T} Rys. \ref{fig/ekgGraph}. Cykl serca rozpoczyna siê
+jako \textbf{P-QRS-T} (Rys. \ref{fig/ekgGraph}). Cykl serca rozpoczyna siê
 za³amkiem P, który odpowiada za depolaryzacjê przedsionków, prowadz¹c¹ do ich
 skurczu. Nastêpnie wystêpuje kompleks QRS, odpowiedzialny za depolaryzacjê
 komór serca – kluczowy moment skurczu miêœnia sercowego. Kompleks ten sk³ada
 siê z trzech fal:
 
 \begin{itemize}
-    \item \textbf{Za³amek Q} to pierwszy negatywny za³amek w kompleksie, który odzwierciedla pocz¹tkow¹ fazê rozchodzenia siê impulsu elektrycznego przez przegrodê miêdzykomorow¹.
-    \item \textbf{Za³amek R} jest dodatni i najczêœciej najwiêkszy w ca³ym kompleksie. Reprezentuje g³ówn¹ fazê depolaryzacji komór, kiedy wiêkszoœæ masy miêœniowej zostaje pobudzona do skurczu.
-    \item \textbf{Za³amek S} to kolejny negatywny za³amek, który zamyka kompleks QRS i reprezentuje koñcow¹ fazê depolaryzacji komór, widoczn¹ jako spadek wykresu poni¿ej linii izoelektrycznej.
+  \item \textbf{Za³amek Q} to pierwszy negatywny za³amek w kompleksie, który odzwierciedla pocz¹tkow¹ fazê rozchodzenia siê impulsu elektrycznego przez przegrodê miêdzykomorow¹.
+  \item \textbf{Za³amek R} jest dodatni i najczêœciej najwiêkszy w ca³ym kompleksie. Reprezentuje g³ówn¹ fazê depolaryzacji komór, kiedy wiêkszoœæ masy miêœniowej zostaje pobudzona do skurczu.
+  \item \textbf{Za³amek S} to kolejny negatywny za³amek, który zamyka kompleks QRS i reprezentuje koñcow¹ fazê depolaryzacji komór, widoczn¹ jako spadek wykresu poni¿ej linii izoelektrycznej.
 \end{itemize}
 
 Po kompleksie QRS pojawia siê za³amek T, który obrazuje repolaryzacjê komór,
@@ -51,11 +55,11 @@ umo¿liwiaj¹c ocenê stanu uk³adu sercowo-naczyniowego oraz identyfikacjê
 ró¿norodnych zaburzeñ i patologii sercowych \cite{Romano-ECG}.
 
 \begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.25]{Rysunki/Normal-ECG-signal-with-his-different-features.png}
-    \caption{Normalny sygna³ EKG z jego cechami.}
-    \caption*{ród³o:  \url{https://www.researchgate.net/figure/Normal-ECG-signal-with-his-different-features_fig1_299575422} [Data uzyskania dostêpu 02.11.2024]}
-    \label{fig/ekgGraph}
+  \centering
+  \includegraphics[scale=0.25]{Rysunki/Normal-ECG-signal-with-his-different-features.png}
+  \caption{Normalny sygna³ EKG z jego cechami.}
+  \caption*{ród³o:  \url{https://www.researchgate.net/figure/Normal-ECG-signal-with-his-different-features_fig1_299575422} [Data uzyskania dostêpu 02.11.2024]}
+  \label{fig/ekgGraph}
 \end{figure}
 
 \section{Charakterystyki sygna³u EKG \small{(autor: Piotr Weso³owski)}}\label{MiaryHRV}
@@ -66,30 +70,51 @@ sercowo-naczyniowego badanej osoby.
 
 \subsection{Odstêpy RR i puls}
 
-Jednym z kluczowych parametrów opisuj¹cych sygna³ EKG jest czas pomiêdzy kolejnymi szczytami za³amków R, wyra¿any w milisekundach (ms). Parametr ten nazywany jest \textit{odstêpem RR} (ang. \textit{RR interval}). W literaturze wystêpuje równie¿ okreœlenie \textit{odstêp NN} (ang. \textit{NN interval}), które odnosi siê do odstêpów pomiêdzy kolejnymi za³amkami R, ale z uwzglêdnieniem wy³¹cznie rytmu prawid³owego, pozbawionego artefaktów i zak³óceñ (ang. \textit{normal-to-normal}). Chocia¿ w praktyce oba terminy bywaj¹ u¿ywane zamiennie, w analizach dotycz¹cych pracy serca kluczowe jest, aby uwzglêdniaæ jedynie prawid³owy rytm, wolny od znacz¹cych zak³óceñ i artefaktów. Jego analiza pozwala bezpoœrednio okreœliæ inn¹ istotn¹ metrykê, jak¹ jest puls, czyli \textit{HR} (ang. \textit{heart rate}), który oznacza liczbê uderzeñ serca na minutê. Ka¿demu skurczowi serca towarzyszy charakterystyczny wzrost potencja³u elektrycznego, rejestrowany jako szczyt $R$ na wykresie EKG \cite{Zhan-RWave}.
+Jednym z kluczowych parametrów opisuj¹cych sygna³ EKG jest czas pomiêdzy
+kolejnymi szczytami za³amków R, wyra¿any w milisekundach (ms). Parametr ten
+nazywany jest \textit{odstêpem RR} (ang. \textit{RR interval}). W literaturze
+wystêpuje równie¿ okreœlenie \textit{odstêp NN} (ang. \textit{NN interval}),
+które odnosi siê do odstêpów pomiêdzy kolejnymi za³amkami R, ale z
+uwzglêdnieniem wy³¹cznie rytmu prawid³owego, pozbawionego artefaktów i zak³óceñ
+(ang. \textit{normal-to-normal}). Chocia¿ w praktyce oba terminy bywaj¹ u¿ywane
+zamiennie, w analizach dotycz¹cych pracy serca kluczowe jest, aby uwzglêdniaæ
+jedynie prawid³owy rytm, wolny od znacz¹cych zak³óceñ i artefaktów. Jego
+analiza pozwala bezpoœrednio okreœliæ inn¹ istotn¹ metrykê, jak¹ jest puls,
+czyli \textit{HR} (ang. \textit{heart rate}), który oznacza liczbê uderzeñ
+serca na minutê. Ka¿demu skurczowi serca towarzyszy charakterystyczny wzrost
+potencja³u elektrycznego, rejestrowany jako szczyt $R$ na wykresie EKG
+\cite{Zhan-RWave}.
 
-Chwilowe têtno w chwili \( t_{R_n} \), czyli w momencie wyst¹pienia \( n \)-tego szczytu \( R \), mo¿na wyraziæ za pomoc¹ wzoru:
+Chwilowe têtno w chwili \( t_{R_n} \), czyli w momencie wyst¹pienia \( n
+\)-tego szczytu \( R \), mo¿na wyraziæ za pomoc¹ wzoru:
 
-\begin{equation}  
-    HR_n = \frac{60}{t_{R_n} - t_{R_{n-1}}}
+\begin{equation}
+  HR_n = \frac{60}{t_{R_n} - t_{R_{n-1}}}
 \end{equation}
 
 gdzie:
 
 \begin{itemize}
-    \item \( t_{R_n} \) to czas wyst¹pienia \( n \)-tego szczytu \( R \),
-    \item \( t_{R_{n-1}} \) to czas wyst¹pienia poprzedniego szczytu \( R \),
-    \item wynik \( HR_n \) wyra¿ony jest w uderzeniach na minutê (bpm, \textit{beats per minute}).
+  \item \( t_{R_n} \) to czas wyst¹pienia \( n \)-tego szczytu \( R \),
+  \item \( t_{R_{n-1}} \) to czas wyst¹pienia poprzedniego szczytu \( R \),
+  \item wynik \( HR_n \) wyra¿ony jest w uderzeniach na minutê (bpm, \textit{beats per
+          minute}).
 \end{itemize}
 
-Jeœli jednak chcielibyœmy przybli¿yæ wartoœæ têtna w dowolnym punkcie pomiêdzy szczytami, nale¿a³oby tê wartoœæ odpowiednio ekstrapolowaæ.
+Jeœli jednak chcielibyœmy przybli¿yæ wartoœæ têtna w dowolnym punkcie pomiêdzy
+szczytami, nale¿a³oby tê wartoœæ odpowiednio ekstrapolowaæ.
 
-Wielkoœæ ró¿nic pomiêdzy kolejnymi odstêpami RR (tzw. \textit{RR variability}) jest kolejnym kluczowym wskaŸnikiem pracy serca. Analiza tych ró¿nic jest podstaw¹ do okreœlenia zmiennoœci rytmu serca (\textit{HRV}) i jej charakterystyk, takich jak \textit{RSA} czy ró¿ne miary czasowe i czêstotliwoœciowe HRV.
-
+Wielkoœæ ró¿nic pomiêdzy kolejnymi odstêpami RR (tzw. \textit{RR variability})
+jest kolejnym kluczowym wskaŸnikiem pracy serca. Analiza tych ró¿nic jest
+podstaw¹ do okreœlenia zmiennoœci rytmu serca (\textit{HRV}) i jej
+charakterystyk, takich jak \textit{RSA} czy ró¿ne miary czasowe i
+czêstotliwoœciowe HRV.
 
 \subsection{Analiza w domenie czasowej}
 
-Metody analizy czasowej opieraj¹ siê na bezpoœrednim pomiarze odstêpów RR w sygnale EKG, które reprezentuj¹ czas miêdzy kolejnymi skurczami serca. Poni¿ej przedstawiono podstawowe miary analizy czasowej:
+Metody analizy czasowej opieraj¹ siê na bezpoœrednim pomiarze odstêpów RR w
+sygnale EKG, które reprezentuj¹ czas miêdzy kolejnymi skurczami serca. Poni¿ej
+przedstawiono podstawowe miary analizy czasowej:
 
 \subsubsection{SDNN}
 {SDNN} (ang. \textit{Standard Deviation of NN intervals}), czyli odchylenie standardowe wszystkich odstêpów RR w badanym okresie, jest jedn¹ z podstawowych miar zmiennoœci rytmu serca. Wartoœæ SDNN odzwierciedla ca³kowit¹ zmiennoœæ sygna³u rytmu serca, poniewa¿ wariancja sygna³u, bêd¹ca kwadratem odchylenia standardowego, jest równa sumie mocy w ca³ym zakresie czêstotliwoœci \cite{Saul1988}. SDNN jest prost¹ miar¹ do obliczenia, jednak nie jest dobrze zdefiniowan¹ zmienn¹ statystyczn¹, poniewa¿ jej wartoœæ zale¿y od d³ugoœci badania. Wielkoœæ SDNN wzrasta wraz z czasem trwania rejestracji, dlatego porównywanie wyników miêdzy badaniami o ró¿nej d³ugoœci wymaga wczeœniejszej normalizacji do okreœlonych okresów, np. do nominalnych zapisów 24-godzinnych lub krótkoterminowych trwaj¹cych 5 minut.
@@ -112,7 +137,6 @@ gdzie:
   \text{RMSSD} = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N-1} \left( RR_{i+1} - RR_i \right)^2}
 \end{equation}
 
-
 gdzie:
 
 \begin{itemize}
@@ -134,7 +158,9 @@ gdzie:
   \item \(N\) to liczba pomiarów odstêpów RR u¿ywanych do obliczenia NN50, czyli liczba interwa³ów RR w analizowanym okresie czasu.
 \end{itemize}
 
-Nastêpnie, {PNN50} (ang. \textit{Proportion of NN50 intervals to the total number of NN intervals}) to procent tych ró¿nic w stosunku do ca³kowitej liczby odstêpów RR:
+Nastêpnie, {PNN50} (ang. \textit{Proportion of NN50 intervals to the total
+  number of NN intervals}) to procent tych ró¿nic w stosunku do ca³kowitej liczby
+odstêpów RR:
 
 \begin{equation}
   \text{pNN50} = \frac{\text{NN50}}{N-1} \times 100
@@ -162,7 +188,11 @@ gdzie:
 \end{itemize}
 
 \subsubsection{SDNN Index}
-SDNN Index jest œredni¹ wartoœci¹ odchylenia standardowego odstêpów NN dla wszystkich 5-minutowych segmentów ca³ego okresu rejestracji. Ró¿ni siê on od SDANN tym, ¿e odnosi siê do krótkoterminowej zmiennoœci rytmu serca w obrêbie poszczególnych segmentów. Ta miara jest u¿ywana do oceny bardziej szczegó³owych zmian w rytmie serca w krótszych przedzia³ach czasowych.
+SDNN Index jest œredni¹ wartoœci¹ odchylenia standardowego odstêpów NN dla
+wszystkich 5-minutowych segmentów ca³ego okresu rejestracji. Ró¿ni siê on od
+SDANN tym, ¿e odnosi siê do krótkoterminowej zmiennoœci rytmu serca w obrêbie
+poszczególnych segmentów. Ta miara jest u¿ywana do oceny bardziej szczegó³owych
+zmian w rytmie serca w krótszych przedzia³ach czasowych.
 \begin{equation}
   \text{SDNN Index} = \frac{1}{M} \sum_{j=1}^{M} \sqrt{\frac{1}{N_j-1} \sum_{i=1}^{N_j} \left( RR_{i,j} - \overline{RR}_j \right)^2}
 \end{equation}
@@ -175,10 +205,26 @@ gdzie:
   \item \(\overline{RR}_j\) to œrednia wartoœæ odstêpów RR w \(j\)-tym segmencie.
 \end{itemize}
 
-
 \subsection{Analiza w domenie czêstotliwoœciowej}
 
-Analiza czêstotliwoœciowa pozwala przekszta³ciæ sygna³ z dziedziny czasu na dziedzinê czêstotliwoœci, co umo¿liwia ocenê mocy sygna³u w ró¿nych pasmach. Kluczowym narzêdziem tej analizy jest transformacja Fouriera, która identyfikuje obecne w sygnale czêstotliwoœci oraz przypisan¹ im moc. Dok³adna dekompozycja sygna³u jest operacj¹ bardzo z³o¿on¹ obliczeniowo i czasowo, dlatego w praktyce stosuje siê {FFTD} (ang. \textit{Fast Fourier Transform}), czyli szybk¹ transformacjê Fouriera, która umo¿liwia efektywn¹ analizê mocy widmowej ({PSD} (ang. \textit{Power Spectral Density})), nale¿y jednak pamiêtaæ ¿e uzyskany w ten sposób wynik to jedynie oszacowanie rzeczywistej mocy. Analiza ta zak³ada stacjonarnoœæ sygna³u w badanym przedziale czasowym, co mo¿e byæ problematyczne w przypadku sygna³ów biologicznych, takich jak rytm serca czy oddech. Z tego powodu FFT najlepiej sprawdza siê w badaniach, gdzie sygna³y s¹ wzglêdnie stabilne, np. podczas spokojnego oddychania. W sytuacjach, gdy wystêpuj¹ zmiany w rytmie oddechowym i têtnie (np. w wyniku dzia³ania stresora), analiza FFT mo¿e wykazaæ umiarkowan¹ moc w szerokim zakresie czêstotliwoœci, co utrudnia identyfikacjê dominuj¹cych pasm. Dlatego analizy czêstotliwoœciowe s¹ najczêœciej wykonywane na sygna³ach trwaj¹cych oko³o 5 minut \cite{TaskForce1996}.
+Analiza czêstotliwoœciowa pozwala przekszta³ciæ sygna³ z dziedziny czasu na
+dziedzinê czêstotliwoœci, co umo¿liwia ocenê mocy sygna³u w ró¿nych pasmach.
+Kluczowym narzêdziem tej analizy jest transformacja Fouriera, która
+identyfikuje obecne w sygnale czêstotliwoœci oraz przypisan¹ im moc. Dok³adna
+dekompozycja sygna³u jest operacj¹ bardzo z³o¿on¹ obliczeniowo i czasowo,
+dlatego w praktyce stosuje siê {FFTD} (ang. \textit{Fast Fourier Transform}),
+czyli szybk¹ transformacjê Fouriera, która umo¿liwia efektywn¹ analizê mocy
+widmowej ({PSD} (ang. \textit{Power Spectral Density})), nale¿y jednak pamiêtaæ
+¿e uzyskany w ten sposób wynik to jedynie oszacowanie rzeczywistej mocy.
+Analiza ta zak³ada stacjonarnoœæ sygna³u w badanym przedziale czasowym, co mo¿e
+byæ problematyczne w przypadku sygna³ów biologicznych, takich jak rytm serca
+czy oddech. Z tego powodu FFT najlepiej sprawdza siê w badaniach, gdzie sygna³y
+s¹ wzglêdnie stabilne, np. podczas spokojnego oddychania. W sytuacjach, gdy
+wystêpuj¹ zmiany w rytmie oddechowym i têtnie (np. w wyniku dzia³ania
+stresora), analiza FFT mo¿e wykazaæ umiarkowan¹ moc w szerokim zakresie
+czêstotliwoœci, co utrudnia identyfikacjê dominuj¹cych pasm. Dlatego analizy
+czêstotliwoœciowe s¹ najczêœciej wykonywane na sygna³ach trwaj¹cych oko³o 5
+minut \cite{TaskForce1996}.
 \begin{equation}
   \text{PSD}(f) = \left| \int_{-\infty}^{\infty} x(t) e^{-j 2 \pi f t} dt \right|^2
 \end{equation}
@@ -203,25 +249,30 @@ gdzie:
 \begin{itemize}
   \item \(f_{\text{min}}\) i \(f_{\text{max}}\) to granice czêstotliwoœci, które definiuj¹ pasmo, w którym obliczana jest moc sygna³u,
   \item \(\text{PSD}(f)\) to wartoœæ gêstoœci widmowej mocy w czêstotliwoœci \(f\),
-  \item ca³kowanie po \(f\) w granicach \(f_{\text{min}}\) i \(f_{\text{max}}\) pozwala na obliczenie ca³kowitej mocy w danym paœmie.
+  \item ca³kowanie po \(f\) w granicach \(f_{\text{min}}\) i \(f_{\text{max}}\) pozwala
+        na obliczenie ca³kowitej mocy w danym paœmie.
 \end{itemize}
 Powszechnie analizowane pasma to \cite{Malik-HRV}:
 \begin{itemize}
-    \item \textbf{ULF} (ang. \textit{Ultra Low Frequency}) (<0.003 Hz): Odzwierciedla mechanizmy hormonalne oraz inne wolnozmienne procesy fizjologiczne.
-    \item \textbf{VLF} (ang. \textit{Very Low Frequency}) (0.003–0.04 Hz): Zwi¹zane z procesami termoregulacji i innymi mechanizmami o niskiej czêstotliwoœci.
-    \item \textbf{LF} (ang. \textit{Low Frequency}) (0.04–0.15 Hz): Odzwierciedla aktywnoœæ wspó³czuln¹ i przywspó³czuln¹ oraz barorefleksjê która odpowiada za utrzymanie ciœnienia krwi na sta³ym poziomie.
-    \item \textbf{HF} (ang. \textit{High Frequency}) (0.15–0.4 Hz): Powi¹zane z rytmem oddechowym i aktywnoœci¹ przywspó³czuln¹, szczególnie widoczne u zdrowych osób.
-    \item \textbf{UHF} (ang. \textit{Ultra High Frequency}) (> 0.4 Hz):  Rzadko analizowane, mo¿e obejmowaæ szybkie zmiany fizjologiczne, ale tak¿e zak³ócenia i artefakty zwi¹zane z pomiarem.
+  \item \textbf{ULF} (ang. \textit{Ultra Low Frequency}) (<0.003 Hz): Odzwierciedla mechanizmy hormonalne oraz inne wolnozmienne procesy fizjologiczne.
+  \item \textbf{VLF} (ang. \textit{Very Low Frequency}) (0.003–0.04 Hz): Zwi¹zane z procesami termoregulacji i innymi mechanizmami o niskiej czêstotliwoœci.
+  \item \textbf{LF} (ang. \textit{Low Frequency}) (0.04–0.15 Hz): Odzwierciedla aktywnoœæ wspó³czuln¹ i przywspó³czuln¹ oraz barorefleksjê która odpowiada za utrzymanie ciœnienia krwi na sta³ym poziomie.
+  \item \textbf{HF} (ang. \textit{High Frequency}) (0.15–0.4 Hz): Powi¹zane z rytmem oddechowym i aktywnoœci¹ przywspó³czuln¹, szczególnie widoczne u zdrowych osób.
+  \item \textbf{UHF} (ang. \textit{Ultra High Frequency}) (> 0.4 Hz):  Rzadko analizowane, mo¿e obejmowaæ szybkie zmiany fizjologiczne, ale tak¿e zak³ócenia i artefakty zwi¹zane z pomiarem.
 \end{itemize}
 
-W analizie czêstotliwoœciowej stosuje siê równie¿ wskaŸniki znormalizowane, takie jak LF norm i HF norm, które pozwalaj¹ oceniæ moc w poszczególnych pasmach w odniesieniu do ca³kowitej mocy sygna³u:
+W analizie czêstotliwoœciowej stosuje siê równie¿ wskaŸniki znormalizowane,
+takie jak LF norm i HF norm, które pozwalaj¹ oceniæ moc w poszczególnych
+pasmach w odniesieniu do ca³kowitej mocy sygna³u:
 
 \begin{equation}
   \text{LF}_{\text{norm}} = \frac{\text{LF}}{\text{LF} + \text{HF}} \cdot 100, \quad
   \text{HF}_{\text{norm}} = \frac{\text{HF}}{\text{LF} + \text{HF}} \cdot 100
 \end{equation}
 
-Dodatkowo, wskaŸnik LF/HF jest powszechnie stosowany jako miara równowagi miêdzy uk³adem wspó³czulnym a przywspó³czulnym, choæ jego interpretacja mo¿e byæ niejednoznaczna:
+Dodatkowo, wskaŸnik LF/HF jest powszechnie stosowany jako miara równowagi
+miêdzy uk³adem wspó³czulnym a przywspó³czulnym, choæ jego interpretacja mo¿e
+byæ niejednoznaczna:
 
 \begin{equation}
   \text{LF/HF} = \frac{\text{LF}}{\text{HF}}
@@ -229,14 +280,18 @@ Dodatkowo, wskaŸnik LF/HF jest powszechnie stosowany jako miara równowagi miêdzy
 
 gdzie:
 \begin{itemize}
-    \item LF – moc w niskich czêstotliwoœciach (Low Frequency),
-    \item HF – moc w wysokich czêstotliwoœciach (High Frequency),
-    \item $\text{LF} + \text{HF}$ – ca³kowita moc sygna³u w analizowanych pasmach.
+  \item LF – moc w niskich czêstotliwoœciach (Low Frequency),
+  \item HF – moc w wysokich czêstotliwoœciach (High Frequency),
+  \item $\text{LF} + \text{HF}$ – ca³kowita moc sygna³u w analizowanych pasmach.
 \end{itemize}
 
 \subsection{Analiza W dziedzinie czasowo-czêstotliwoœciowEJ}
 
-Analiza czasowo-czêstotliwoœciowa pozwala na jednoczesne okreœlenie mocy sygna³u w wybranych pasmach czêstotliwoœci i ich zmian w czasie. W przeciwieñstwie do klasycznej analizy czêstotliwoœciowej, która zak³ada stacjonarnoœæ sygna³u, analiza czasowo-czêstotliwoœciowa uwzglêdnia zmiennoœæ sygna³u w czasie \cite{Boashash1992}.
+Analiza czasowo-czêstotliwoœciowa pozwala na jednoczesne okreœlenie mocy
+sygna³u w wybranych pasmach czêstotliwoœci i ich zmian w czasie. W
+przeciwieñstwie do klasycznej analizy czêstotliwoœciowej, która zak³ada
+stacjonarnoœæ sygna³u, analiza czasowo-czêstotliwoœciowa uwzglêdnia zmiennoœæ
+sygna³u w czasie \cite{Boashash1992}.
 
 \begin{equation}
   W_x(a, b) = \int_{-\infty}^{\infty} x(t) \psi^* \left( \frac{t-b}{a} \right) dt
@@ -252,10 +307,22 @@ gdzie:
   \item \( \psi^* \) to sprzê¿enie zespolone funkcji falki.
 \end{itemize}
 
-W sytuacjach, w których rytm serca i oddechu zmieniaj¹ siê w czasie, przydatnym narzêdziem jest analiza falkowa, np. z u¿yciem falki Morleta. Pozwala ona analizowaæ sygna³ jednoczeœnie w domenie czasowej i czêstotliwoœciowej, co umo¿liwia œledzenie, jak zmienia siê moc w okreœlonych czêstotliwoœciach w czasie. W tym celu wykorzystuje zestaw funkcji zwanych falami, które s¹ odpowiednio przesuwane oraz skalowane (œciskane lub rozci¹gane), aby dopasowaæ je do analizy krótkotrwa³ych zjawisk o wysokiej czêstotliwoœci lub d³ugotrwa³ych zjawisk o niskiej czêstotliwoœci. Dziêki temu mo¿na oceniæ aktywnoœæ uk³adów regulacyjnych (np. przywspó³czulnego) w okreœlonych przedzia³ach czasowych, np oddzielnie dla relaksu, stresu, aktywnoœci fizycznej czy æwiczeñ oddechowych \cite{Boashash1992}.
+W sytuacjach, w których rytm serca i oddechu zmieniaj¹ siê w czasie, przydatnym
+narzêdziem jest analiza falkowa, np. z u¿yciem falki Morleta. Pozwala ona
+analizowaæ sygna³ jednoczeœnie w domenie czasowej i czêstotliwoœciowej, co
+umo¿liwia œledzenie, jak zmienia siê moc w okreœlonych czêstotliwoœciach w
+czasie. W tym celu wykorzystuje zestaw funkcji zwanych falami, które s¹
+odpowiednio przesuwane oraz skalowane (œciskane lub rozci¹gane), aby dopasowaæ
+je do analizy krótkotrwa³ych zjawisk o wysokiej czêstotliwoœci lub
+d³ugotrwa³ych zjawisk o niskiej czêstotliwoœci. Dziêki temu mo¿na oceniæ
+aktywnoœæ uk³adów regulacyjnych (np. przywspó³czulnego) w okreœlonych
+przedzia³ach czasowych, np oddzielnie dla relaksu, stresu, aktywnoœci fizycznej
+czy æwiczeñ oddechowych \cite{Boashash1992}.
 
-
-Wyniki analizy falkowej s¹ czêsto przedstawiane na skalogramie czyli  graficznej reprezentacji mocy sygna³u w zale¿noœci od czasu i czêstotliwoœci. Przedstawia on zmiany mocy w formie kolorowego wykresu, gdzie oœ X reprezentuje czas, oœ Y – czêstotliwoœæ, a kolory – moc sygna³u.
+Wyniki analizy falkowej s¹ czêsto przedstawiane na skalogramie czyli graficznej
+reprezentacji mocy sygna³u w zale¿noœci od czasu i czêstotliwoœci. Przedstawia
+on zmiany mocy w formie kolorowego wykresu, gdzie oœ X reprezentuje czas, oœ Y
+– czêstotliwoœæ, a kolory – moc sygna³u.
 
 \begin{equation}
   S(a, b) = |W_x(a, b)|^2
@@ -274,124 +341,238 @@ gdzie:
 {HRV} (ang. \textit{Heart Rate Variability}), oznaczaj¹cy zmiennoœæ rytmu pracy serca. Charakterystyka ta odnosi siê do zmiennoœci czasowej odleg³oœci miêdzy kolejnymi szczytami R w sygnale EKG. Za jej pomoc¹ mo¿na okreœliæ, jak serce reaguje na ró¿ne warunki, takie jak stres, aktywnoœæ fizyczna czy zmiany w oddychaniu. Wartoœæ tê mo¿na analizowaæ za pomoc¹ metod czasowych, czêstotliwoœciowych, czasowo-czêstotliwoœciowych, a tak¿e geometrycznych (te ostatnie nie s¹ rozwijane w niniejszej pracy). Dobór konkretnej metody analizy zale¿y od charakterystyki badania, takiej jak czas jego trwania, stacjonarnoœæ rytmu serca czy wp³yw stresorów. Znaczenie i interpretacja uzyskanych wyników s¹ istotne dla oceny pracy serca i czêsto bardziej z³o¿one, ni¿ siê powszechnie uwa¿a, co mo¿e prowadziæ do b³êdnych wniosków.
 
 \subsection{Podzia³ miar HRV}
-Do oceny HRV mo¿na wykorzystaæ miary podzielone na dwie grupy w zale¿noœci od rodzaju danych s³u¿¹cych do ich obliczeñ \cite{Malik-HRV}:
+Do oceny HRV mo¿na wykorzystaæ miary podzielone na dwie grupy w zale¿noœci od
+rodzaju danych s³u¿¹cych do ich obliczeñ \cite{Malik-HRV}:
 
 \subsection*{Miary oparte na bezpoœrednich d³ugoœciach odstêpów RR}
 \begin{itemize}
-    \item \textbf{S³u¿¹ce do ogólnej oceny zmiennoœci rytmu serca:}
-    \begin{itemize}
-        \item SDNN,
-        \item ró¿nica miêdzy najd³u¿szym a najkrótszym odstêpem RR.
-    \end{itemize}
-    \item \textbf{S³u¿¹ce do oceny d³ugoterminowych zmiennoœci HRV, wynikaj¹cych m.in. z ró¿nic podczas cyklu dobowego czy aktywnoœci fizycznej:}
-    \begin{itemize}
-        \item SDANN.
-    \end{itemize}
+  \item \textbf{S³u¿¹ce do ogólnej oceny zmiennoœci rytmu serca:}
+        \begin{itemize}
+          \item SDNN,
+          \item ró¿nica miêdzy najd³u¿szym a najkrótszym odstêpem RR.
+        \end{itemize}
+  \item \textbf{S³u¿¹ce do oceny d³ugoterminowych zmiennoœci HRV, wynikaj¹cych m.in. z ró¿nic podczas cyklu dobowego czy aktywnoœci fizycznej:}
+        \begin{itemize}
+          \item SDANN.
+        \end{itemize}
 \end{itemize}
 
 \subsection*{Miary oparte na ró¿nicach miêdzy kolejnymi odstêpami RR}
 \begin{itemize}
-    \item \textbf{S³u¿¹ce do oceny krótkoterminowych zmiennoœci HRV, czêsto u¿ywane do oceny aktywnoœci przywspó³czulnej:}
-    \begin{itemize}
-        \item RMSSD,
-        \item SDNN Index,
-        \item pNN50.
-    \end{itemize}
+  \item \textbf{S³u¿¹ce do oceny krótkoterminowych zmiennoœci HRV, czêsto u¿ywane do oceny aktywnoœci przywspó³czulnej:}
+        \begin{itemize}
+          \item RMSSD,
+          \item SDNN Index,
+          \item pNN50.
+        \end{itemize}
 \end{itemize}
 
-
 \subsection{Analiza czêstotliwoœciowa HRV}
-Do analizy czêstotliwoœciowej HRV wykorzystuje siê nastêpuj¹ce wskaŸniki \cite{Malik-HRV}:
+Do analizy czêstotliwoœciowej HRV wykorzystuje siê nastêpuj¹ce wskaŸniki
+\cite{Malik-HRV}:
 \begin{itemize}
-    \item \textbf{Moc w paœmie HF (wysokiej czêstotliwoœci):} Silnie skorelowana z aktywnoœci¹ uk³adu przywspó³czulnego. Zazwyczaj wzrasta w wyniku kontrolowanego oddychania oraz pod wp³ywem takich czynników jak stymulacja narz¹du równowagi czy stymulacja twarzy zimnem. HF mo¿e byæ równie¿ modyfikowane przez rytm oddechowy, co wymaga jego kontroli w trakcie badania.
-    \item \textbf{Moc w paœmie LF (niskiej czêstotliwoœci):} Czêsto uznawana za marker aktywnoœci wspó³czulnej, choæ wiêkszoœæ badaczy uwa¿a, ¿e odzwierciedla wp³yw obu uk³adów autonomicznych. Jej wartoœæ wzrasta m.in. w wyniku stresu, wysi³ku fizycznego, a tak¿e przy zmianie pozycji na stoj¹c¹ lub bardziej pionow¹. Interpretacja LF wymaga ostro¿noœci, poniewa¿ mo¿e byæ podatna na zak³ócenia niefizjologiczne, takie jak artefakty ruchowe.
+  \item \textbf{Moc w paœmie HF (wysokiej czêstotliwoœci):} Silnie skorelowana z aktywnoœci¹ uk³adu przywspó³czulnego. Zazwyczaj wzrasta w wyniku kontrolowanego oddychania oraz pod wp³ywem takich czynników jak stymulacja narz¹du równowagi czy stymulacja twarzy zimnem. HF mo¿e byæ równie¿ modyfikowane przez rytm oddechowy, co wymaga jego kontroli w trakcie badania.
+  \item \textbf{Moc w paœmie LF (niskiej czêstotliwoœci):} Czêsto uznawana za marker aktywnoœci wspó³czulnej, choæ wiêkszoœæ badaczy uwa¿a, ¿e odzwierciedla wp³yw obu uk³adów autonomicznych. Jej wartoœæ wzrasta m.in. w wyniku stresu, wysi³ku fizycznego, a tak¿e przy zmianie pozycji na stoj¹c¹ lub bardziej pionow¹. Interpretacja LF wymaga ostro¿noœci, poniewa¿ mo¿e byæ podatna na zak³ócenia niefizjologiczne, takie jak artefakty ruchowe.
 \end{itemize}
 
 \subsection{Normalizacja i wskaŸniki dodatkowe}
-Moc w okreœlonym paœmie zale¿y od d³ugoœci rejestrowanego sygna³u. Dlatego, oprócz zalecanej d³ugoœci badania wynosz¹cej 5 minut, stosuje siê wskaŸniki w jednostkach znormalizowanych [nu.].
-WskaŸniki te s¹ bardziej wiarygodne przy umiarkowanych lub wysokich wartoœciach ca³kowitej mocy HRV (\textit{Total Power -- TP}) i mog¹ prowadziæ do b³êdnych wniosków w stanach obni¿onej zmiennoœci rytmu serca, takich jak silny stres czy zaawansowany wiek. Czêsto wykorzystuje siê tak¿e stosunek LF/HF jako wskaŸnik równowagi miêdzy uk³adem wspó³czulnym a przywspó³czulnym, jednak jego wysoki stosunek mo¿e wynikaæ zarówno ze zwiêkszonej aktywnoœci wspó³czulnej, jak i z os³abienia aktywnoœci przywspó³czulnej \cite{Malik-HRV}.
+Moc w okreœlonym paœmie zale¿y od d³ugoœci rejestrowanego sygna³u. Dlatego,
+oprócz zalecanej d³ugoœci badania wynosz¹cej 5 minut, stosuje siê wskaŸniki w
+jednostkach znormalizowanych [nu.]. WskaŸniki te s¹ bardziej wiarygodne przy
+umiarkowanych lub wysokich wartoœciach ca³kowitej mocy HRV (\textit{Total Power
+  -- TP}) i mog¹ prowadziæ do b³êdnych wniosków w stanach obni¿onej zmiennoœci
+rytmu serca, takich jak silny stres czy zaawansowany wiek. Czêsto wykorzystuje
+siê tak¿e stosunek LF/HF jako wskaŸnik równowagi miêdzy uk³adem wspó³czulnym a
+przywspó³czulnym, jednak jego wysoki stosunek mo¿e wynikaæ zarówno ze
+zwiêkszonej aktywnoœci wspó³czulnej, jak i z os³abienia aktywnoœci
+przywspó³czulnej \cite{Malik-HRV}.
 
 \subsection{Analiza d³ugoterminowa}
 
-W badaniach trwaj¹cych 24 godziny, które umo¿liwiaj¹ ocenê HRV w ci¹gu ca³ej doby, wiele zmiennych z dziedziny czasu i czêstotliwoœci jest ze sob¹ skorelowanych. Jeœli nie zamierzamy stosowaæ dodatkowych miar, takich jak nachylenie log-log skalogramu w analizie spektralnej, wyniki pomiarów z dziedziny czasu s¹ niemal to¿same z wynikami z analizy czêstotliwoœciowej. Jednoczeœnie s¹ one ³atwiejsze do uzyskania i interpretacji. 
+W badaniach trwaj¹cych 24 godziny, które umo¿liwiaj¹ ocenê HRV w ci¹gu ca³ej
+doby, wiele zmiennych z dziedziny czasu i czêstotliwoœci jest ze sob¹
+skorelowanych. Jeœli nie zamierzamy stosowaæ dodatkowych miar, takich jak
+nachylenie log-log skalogramu w analizie spektralnej, wyniki pomiarów z
+dziedziny czasu s¹ niemal to¿same z wynikami z analizy czêstotliwoœciowej.
+Jednoczeœnie s¹ one ³atwiejsze do uzyskania i interpretacji.
 
-Nale¿y jednak pamiêtaæ, ¿e metody czasowe lepiej sprawdzaj¹ siê w analizie d³ugoterminowych rejestracji ze wzglêdu na brak stabilnoœci sygna³u w ca³ym zakresie, podczas gdy metody czêstotliwoœciowe s¹ bardziej odpowiednie do oceny krótkoterminowych zmiennoœci rytmu serca \cite{Malik-HRV}.
+Nale¿y jednak pamiêtaæ, ¿e metody czasowe lepiej sprawdzaj¹ siê w analizie
+d³ugoterminowych rejestracji ze wzglêdu na brak stabilnoœci sygna³u w ca³ym
+zakresie, podczas gdy metody czêstotliwoœciowe s¹ bardziej odpowiednie do oceny
+krótkoterminowych zmiennoœci rytmu serca \cite{Malik-HRV}.
 
 \subsection{Artefakty i jakoœæ sygna³u}
 
-HRV jest bardzo wra¿liwe na artefakty w zapisie EKG (np. b³êdy detekcji R-R lub ruch pacjenta). Dlatego kluczowym etapem analizy jest usuniêcie artefaktów oraz weryfikacja poprawnoœci detekcji szczytów R w sygnale EKG, co pozwala unikn¹æ zniekszta³cenia wyników.
+HRV jest bardzo wra¿liwe na artefakty w zapisie EKG (np. b³êdy detekcji R-R lub
+ruch pacjenta). Dlatego kluczowym etapem analizy jest usuniêcie artefaktów oraz
+weryfikacja poprawnoœci detekcji szczytów R w sygnale EKG, co pozwala unikn¹æ
+zniekszta³cenia wyników.
 
 \subsection{Zale¿noœæ HRV od czynników demograficznych i zdrowotnych}
 
-Warto podkreœliæ, ¿e HRV silnie zale¿y od takich czynników jak wiek, p³eæ czy stan zdrowia. Na przyk³ad ogólna zmiennoœæ HRV (\textit{SDNN}) spada z wiekiem, a ró¿nice miêdzy p³ciami mog¹ wynikaæ z odmiennej aktywnoœci uk³adu autonomicznego. Interpretacja wyników powinna zawsze uwzglêdniaæ te konteksty \cite{TaskForce1996}.
+Warto podkreœliæ, ¿e HRV silnie zale¿y od takich czynników jak wiek, p³eæ czy
+stan zdrowia. Na przyk³ad ogólna zmiennoœæ HRV (\textit{SDNN}) spada z wiekiem,
+a ró¿nice miêdzy p³ciami mog¹ wynikaæ z odmiennej aktywnoœci uk³adu
+autonomicznego. Interpretacja wyników powinna zawsze uwzglêdniaæ te konteksty
+\cite{TaskForce1996}.
 
 \subsection{Interpretacja wyników}
-W celu rzetelnej oceny zmiennoœci rytmu serca w dziedzinie czasu nale¿y interpretowaæ jednoczeœnie wyniki opisuj¹ce ogóln¹ zmiennoœæ (np. SDNN) oraz sk³adniki krótkoterminowe i d³ugoterminowe (odpowiednio RMSSD i SDANN). Analogicznie, w analizie czêstotliwoœciowej oraz czasowo-czêstotliwoœciowej kluczowe znaczenie maj¹ miary mocy w ró¿nych pasmach widmowych (np. HF i LF). Nic nie stoi na przeszkodzie, aby analizowaæ poszczególne sk³adniki z perspektywy ró¿nych metod.
+W celu rzetelnej oceny zmiennoœci rytmu serca w dziedzinie czasu nale¿y
+interpretowaæ jednoczeœnie wyniki opisuj¹ce ogóln¹ zmiennoœæ (np. SDNN) oraz
+sk³adniki krótkoterminowe i d³ugoterminowe (odpowiednio RMSSD i SDANN).
+Analogicznie, w analizie czêstotliwoœciowej oraz czasowo-czêstotliwoœciowej
+kluczowe znaczenie maj¹ miary mocy w ró¿nych pasmach widmowych (np. HF i LF).
+Nic nie stoi na przeszkodzie, aby analizowaæ poszczególne sk³adniki z
+perspektywy ró¿nych metod.
 
-Wy¿sze wartoœci zarówno metryk czasowych, jak i czêstotliwoœciowych (np. moc w analizowanych pasmach) wskazuj¹ na wy¿sze ogólne HRV, co zazwyczaj jest uwa¿ane za korzystne dla zdrowia. Nale¿y jednak pamiêtaæ, ¿e kluczowe dla oceny zdrowotnej zmiennoœci rytmu serca jest proporcja sk³adników odpowiadaj¹cych ró¿nym mechanizmom regulacyjnym.
+Wy¿sze wartoœci zarówno metryk czasowych, jak i czêstotliwoœciowych (np. moc w
+analizowanych pasmach) wskazuj¹ na wy¿sze ogólne HRV, co zazwyczaj jest uwa¿ane
+za korzystne dla zdrowia. Nale¿y jednak pamiêtaæ, ¿e kluczowe dla oceny
+zdrowotnej zmiennoœci rytmu serca jest proporcja sk³adników odpowiadaj¹cych
+ró¿nym mechanizmom regulacyjnym.
 
-O ile wysokie wartoœci HRV s¹ ogólnie pozytywne, to ich zdrowotne znaczenie wzrasta, gdy wynikaj¹ z wysokiej mocy w paœmie HF, co wskazuje na prawid³owe i intensywne dzia³anie uk³adu przywspó³czulnego. Taka sytuacja zwykle jest zwi¹zana z regularnym oddechem lub efektywnymi reakcjami relaksacyjnymi.
+O ile wysokie wartoœci HRV s¹ ogólnie pozytywne, to ich zdrowotne znaczenie
+wzrasta, gdy wynikaj¹ z wysokiej mocy w paœmie HF, co wskazuje na prawid³owe i
+intensywne dzia³anie uk³adu przywspó³czulnego. Taka sytuacja zwykle jest
+zwi¹zana z regularnym oddechem lub efektywnymi reakcjami relaksacyjnymi.
 
-Z kolei w badaniach, w których ogólna zmiennoœæ rytmu serca (np. SDNN lub ca³kowita moc) jest wysoka, ale dominuje wp³yw pasma LF, mo¿e to oznaczaæ, ¿e rytm serca jest zmienny g³ównie z powodu zwiêkszonej aktywnoœci wspó³czulnej. Taka sytuacja mo¿e byæ zwi¹zana ze stresem, przeci¹¿eniem organizmu lub nawet stanami patologicznymi, takimi jak arytmie \cite{Malik-HRV}.
+Z kolei w badaniach, w których ogólna zmiennoœæ rytmu serca (np. SDNN lub
+ca³kowita moc) jest wysoka, ale dominuje wp³yw pasma LF, mo¿e to oznaczaæ, ¿e
+rytm serca jest zmienny g³ównie z powodu zwiêkszonej aktywnoœci wspó³czulnej.
+Taka sytuacja mo¿e byæ zwi¹zana ze stresem, przeci¹¿eniem organizmu lub nawet
+stanami patologicznymi, takimi jak arytmie \cite{Malik-HRV}.
 \subsection{Podsumowanie}
 
-Nale¿y pamiêtaæ, ¿e HRV mierzy zmiennoœæ rytmu pracy serca, a nie jego œredni poziom. Zgodnie z obecn¹ wiedz¹ medyczn¹, w³aœciwa ocena HRV jest trudna, lecz mo¿e znacznie przyczyniæ siê do lepszego zrozumienia mechanizmów reguluj¹cych rytm serca oraz ich powi¹zañ z procesami fizjologicznymi i stanami chorobowymi. 
+Nale¿y pamiêtaæ, ¿e HRV mierzy zmiennoœæ rytmu pracy serca, a nie jego œredni
+poziom. Zgodnie z obecn¹ wiedz¹ medyczn¹, w³aœciwa ocena HRV jest trudna, lecz
+mo¿e znacznie przyczyniæ siê do lepszego zrozumienia mechanizmów reguluj¹cych
+rytm serca oraz ich powi¹zañ z procesami fizjologicznymi i stanami chorobowymi.
 
-Badanie HRV, zw³aszcza jego d³ugookresowych fluktuacji, stanowi cenny wskaŸnik stanu zdrowia w wielu zaburzeniach. Na przyk³ad po zawale miêœnia sercowego pozwala z wysok¹ dok³adnoœci¹ oszacowaæ przewidywany czas prze¿ycia, niezale¿nie od innych parametrów.
-
+Badanie HRV, zw³aszcza jego d³ugookresowych fluktuacji, stanowi cenny wskaŸnik
+stanu zdrowia w wielu zaburzeniach. Na przyk³ad po zawale miêœnia sercowego
+pozwala z wysok¹ dok³adnoœci¹ oszacowaæ przewidywany czas prze¿ycia,
+niezale¿nie od innych parametrów.
 
 \section{RSA \small{(autor: Piotr Weso³owski)}}
 
-
-
-{RSA} (ang. \textit{Respiratory Sinus Arrhythmia}) to zjawisko polegaj¹ce na cyklicznych i skorelowanych z cyklami oddechowymi zmianach w czêstotliwoœci rytmu serca. Wynika ono z interakcji miêdzy uk³adem oddechowym, kr¹¿eniowym i nerwowym \cite{Hayano1996}.
+ {RSA} (ang. \textit{Respiratory Sinus Arrhythmia}) to zjawisko polegaj¹ce na cyklicznych i skorelowanych z cyklami oddechowymi zmianach w czêstotliwoœci rytmu serca. Wynika ono z interakcji miêdzy uk³adem oddechowym, kr¹¿eniowym i nerwowym \cite{Hayano1996}.
 
 \subsection{Mechanizm RSA}
 
-Podczas wdechu przepona kurczy siê i przesuwa w dó³, co zwiêksza objêtoœæ klatki piersiowej i powoduje spadek ciœnienia wewn¹trzklatkowego. Obni¿one ciœnienie u³atwia powrót ¿ylny do serca oraz objêtoœæ wyrzutow¹, a jednoczeœnie powoduje zmniejszenie aktywnoœci nerwu b³êdnego (przywspó³czulnego), co prowadzi do wzrostu czêstoœci rytmu serca.
+Podczas wdechu przepona kurczy siê i przesuwa w dó³, co zwiêksza objêtoœæ
+klatki piersiowej i powoduje spadek ciœnienia wewn¹trzklatkowego. Obni¿one
+ciœnienie u³atwia powrót ¿ylny do serca oraz objêtoœæ wyrzutow¹, a jednoczeœnie
+powoduje zmniejszenie aktywnoœci nerwu b³êdnego (przywspó³czulnego), co
+prowadzi do wzrostu czêstoœci rytmu serca.
 
-Podczas wydechu przepona rozluŸnia siê i wraca w górê, zmniejszaj¹c objêtoœæ klatki piersiowej. To powoduje wzrost ciœnienia wewn¹trzklatkowego, co zmniejsza powrót ¿ylny i objêtoœæ wyrzutow¹ serca. W tym samym czasie wzrasta aktywnoœæ nerwu b³êdnego, co skutkuje spowolnieniem rytmu serca.
+Podczas wydechu przepona rozluŸnia siê i wraca w górê, zmniejszaj¹c objêtoœæ
+klatki piersiowej. To powoduje wzrost ciœnienia wewn¹trzklatkowego, co
+zmniejsza powrót ¿ylny i objêtoœæ wyrzutow¹ serca. W tym samym czasie wzrasta
+aktywnoœæ nerwu b³êdnego, co skutkuje spowolnieniem rytmu serca.
 
-Te zmiany s¹ dodatkowo modulowane przez mechanizm barorefleksji, który odpowiada za utrzymanie stabilnoœci ciœnienia têtniczego. Dodatkowo, zmiennoœæ rytmu serca podczas oddychania mo¿e optymalizowaæ wymianê gazow¹ w p³ucach, synchronizuj¹c przep³yw krwi z absorpcj¹ tlenu i usuwaniem dwutlenku wêgla \cite{Porges-RSA}.
+Te zmiany s¹ dodatkowo modulowane przez mechanizm barorefleksji, który
+odpowiada za utrzymanie stabilnoœci ciœnienia têtniczego. Dodatkowo, zmiennoœæ
+rytmu serca podczas oddychania mo¿e optymalizowaæ wymianê gazow¹ w p³ucach,
+synchronizuj¹c przep³yw krwi z absorpcj¹ tlenu i usuwaniem dwutlenku wêgla
+\cite{Porges-RSA}.
 
 \subsection{Pomiar RSA}
 
-Efekt RSA mo¿na mierzyæ na ró¿ne sposoby, w zale¿noœci od warunków przeprowadzanych badañ. W ocenie jego si³y stosuje siê analizê czasow¹ (np. RMSSD), czêstotliwoœciow¹ (np. FFT) lub czasowo-czêstotliwoœciow¹ (np. analizê falkow¹). Analizy czêstotliwoœciowe oraz czasowo-czêstotliwoœciowe s¹ szczególnie zalecane, poniewa¿ umo¿liwiaj¹ skuteczn¹ ocenê RSA w ró¿nych warunkach.
-
+Efekt RSA mo¿na mierzyæ na ró¿ne sposoby, w zale¿noœci od warunków
+przeprowadzanych badañ. W ocenie jego si³y stosuje siê analizê czasow¹ (np.
+RMSSD), czêstotliwoœciow¹ (np. FFT) lub czasowo-czêstotliwoœciow¹ (np. analizê
+falkow¹). Analizy czêstotliwoœciowe oraz czasowo-czêstotliwoœciowe s¹
+szczególnie zalecane, poniewa¿ umo¿liwiaj¹ skuteczn¹ ocenê RSA w ró¿nych
+warunkach.
 
 \subsection {Analiza czasowa}
 
- W kontekœcie RSA najwiêksz¹ korelacjê wykazuje RMSSD, poniewa¿ mierzy krótkoterminow¹ zmiennoœæ rytmu serca, g³ównie zwi¹zan¹ z aktywnoœci¹ przywspó³czuln¹. WskaŸnik SDNN, który uwzglêdnia wp³yw zarówno uk³adu wspó³czulnego, jak i przywspó³czulnego, lepiej odzwierciedla ca³kowit¹ zmiennoœæ rytmu serca.
+W kontekœcie RSA najwiêksz¹ korelacjê wykazuje RMSSD, poniewa¿ mierzy
+krótkoterminow¹ zmiennoœæ rytmu serca, g³ównie zwi¹zan¹ z aktywnoœci¹
+przywspó³czuln¹. WskaŸnik SDNN, który uwzglêdnia wp³yw zarówno uk³adu
+wspó³czulnego, jak i przywspó³czulnego, lepiej odzwierciedla ca³kowit¹
+zmiennoœæ rytmu serca.
 
- \subsection{Analiza czêstotliwoœciowa}
+\subsection{Analiza czêstotliwoœciowa}
 
- Analizuj¹c wielkoœæ efektu RSA metodami czêstotliwoœciowymi, kluczowym parametrem jest moc w paœmie HF (0.15–0.4 Hz), która odzwierciedla zmiennoœæ odcinków RR wynikaj¹c¹ z oddechu o czêstotliwoœci typowej dla zdrowej osoby, mieszcz¹cej siê w tym zakresie. Wysoka moc w tym zakresie wskazuje na silny wp³yw uk³adu przywspó³czulnego oraz wyraŸny efekt sinusowej arytmii oddechowej. Dodatkowo warto uwzglêdniæ znormalizowan¹ moc HF, która pozwala oceniæ wzglêdny udzia³ tego pasma w ca³kowitej zmiennoœci rytmu serca, oraz stosunek LF/HF. Niski stosunek LF/HF jest typowy dla wysokiego RSA, co wskazuje na dominacjê przywspó³czuln¹ nad wspó³czuln¹ aktywnoœci¹ w regulacji rytmu serca.
- 
- \subsection{Analiza czasowo czêstotliwoœciowa}
-Analiza czasowo-czêstotliwoœciowa pozwala na dodatkowe uwzglêdnienie dynamiki zmian w czasie. Dziêki tej metodzie mo¿liwe jest obserwowanie efektu RSA w konkretnych przedzia³ach czasu, co jest szczególnie przydatne w niestacjonarnych warunkach badania. W takich przypadkach tradycyjna analiza czêstotliwoœciowa mog³aby pokazaæ wzrost ogólnej mocy w paœmie LF, co mog³oby maskowaæ rzeczywisty wp³yw efektu RSA. Analiza czasowo-czêstotliwoœciowa umo¿liwia precyzyjne zlokalizowanie wzrostu mocy HF w odpowiednich momentach i lepsze odwzorowanie dynamicznych zmian rytmu serca.
+Analizuj¹c wielkoœæ efektu RSA metodami czêstotliwoœciowymi, kluczowym
+parametrem jest moc w paœmie HF (0.15–0.4 Hz), która odzwierciedla zmiennoœæ
+odcinków RR wynikaj¹c¹ z oddechu o czêstotliwoœci typowej dla zdrowej osoby,
+mieszcz¹cej siê w tym zakresie. Wysoka moc w tym zakresie wskazuje na silny
+wp³yw uk³adu przywspó³czulnego oraz wyraŸny efekt sinusowej arytmii oddechowej.
+Dodatkowo warto uwzglêdniæ znormalizowan¹ moc HF, która pozwala oceniæ wzglêdny
+udzia³ tego pasma w ca³kowitej zmiennoœci rytmu serca, oraz stosunek LF/HF.
+Niski stosunek LF/HF jest typowy dla wysokiego RSA, co wskazuje na dominacjê
+przywspó³czuln¹ nad wspó³czuln¹ aktywnoœci¹ w regulacji rytmu serca.
+
+\subsection{Analiza czasowo czêstotliwoœciowa}
+Analiza czasowo-czêstotliwoœciowa pozwala na dodatkowe uwzglêdnienie dynamiki
+zmian w czasie. Dziêki tej metodzie mo¿liwe jest obserwowanie efektu RSA w
+konkretnych przedzia³ach czasu, co jest szczególnie przydatne w
+niestacjonarnych warunkach badania. W takich przypadkach tradycyjna analiza
+czêstotliwoœciowa mog³aby pokazaæ wzrost ogólnej mocy w paœmie LF, co mog³oby
+maskowaæ rzeczywisty wp³yw efektu RSA. Analiza czasowo-czêstotliwoœciowa
+umo¿liwia precyzyjne zlokalizowanie wzrostu mocy HF w odpowiednich momentach i
+lepsze odwzorowanie dynamicznych zmian rytmu serca.
 
 \subsection {RSA a rytm oddechowy}
 
-Jako ¿e zjawisko RSA polega na dostosowywaniu siê rytmu serca do rytmu oddechowego, mo¿na obliczyæ wspó³czynnik korelacji pomiêdzy zmiennoœci¹ rytmu serca a zmiennoœci¹ rytmu oddechowego. Wymaga to jednak zastosowania narzêdzi takich jak spirometr czy pletzymograf, które precyzyjnie okreœlaj¹ objêtoœæ oddechow¹ i tempo oddechu. W niniejszej pracy nie u¿ywano takich urz¹dzeñ – tempo oddechu by³o kontrolowane za pomoc¹ stopera.
+Jako ¿e zjawisko RSA polega na dostosowywaniu siê rytmu serca do rytmu
+oddechowego, mo¿na obliczyæ wspó³czynnik korelacji pomiêdzy zmiennoœci¹ rytmu
+serca a zmiennoœci¹ rytmu oddechowego. Wymaga to jednak zastosowania narzêdzi
+takich jak spirometr czy pletzymograf, które precyzyjnie okreœlaj¹ objêtoœæ
+oddechow¹ i tempo oddechu. W niniejszej pracy nie u¿ywano takich urz¹dzeñ –
+tempo oddechu by³o kontrolowane za pomoc¹ stopera.
 
-W takich sytuacjach, gdy badanie nie posiada bezpoœredniego pomiaru oddechu przy pomocy wy¿ej wymienionych narzêdzi, rytm oddechowy mo¿e zostaæ estymowany na podstawie tachogramu, czyli wykresu przedstawiaj¹cego zmianê czêstotliwoœci skurczów serca w czasie. W przypadku rytmu serca o czêstotliwoœci zbli¿onej do rytmu oddechowego, momenty pocz¹tku wdechu mo¿na aproksymowaæ jako lokalne minima na wykresie têtna, a momenty wydechu - jako lokalne maksima.
-Pozwala to obliczyæ œredni¹ ró¿nicê w odstêpach RR pomiêdzy wdechem a wydechem i u¿ywaæ ich jako wskaŸników RSA - RSA Index. Im bardziej wyraŸne jest zjawisko RSA, tym dok³adniej mo¿na okreœliæ jego moc \cite{Berntson-RSA}.
-
+W takich sytuacjach, gdy badanie nie posiada bezpoœredniego pomiaru oddechu
+przy pomocy wy¿ej wymienionych narzêdzi, rytm oddechowy mo¿e zostaæ estymowany
+na podstawie tachogramu, czyli wykresu przedstawiaj¹cego zmianê czêstotliwoœci
+skurczów serca w czasie. W przypadku rytmu serca o czêstotliwoœci zbli¿onej do
+rytmu oddechowego, momenty pocz¹tku wdechu mo¿na aproksymowaæ jako lokalne
+minima na wykresie têtna, a momenty wydechu - jako lokalne maksima. Pozwala to
+obliczyæ œredni¹ ró¿nicê w odstêpach RR pomiêdzy wdechem a wydechem i u¿ywaæ
+ich jako wskaŸników RSA - RSA Index. Im bardziej wyraŸne jest zjawisko RSA, tym
+dok³adniej mo¿na okreœliæ jego moc \cite{Berntson-RSA}.
 
 \subsection {Zale¿noœæ RSA od czêstotliwoœci oddechów}
 
-W badaniach, wykazano, ¿e efekt RSA jest maksymalny dla czêstotliwoœci 6 oddechów na minutê (0.1 Hz), co odpowiada cyklowi oddechowemu trwaj¹cemu 10 sekund (5 sekund wdech, 5 sekund wydech). Takie tempo oddychania powoduje rezonans w uk³adzie sercowo-naczyniowym, wynikaj¹cy z synchronizacji rytmu oddechowego z naturalnymi oscylacjami ciœnienia krwi w paœmie LF (~0.1 Hz), które s¹ regulowane przez barorefleksjê. Ten rezonans wzmacnia efekt RSA, czyni¹c go bardziej wyraŸnym \cite{Bartsch-PhaseTransitions}.
-
+W badaniach, wykazano, ¿e efekt RSA jest maksymalny dla czêstotliwoœci 6
+oddechów na minutê (0.1 Hz), co odpowiada cyklowi oddechowemu trwaj¹cemu 10
+sekund (5 sekund wdech, 5 sekund wydech). Takie tempo oddychania powoduje
+rezonans w uk³adzie sercowo-naczyniowym, wynikaj¹cy z synchronizacji rytmu
+oddechowego z naturalnymi oscylacjami ciœnienia krwi w paœmie LF (~0.1 Hz),
+które s¹ regulowane przez barorefleksjê. Ten rezonans wzmacnia efekt RSA,
+czyni¹c go bardziej wyraŸnym \cite{Bartsch-PhaseTransitions}.
 
 \subsection {Problemy w interpretacji RSA w analizie FFT}
 
-Przy czêstotliwoœci oddechu 0.1 Hz moc RSA pojawia siê w paœmie LF, a nie w HF, co wynika z ustalonych granic pasm. HF obejmuje zakres od 0.15 do 0.4 Hz, odpowiadaj¹cy czêstotliwoœci oddechu dla zdrowej osoby - 12–20 oddechów na minutê (0.2 - 0.33 Hz). W takich przypadkach stosowanie wskaŸnika LF/HF mo¿e byæ myl¹ce i wymaga dodatkowej analizy czasowej lub uwzglêdnienia innych mechanizmów, takich jak oscylacja barorefleksyjna, które równie¿ maj¹ wp³yw w tym zakresie czêstotliwoœci.
+Przy czêstotliwoœci oddechu 0.1 Hz moc RSA pojawia siê w paœmie LF, a nie w HF,
+co wynika z ustalonych granic pasm. HF obejmuje zakres od 0.15 do 0.4 Hz,
+odpowiadaj¹cy czêstotliwoœci oddechu dla zdrowej osoby - 12–20 oddechów na
+minutê (0.2 - 0.33 Hz). W takich przypadkach stosowanie wskaŸnika LF/HF mo¿e
+byæ myl¹ce i wymaga dodatkowej analizy czasowej lub uwzglêdnienia innych
+mechanizmów, takich jak oscylacja barorefleksyjna, które równie¿ maj¹ wp³yw w
+tym zakresie czêstotliwoœci.
 
 \subsection {Wysokie RSA jako wskaŸnik zdrowia i adaptacyjnoœci}
 
-Wysokie RSA jest uwa¿ane za istotny marker zdrowia uk³adu sercowo-naczyniowego i autonomicznego. WyraŸne RSA œwiadczy o zdolnoœci organizmu do efektywnego reagowania na zmieniaj¹ce siê warunki œrodowiskowe, co odzwierciedla dobr¹ równowagê miêdzy uk³adem wspó³czulnym a przywspó³czulnym. Os³abienie RSA mo¿e byæ zwi¹zane z ró¿nymi czynnikami, takimi jak stres, starzenie siê, choroby uk³adu kr¹¿enia, cukrzyca, czy obci¹¿enia psychiczne.
-Efekt RSA jest najbardziej widoczny u m³odych, zdrowych osób, co wynika z wy¿szej aktywnoœci nerwu b³êdnego. Z wiekiem RSA stopniowo maleje, co jest naturalnym procesem zwi¹zanym ze spadkiem zdolnoœci adaptacyjnych uk³adu autonomicznego. WyraŸne ró¿nice w sile RSA mo¿na równie¿ zaobserwowaæ u osób aktywnych fizycznie – silniejsze RSA u takich osób wskazuje na lepsz¹ regulacjê autonomiczn¹ oraz zdolnoœæ organizmu do utrzymania homeostazy.
-W kontekœcie ogólnej zmiennoœci rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, szczególnie u osób o dobrej kondycji fizycznej. Zmiennoœæ rytmu serca wywo³ana oddechem jest jednym z g³ównych parametrów HRV, który umo¿liwia ocenê zdolnoœci adaptacyjnych organizmu oraz wp³ywu czynników zewnêtrznych, takich jak stres czy trening fizyczny \cite{Porges-RSA}.
+Wysokie RSA jest uwa¿ane za istotny marker zdrowia uk³adu sercowo-naczyniowego
+i autonomicznego. WyraŸne RSA œwiadczy o zdolnoœci organizmu do efektywnego
+reagowania na zmieniaj¹ce siê warunki œrodowiskowe, co odzwierciedla dobr¹
+równowagê miêdzy uk³adem wspó³czulnym a przywspó³czulnym. Os³abienie RSA mo¿e
+byæ zwi¹zane z ró¿nymi czynnikami, takimi jak stres, starzenie siê, choroby
+uk³adu kr¹¿enia, cukrzyca, czy obci¹¿enia psychiczne. Efekt RSA jest
+najbardziej widoczny u m³odych, zdrowych osób, co wynika z wy¿szej aktywnoœci
+nerwu b³êdnego. Z wiekiem RSA stopniowo maleje, co jest naturalnym procesem
+zwi¹zanym ze spadkiem zdolnoœci adaptacyjnych uk³adu autonomicznego. WyraŸne
+ró¿nice w sile RSA mo¿na równie¿ zaobserwowaæ u osób aktywnych fizycznie –
+silniejsze RSA u takich osób wskazuje na lepsz¹ regulacjê autonomiczn¹ oraz
+zdolnoœæ organizmu do utrzymania homeostazy. W kontekœcie ogólnej zmiennoœci
+rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, szczególnie u osób o dobrej
+kondycji fizycznej. Zmiennoœæ rytmu serca wywo³ana oddechem jest jednym z
+g³ównych parametrów HRV, który umo¿liwia ocenê zdolnoœci adaptacyjnych
+organizmu oraz wp³ywu czynników zewnêtrznych, takich jak stres czy trening
+fizyczny \cite{Porges-RSA}.
 
 \section{Metody uœredniania sygna³ów \small{(autor: Piotr Weso³owski)}}
 
@@ -399,75 +580,80 @@ W kontekœcie ogólnej zmiennoœci rytmu serca (HRV), RSA odgrywa kluczow¹ rolê, sz
 
 Œrednia krocz¹ca mo¿e byæ podzielona na dwa g³ówne typy:
 \begin{itemize}
-    \item \textbf{Œrednia krocz¹ca prosta (historyczna):} uwzglêdnia jedynie dane wczeœniejsze wzglêdem aktualnego punktu. Jest szczególnie przydatna w przypadku analizy danych w czasie rzeczywistym, gdzie przysz³e próbki s¹ nieznane.
-    \item \textbf{Œrednia krocz¹ca centralna:} wykorzystywana do analizy danych w pe³ni dostêpnych (np. po zakoñczeniu akwizycji). Uwzglêdnia dane z obu stron analizowanego punktu, tj. próbki z lewej i prawej strony. Dziêki symetrycznemu uœrednianiu œrednia centralna nie wykazuje efektu przesuniêcia (lagu).
+  \item \textbf{Œrednia krocz¹ca prosta (historyczna):} uwzglêdnia jedynie dane wczeœniejsze wzglêdem aktualnego punktu. Jest szczególnie przydatna w przypadku analizy danych w czasie rzeczywistym, gdzie przysz³e próbki s¹ nieznane.
+  \item \textbf{Œrednia krocz¹ca centralna:} wykorzystywana do analizy danych w pe³ni dostêpnych (np. po zakoñczeniu akwizycji). Uwzglêdnia dane z obu stron analizowanego punktu, tj. próbki z lewej i prawej strony. Dziêki symetrycznemu uœrednianiu œrednia centralna nie wykazuje efektu przesuniêcia (lagu).
 \end{itemize}
-
 
 Œrednia krocz¹ca polega na zastosowaniu filtra, który okreœla wagi przypisane poszczególnym próbkach w oknie uœredniania, a nastêpnie na wykonaniu operacji konwolucji sygna³u z tym filtrem. Wybór odpowiednich wag zale¿y od rodzaju zastosowanej œredniej. Najczêœciej stosowane s¹ nastêpuj¹ce typy filtrów:
 
-
 \subsection{Rodzaje œrednich krocz¹cych}
 \begin{itemize}
-    \item \textbf{Prosta (jednorodna):} Wszystkie próbki w oknie uœredniania maj¹ tê sam¹ wagê. Jeœli d³ugoœæ okna wynosi $n$, ka¿da próbka w oknie ma wagê $1/n$. Jest to podstawowa metoda, odpowiednia do sygna³ów o umiarkowanej zmiennoœci i w przypadku mniej krytycznych zastosowañ.
-    \item \textbf{Liniowa:} Wagi w oknie uœredniania zmniejszaj¹ siê liniowo wraz z odleg³oœci¹ od centralnej próbki. Jest to u¿yteczne w przypadkach, gdy próbki bli¿sze analizowanemu punktowi powinny mieæ wiêkszy wp³yw na wynik.
-    \item \textbf{Gaussowska:} Wagi s¹ obliczane na podstawie rozk³adu normalnego (gaussowskiego). Jest najlepsza w przypadku dynamicznych sygna³ów lub danych, gdzie wa¿ne jest uzyskanie naturalnego wyg³adzenia. Wartoœæ wagi dla próbki $x_i$ zale¿y od odleg³oœci od centralnej próbki $x_c$ i jest wyra¿ona wzorem:
-    \begin{equation}
-      w_i = \frac{1}{\sqrt{2\pi}\sigma} \cdot e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
-    \end{equation}
-    gdzie:
-    \begin{itemize}
-        \item $\sigma$ to odchylenie standardowe okreœlaj¹ce szerokoœæ rozk³adu,
-        \item $x_i$ to odleg³oœæ próbki od œrodka okna.
-    \end{itemize}
+  \item \textbf{Prosta (jednorodna):} Wszystkie próbki w oknie uœredniania maj¹ tê sam¹ wagê. Jeœli d³ugoœæ okna wynosi $n$, ka¿da próbka w oknie ma wagê $1/n$. Jest to podstawowa metoda, odpowiednia do sygna³ów o umiarkowanej zmiennoœci i w przypadku mniej krytycznych zastosowañ.
+  \item \textbf{Liniowa:} Wagi w oknie uœredniania zmniejszaj¹ siê liniowo wraz z odleg³oœci¹ od centralnej próbki. Jest to u¿yteczne w przypadkach, gdy próbki bli¿sze analizowanemu punktowi powinny mieæ wiêkszy wp³yw na wynik.
+  \item \textbf{Gaussowska:} Wagi s¹ obliczane na podstawie rozk³adu normalnego (gaussowskiego). Jest najlepsza w przypadku dynamicznych sygna³ów lub danych, gdzie wa¿ne jest uzyskanie naturalnego wyg³adzenia. Wartoœæ wagi dla próbki $x_i$ zale¿y od odleg³oœci od centralnej próbki $x_c$ i jest wyra¿ona wzorem:
+        \begin{equation}
+          w_i = \frac{1}{\sqrt{2\pi}\sigma} \cdot e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
+        \end{equation}
+        gdzie:
+        \begin{itemize}
+          \item $\sigma$ to odchylenie standardowe okreœlaj¹ce szerokoœæ rozk³adu,
+          \item $x_i$ to odleg³oœæ próbki od œrodka okna.
+        \end{itemize}
 \end{itemize}
 
-
-W projekcie zdecydowano siê na zastosowanie œredniej gaussowskiej, poniewa¿ najlepiej nadaje siê ona do analizy sygna³ów takich jak EKG, gdzie zmiennoœæ sygna³u ma kluczowe znaczenie, a jednoczeœnie wymagane jest p³ynne odwzorowanie globalnych trendów.
+W projekcie zdecydowano siê na zastosowanie œredniej gaussowskiej, poniewa¿
+najlepiej nadaje siê ona do analizy sygna³ów takich jak EKG, gdzie zmiennoœæ
+sygna³u ma kluczowe znaczenie, a jednoczeœnie wymagane jest p³ynne odwzorowanie
+globalnych trendów.
 
 \subsection{Œrednia gaussowska — przyk³ad obliczenia}
 
-W praktycznych implementacjach œredniej Gaussowskiej wspó³czynnik \( \frac{1}{\sqrt{2\pi}\sigma} \) nie jest jawnie uwzglêdniany, poniewa¿ wagi s¹ normalizowane po obliczeniu. Normalizacja sprawia, ¿e suma wag wynosi 1, co osi¹ga ten sam efekt, jaki zapewnia³by ten wspó³czynnik. W efekcie u¿ywamy uproszczonego wzoru:
+W praktycznych implementacjach œredniej Gaussowskiej wspó³czynnik \(
+\frac{1}{\sqrt{2\pi}\sigma} \) nie jest jawnie uwzglêdniany, poniewa¿ wagi s¹
+normalizowane po obliczeniu. Normalizacja sprawia, ¿e suma wag wynosi 1, co
+osi¹ga ten sam efekt, jaki zapewnia³by ten wspó³czynnik. W efekcie u¿ywamy
+uproszczonego wzoru:
 \begin{equation}
-w_i' = e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
+  w_i' = e^{-\frac{(x_i - x_c)^2}{2\sigma^2}}
 \end{equation}
 a nastêpnie normalizujemy wszystkie \( w_i' \), aby uzyskaæ koñcowe wagi.
 
 \subsubsection{Przyk³ad}
 Za³ó¿my:
 \begin{itemize}
-    \item Sygna³: \([3, 5, 8, 6, 4, 7]\)
-    \item D³ugoœæ okna: \(n = 3\)
-    \item Odchylenie standardowe: \(\sigma = n / 4 = 0.75\)
+  \item Sygna³: \([3, 5, 8, 6, 4, 7]\)
+  \item D³ugoœæ okna: \(n = 3\)
+  \item Odchylenie standardowe: \(\sigma = n / 4 = 0.75\)
 \end{itemize}
 
 \subsubsection{Krok 1: Obliczenie wag gaussowskich}
 Dla œrodka okna (\(x_c\)) na pozycji \(i = 1\) (œrodek okna):
 \[
-w_0 = e^{-\frac{(0 - 1)^2}{2 \cdot 0.75^2}} = e^{-\frac{1}{1.125}} \approx 0.472
+  w_0 = e^{-\frac{(0 - 1)^2}{2 \cdot 0.75^2}} = e^{-\frac{1}{1.125}} \approx 0.472
 \]
 Podobnie obliczamy \(w_1\) i \(w_2\).
 
 Lista wag przed normalizacj¹:
 \[
-w = [0.472, 1.0, 0.472]
+  w = [0.472, 1.0, 0.472]
 \]
 
 Normalizujemy, dziel¹c przez sumê wag (\(1.944\)):
 \[
-w = \left[\frac{0.472}{1.944}, \frac{1.0}{1.944}, \frac{0.472}{1.944}\right] \approx [0.243, 0.514, 0.243]
+  w = \left[\frac{0.472}{1.944}, \frac{1.0}{1.944}, \frac{0.472}{1.944}\right] \approx [0.243, 0.514, 0.243]
 \]
 
 \subsubsection{Krok 2: Konwolucja sygna³u z wagami}
 Dla przyk³adu obliczmy œredni¹ dla punktu \(x_3 = 8\) (okno: \([5, 8, 6]\)):
 \[
-y_3 = 5 \cdot 0.243 + 8 \cdot 0.514 + 6 \cdot 0.243 = 1.215 + 4.112 + 1.458 \approx 6.785
+  y_3 = 5 \cdot 0.243 + 8 \cdot 0.514 + 6 \cdot 0.243 = 1.215 + 4.112 + 1.458 \approx 6.785
 \]
 
 \subsubsection{Wynik koñcowy}
-Podobnie obliczamy dla wszystkich punktów, stosuj¹c te same wagi, a tak prezentuje siê wynikowy sygna³:  
+Podobnie obliczamy dla wszystkich punktów, stosuj¹c te same wagi, a tak
+prezentuje siê wynikowy sygna³:
 \[
-\text{Sygna³ uœredniony} \approx [3.299, 5.243, 6.785, 6.0, 5.215, 4.57]
+  \text{Sygna³ uœredniony} \approx [3.299, 5.243, 6.785, 6.0, 5.215, 4.57]
 \]
 
 \input{Rodzialy/Przeglad uczenia maszynowego.tex}
