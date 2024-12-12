@@ -13,22 +13,23 @@ maszynowego, które automatyzuj¹ analizê i zwiêkszaj¹ jej skutecznoœæ
 Do rozpoznawania arytmii wykorzystuje siê szeroki zakres metod uczenia
 maszynowego, obejmuj¹cych zarówno klasyczne podejœcia uczenia nadzorowanego,
 jak i techniki uczenia nienadzorowanego. Wœród klasycznych algorytmów
-nadzorowanych popularne s¹ SVM (ang. Support Vector Machines), KNN (ang. K-Nearest
-Neighbors), klasyfikatory Bayesowskie, drzewa decyzyjne oraz lasy losowe.
-Metody uczenia nienadzorowanego równie¿ odgrywaj¹ istotn¹ rolê, wspieraj¹c
-proces eksploracji danych i in¿ynierii cech, co mo¿e znacz¹co poprawiæ
-skutecznoœæ modeli klasyfikacyjnych. W tym zakresie stosuje siê algorytmy takie
-jak K-means, fuzzy c-means clustering, grupowanie hierarchiczne oraz Gaussian
-Mixture Models. Ponadto coraz czêœciej wykorzystuje siê g³êbokie sieci
-neuronowe, w tym splotowe sieci neuronowe (Convolutional Neural Networks, CNN) oraz sieci LSTM (Long
-Short-Term Memory) \cite{Kavya-shockableArthytmiaDetection}.
+nadzorowanych popularne s¹ SVM (ang. Support Vector Machines), KNN (ang.
+K-Nearest Neighbors), klasyfikatory Bayesowskie, drzewa decyzyjne oraz lasy
+losowe. Metody uczenia nienadzorowanego równie¿ odgrywaj¹ istotn¹ rolê,
+wspieraj¹c proces eksploracji danych i in¿ynierii cech, co mo¿e znacz¹co
+poprawiæ skutecznoœæ modeli klasyfikacyjnych. W tym zakresie stosuje siê
+algorytmy takie jak K-means, fuzzy c-means clustering, grupowanie hierarchiczne
+oraz Gaussian Mixture Models. Ponadto coraz czêœciej wykorzystuje siê g³êbokie
+sieci neuronowe, w tym splotowe sieci neuronowe (Convolutional Neural Networks,
+CNN) oraz sieci LSTM (Long Short-Term Memory)
+\cite{Kavya-shockableArthytmiaDetection}.
 
 Ribeiro i wspó³autorzy \cite{ribeiro2020automatic} opracowali g³êbok¹ sieæ
-neuronow¹ (Deep Neural Network, DNN) do automatycznej klasyfikacji
-nieprawid³owoœci w krótkotrwa³ych (7-10 s), 12-odprowadzeniowych zapisach EKG.
+neuronow¹ (ang. Deep Neural Network, DNN) do automatycznej klasyfikacji
+nieprawid³owoœci w krótkotrwa³ych (7-10 s), 12 odprowadzeniowych zapisach EKG.
 Algorytm zosta³ wytrenowany na zbiorze danych obejmuj¹cym ponad 2,3 miliona
 zapisów EKG. Architektura DNN opiera³a siê na sieci rezydualnej przystosowanej
-do analizy sygna³ów jednowymiarowych, z warstwami konwolucyjnymi i po³¹czeniami
+do analizy sygna³ów jednowymiarowych, z warstwami splotowymi i po³¹czeniami
 skip dla zwiêkszenia efektywnoœci treningu.
 
 DNN zosta³a wytrenowana do wykrywania szeœciu nieprawid³owoœci: bloku
@@ -49,7 +50,7 @@ specjalistów. \\
 Metodê klasyfikacji, nie opart¹ o sieci neuronowe przedstawiono w publikacji
 \cite{Morteza-RandomForest}. Autorzy zaproponowali hybrydowy algorytm,
 umo¿liwiaj¹cy przypisanie sygna³u do jednej z czterech klas: migotania
-przedsionków (AF), normalnego rytmu zatokowego, innych rytmów lub sygna³ów zbyt
+przedsionków, normalnego rytmu zatokowego, innych rytmów lub sygna³ów zbyt
 zak³óconych do analizy. Proces ten opiera³ siê na wykorzystaniu klasyfikatora
 opartego o las losowy (ang. Random Forest) zarówno do selekcji cech, jak i do
 finalnej klasyfikacji, co pozwoli³o na efektywne przetwarzanie i analizê du¿ej
@@ -78,9 +79,10 @@ którego obliczane s¹ istotne parametry pracy serca. Tradycyjne metody, takie
 jak algorytm Pan-Tompkins, mimo swojej popularnoœci, czêsto okazuj¹ siê podatne
 na szumy i zak³ócenia w sygnale, co ogranicza ich skutecznoœæ w trudnych
 warunkach. W odpowiedzi na te wyzwania coraz czêœciej stosuje siê metody
-uczenia maszynowego, takie jak splotowe sieci neuronowe (CNN) czy sieci LSTM
-(ang. Long Short-Term Memory), które s¹ bardziej odporne na zak³ócenia i lepiej
-radz¹ sobie z analiz¹ z³o¿onych wzorców sygna³u.
+uczenia maszynowego, takie jak splotowe sieci neuronowe (ang Convolutional
+Neural Networks, CNN) czy sieci LSTM (ang. Long Short-Term Memory), które s¹
+bardziej odporne na zak³ócenia i lepiej radz¹ sobie z analiz¹ z³o¿onych wzorców
+sygna³u.
 
 Przyk³ad zastosowania sieci LSTM w detekcji szczytów R przedstawiono w pracy
 \cite{JUHO-LSTM}. Zaprezentowany model sk³ada³ siê z dwóch warstw
@@ -98,8 +100,8 @@ LSTM osi¹gnê³o wysokie wyniki, osi¹gaj¹c wyniik F1 na poziomie znacznie powy¿ej
 0.90, nawet przy niskim stosunku sygna³u do szumu (SNR 0.1). Zaproponowane
 rozwi¹zanie wykaza³o sie lepszymi rezultatami ni¿ tradycyjne metody nie
 korzystaj¹ce z dorobku uczenia maszynowego (Hamilton, Christov, Engzee,
-Pan-Tompkins). Autorzy wskazali plany na rozwiniêcie owej architektury do modelu
-end-to-end.
+Pan-Tompkins). Autorzy wskazali plany na rozwiniêcie owej architektury do
+modelu end-to-end.
 
 W pracy \cite{MUzairZahid-UNET} autorzy przedstawili model wykorzystuj¹cy
 jednowymiarowe sieci splotowe, o architekturze UNet. Rozwi¹zanie bazowa³o na
@@ -115,9 +117,10 @@ linii bazowej oraz zak³ócenia ruchowe z bazy Noise Stress Test Database
 (NST-DB).
 
 Koñcowym wynikiem dzia³ania modelu by³a jednowymiarowa mapa prawdopodobieñstwa,
-podobna do tej generowanej przez model oparty na LSTM, przedstawiony wczeœniej.
-Po odpowiednim przetworzeniu wyjœcia, model osi¹ga³ wyniki F1 na poziomie
-przekraczaj¹cym 0.99, przewy¿szaj¹c inne metody porównane w badaniu.
+podobna do tej generowanej przez model oparty na LSTM, który zosta³
+przedstawiony wczeœniej w tym rodziale. Po odpowiednim przetworzeniu wyjœcia,
+model osi¹ga³ wyniki F1 na poziomie przekraczaj¹cym 0.99, przewy¿szaj¹c inne
+metody porównane w badaniu.
 
 \subsection{Przewidywanie poziomu elektrolitów we krwi}
 Analiza sygna³u EKG dostarcza informacji nie tylko o pracy serca, ale tak¿e o
@@ -142,32 +145,6 @@ dok³adnoœci pozwalaj¹cej zast¹piæ badania laboratoryjne. Autorzy widz¹ jednak
 potencja³ zastosowania w telemedycynie, szczególnie w karetkach lub odleg³ych
 lokalizacjach bez dostêpu do analiz krwi.
 
-% Analiza sygna³u EKG mo¿e dostarczyæ informacji nie tylko o pracy serca, ale
-% równie¿ o ogólnym stanie zdrowia pacjenta, w tym o poziomie elektrolitów we
-% krwi. Nowoczesne metody oparte na uczeniu maszynowym, w szczególnoœci g³êbokie
-% sieci neuronowe, umo¿liwiaj¹ przewidywanie stê¿eñ takich elektrolitów jak
-% potas, wapñ czy sód na podstawie danych EKG.
-
-% Przyk³adem miar, które mog¹ byæ przewidywane na podstawie analizy wykresu EKG,
-% jest stê¿enie elektrolitów we krwi, takich jak potas, wapñ czy sód, a tak¿e
-% stê¿enie kreatyniny. Temat ten by³ przedmiotem szczegó³owych badañ opisanych w
-% pracy \cite{Bachmann-electrolyte_prediction}, gdzie autorzy wykorzystali
-% g³êbokie sieci neuronowe (DNN), opieraj¹c swoje rozwi¹zanie na architekturze
-% ResNet.
-
-% Model regresji bezpoœredniej wytrenowano na ponad 290 000 nagraniach EKG
-% powi¹zanych z wynikami badañ krwi, zebranych w szwedzkich szpitalach. DNN
-% osi¹gn¹³ lepsze wyniki ni¿ klasyczne metody uczenia maszynowego, takie jak
-% Random Forest czy Gradient Boost. Najlepsze okaza³y sie wyniki dla potasu, z
-% korelacj¹ Pearsona 0,58–0,60, niestety w przypadku innych elektrolitów, takich
-% jak wapñ czy sód, skutecznoœæ by³a ni¿sza, co mo¿e wynikaæ z subtelniejszych
-% zmian w EKG i wê¿szego zakresu wartoœci tych parametrów.
-
-% Mimo przewagi nad tradycyjnymi metodami uczenia maszynowego, model nie osi¹gn¹³
-% dok³adnoœci pozwalaj¹cej zast¹piæ badania laboratoryjne. Autorzy widz¹ jednak
-% potencja³ zastosowania w telemedycynie, szczególnie w karetkach lub odleg³ych
-% lokalizacjach bez dostêpu do analiz krwi.
-
 \subsection{Wykrywanie COVID-19}
 Pandemia COVID-19 wywo³a³a globalne wyzwania w diagnostyce i zarz¹dzaniu
 zdrowiem publicznym. Tradycyjne metody diagnostyczne, takie jak testy PCR, choæ
@@ -178,8 +155,8 @@ zbiorów danych medycznych.
 
 Temat zastosowania uczenia maszynowego do diagnozy COVID-19 poruszyli autorzy
 publikacji \cite{Irungu-EcgCovid}. Zastosowali oni takie algorytmy jak KNN
-(K-Nearest Neighbors), SVM (ang. Support Vector Machines) oraz las losowy (Random
-Forest) do budowy modeli klasyfikacyjnych. Zastosowanie tych algorytmów
+(ang. K-Nearest Neighbors), SVM (ang. Support Vector Machines) oraz las losowy
+(Random Forest) do budowy modeli klasyfikacyjnych. Zastosowanie tych algorytmów
 wymaga³o wczeœniejszego usuniêcia zak³óceñ z sygna³u EKG i wyodrebnienia cech w
 domenach takich jak czasowa, czestotliwosciowa czy czasowo-czestotliwosciowa.
 
@@ -192,12 +169,12 @@ monitorowania pracy serca.
 
 Rozwi¹zanie typu end-to-end, niewymagaj¹ce wczeœniejszego wyodrebniania cech z
 sygna³u EKG przedstawiono w pracy \cite{SAKR2023324}. Autorzy opracowali trzy
-ró¿ne modele oparte na splotowych sieciach neuronowych (CNN) w celu oceny
-ich wydajnoœci w klasyfikacji sygna³ów EKG i wybrali najbardziej obiecuj¹cy z
-nich. Modele te pracowa³y w trybie end-to-end, co oznacza³o, ¿e obrazy EKG by³y
-bezpoœrednio podawane do sieci bez koniecznoœci stosowania dodatkowych etapów
-przetwarzania wstêpnego. Aby zapewniæ spójnoœæ danych wejœciowych, ka¿dy obraz
-by³ przeskalowywany do rozmiaru 180x180 pikseli przed wprowadzeniem do sieci.
+ró¿ne modele oparte na splotowych sieciach neuronowych (CNN) w celu oceny ich
+wydajnoœci w klasyfikacji sygna³ów EKG i wybrali najbardziej obiecuj¹cy z nich.
+Modele te funkcjonowa³y w trybie end-to-end, co oznacza, ¿e obrazy EKG by³y
+bezpoœrednio wprowadzane do sieci bez potrzeby wczeœniejszej obróbki. Aby
+jednak zapewniæ spójnoœæ danych wejœciowych, ka¿dy obraz by³ skalowany do
+rozmiaru 180x180 pikseli przed przetworzeniem przez sieæ.
 
 Pierwszy model sk³ada³ siê z czterech warstw splotowych, z których ka¿da by³a
 zakoñczona operacj¹ max pooling. Po warstwach splotowych zastosowano warstwê
@@ -229,14 +206,14 @@ algorytmów uczenia maszynowego, poniewa¿ podejœcie to wci¹¿ jest rzadko
 stosowane. Klasyczne metody obliczeniowe s¹ natomiast zdecydowanie dok³adne i
 niemal wy³¹cznie one znajduj¹ zastosowanie w analizie HRV.
 
-EKG, HRV i uczenie maszynowe wspó³dzia³aj¹ w sposób poœredni. Algorytmy uczenia
-maszynowego mog¹ byæ stosowane do wykrywania szczytów w sygnale EKG, co stanowi
-pierwszy krok w procesie obliczania wskaŸników HRV klasycznymi metodami. Z
-kolei HRV, wyznaczane w ten sposób, pe³ni istotn¹ rolê jako kluczowa cecha
-wejœciowa w zaawansowanych analizach, takich jak diagnozowanie chorób serca czy
-ocena stresu. Dziêki temu uczenie maszynowe znajduje szerokie zastosowanie w
-analizach opartych na HRV, co podkreœla jego znaczenie w interdyscyplinarnych
-badaniach i zastosowaniach klinicznych.
+EKG, HRV i uczenie maszynowe wspó³dzia³aj¹ jednak w sposób poœredni. Algorytmy
+uczenia maszynowego mog¹ byæ stosowane do wykrywania szczytów w sygnale EKG, co
+stanowi pierwszy krok w procesie obliczania wskaŸników HRV klasycznymi
+metodami. Z kolei HRV, wyznaczane w ten sposób, pe³ni istotn¹ rolê jako
+kluczowa cecha wejœciowa w zaawansowanych analizach, takich jak diagnozowanie
+chorób serca czy ocena stresu. Dziêki temu uczenie maszynowe znajduje szerokie
+zastosowanie w analizach opartych na HRV, co podkreœla jego znaczenie w
+interdyscyplinarnych badaniach i zastosowaniach klinicznych.
 
 Jednym z takich przyk³adów, gdzie metryki HRV s³u¿¹ jako parametry wejœciowe
 jest model klasyfikujacy poziom stresu, lêku i depresji zaprezentowany w
@@ -253,7 +230,7 @@ zaawansowanego przetwarzania sygna³ów. Pretrenowanie modeli zwiêkszy³o
 dok³adnoœæ o 6,9\%, a metoda "hot-spot" poprawia³a wyniki w wybranych
 przypadkach. Wyniki dowodz¹, ¿e modele LSTM skutecznie prognozuj¹ stres, lêk i
 depresjê na podstawie HRV, osi¹gaj¹c wyniki porównywalne z wczeœniejszymi
-badaniami, nawet przy krótszych oknach danych.
+badaniami, nawet przy krótszych oknach danych.\\
 
 Istniej¹ jednak prace, które w kontekœcie metod opartych na sztucznej
 inteligencji skutecznie wyznaczaj¹ miary HRV z innych sygna³ów, takich jak PPG
@@ -277,7 +254,9 @@ przewidywa³ parametry HR, RR, TINN i pNN50, osi¹gaj¹c wysok¹ korelacjê (r >
 Badanie wykaza³o, ¿e algorytmy uczenia maszynowego mog¹ skutecznie analizowaæ
 niektóre metryki HRV na podstawie danych termowizyjnych. Ich zastosowanie mo¿e
 byæ szczególnie przydatne w warunkach, gdzie tradycyjne metody pomiaru s¹
-trudne do zastosowania, takich jak s³abe oœwietlenie.
+niemo¿liwe lub trudne do zastosowania. Co wiêcej, jest to metoda bezkontaktowa,
+co czyni j¹ idealnym rozwi¹zaniem w sytuacjach, gdzie bezpoœredni kontakt z
+pacjentem jest ograniczony lub niewskazany
 
 W pracy \cite{Gudny-ppgHRV} opisano wykorzystanie sieci neuronowych LSTM do
 analizy sygna³ów PPG i danych ruchowych w celu przewidywania parametrów HRV
@@ -365,14 +344,3 @@ analizie entropii (Cross Entropy), spójnoœci czasowo-czêstotliwoœciowej
 Projections), które wykaza³y siê wysok¹ precyzj¹ i odpornoœci¹ na zmiennoœæ
 sygna³ów oddechowych.
 
-% Modele te by³y trenowane przy u¿yciu 10-krotnej walidacji krzy¿owej na dancyh
-% symulacyjnych, w których dok³adnie kontrolowano si³ê sprzê¿enia
-% kardiorespiracyjnego za pomoca przyjêtego parametru., s³u¿y³y do oceny ró¿nych
-% metod i dok³adnoœci przewidywan pod wzglêdem MSE (Mean Squared Error). Pozniej
-% w prawdziwych testach porownano ich zgodnosc ze soba. pierwotnie by³y wyra¿one
-% w ró¿nych jednostkach i skalach. Takie podejœcie by³o niezbêdne do obiektywnego
-% porównania skutecznoœci poszczególnych metod. Analiza wykaza³a, ¿e najlepsze
-% wyniki w odzwierciedlaniu si³y RSA uzyska³y metody oparte na analizie entropii
-% (Cross Entropy), spójnoœci czasowo-czêstotliwoœciowej (Time-Frequency
-% Coherence) oraz projekcjach w podprzestrzeni (Subspace Projections), które
-% wykaza³y siê wysok¹ precyzj¹ i odpornoœci¹ na zmiennoœæ sygna³ów oddechowych.

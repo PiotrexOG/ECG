@@ -412,4 +412,27 @@ Funkcjonalnoœæ obliczania œredniej krocz¹cej, zarówno centralnej, jak i
 klasycznej, zosta³a równie¿ zaimplementowana w przypadku wizualizacji trendów
 pulsu oraz interwa³ów RR, z u¿yciem filtra gaussowskiego.
 
-% \section{}
+\section{Repozytorium z wytworzonym kodem}
+Repozytorium zawieraj¹ce kody Ÿród³owe aplikacji stworzonych na potrzeby niniejszej pracy dyplomowej znajduj¹ siê pod adresem:\href{https://github.com/PiotrexOG/ECG}{https://github.com/PiotrexOG/ECG}.
+
+\noindent Poni¿ej przedstawiono krótki opis zawartoœci plików, u³atwiaj¹cy nawigacjê po repozytorium:
+\begin{itemize}
+    \item config.py -- parametry konfiguracji systemu, takie jak tryb pracy aplikacji, czêstotliwoœæ próbkowania, adres serwera
+    \item main.py -- g³ówny plik aplikacji, zawiera g³ówny punkt wejœcia oraz implementacje serwera.
+    \item dataSenderEmulator.py -- funkcje odpowiedzialne za wczytanie danych z pliku oraz symulacje.
+    \item doba\_analysis.py -- funkcje odpowiedzialne za analize danych HRV dla danych ca³odobowych
+    \item EcgData.py -- klasa odpowiedzialna za przechowywanie i analize danych EKG
+    \item RPeaksFinder.py -- klasa abstrakcyjna, definiuj¹ca metody do znajdowania szczytów R w sygnale EKG
+    \item UNetFinder.py -- implementacja RPeaksFinder korzystaj¹ca z sieci UNet
+    \item PanTompkinsFinder.py -- implementacja RPeaksFinder korzystaj¹ca z algorytmu Pan-Tompkins
+    \item EcgPlotter.py -- klasa rysuj¹ca wykres EKG.
+    \item FFTPlotter.py -- klasa rysuj¹ca analizê spektraln¹ przy u¿yciu FFT
+    \item HRPlotter.py -- klasa rysuj¹ca wykresy têtna, interwa³ów RR oraz ich przefiltrowanych wersji
+    \item models.py -- implementacja modelu UNet
+    \item hrvPredictionModels.py -- implementacje modeli neuronowych do przewidywania miar HRV, model end-to-end oraz model oparty o interwa³y RR
+    \item merge\_csvs.py -- funkcje odpowiedzialne za ³¹czenie wielu plików CSV w jeden
+    \item nnHelpers.py -- funkcje pomocnicze do dzia³ania modelu UNet
+    \item PanTompkins.py -- implementacja algorytmu Pan-Tompkins
+    \item FFT.py -- funkcje odpowiedzialne za obliczanie mocy pasm LF i HF
+    \item trainModel.py -- funkcje odpowiedzialne za trening sieci UNet
+\end{itemize}
