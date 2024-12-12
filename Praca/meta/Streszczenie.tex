@@ -1,6 +1,14 @@
-\chapter*{Streszczenie}
-\indent Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum arcu nec blandit aliquam. Integer eros dolor, molestie eget dictum quis, luctus sit amet sapien. Proin dignissim felis in ornare volutpat. Morbi vulputate rutrum efficitur. Ut vehicula vehicula metus, et iaculis tortor mattis vel. Nam blandit, arcu quis ultricies blandit, libero ante commodo augue, in accumsan dui leo at orci. Phasellus in augue et velit pulvinar malesuada ut et sem. Nulla vehicula nibh eu odio sollicitudin sagittis. Praesent condimentum semper neque, tincidunt luctus nisl scelerisque sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
+\chapter*{Streszczenie \small{(autor: Piotr Weso³owski)}}
+\indent Praca in¿ynierska przedstawia system analizy sygna³ów EKG z wykorzystaniem metod uczenia maszynowego, koncentruj¹c siê na zmiennoœci rytmu serca (HRV) oraz efekcie oddechowo-sercowym (RSA). Projekt bazuje na przetwarzaniu danych w czasie rzeczywistym przy u¿yciu czujnika Polar H10 oraz dedykowanej aplikacji umo¿liwiaj¹cej akwizycjê sygna³ów EKG przesy³anych za pomoc¹ technologii Bluetooth. System obs³uguje równie¿ analizê pe³nych próbek sygna³ów wczytywanych z plików, co pozwala na kompleksowe badanie zale¿noœci w danych.
+
+W systemie zaimplementowano ró¿norodne techniki analizy danych, z których ka¿da wymaga³a wczeœniejszego okreœlenia charakterystycznych szczytów w sygnale EKG za pomoc¹ zaimplementowanego algorytmu. Na podstawie wykrytych szczytów obliczano odstêpy miêdzy nimi, które stanowi³y podstawê dalszych analiz. Podstawowa z nich, dzia³aj¹ca w dziedzinie czasowej, pozwala³a na obliczenie wartoœci szeregu charakterystyk na podstawie tych interwa³ów. Odstêpy te by³y równie¿ wykorzystywane w analizach czêstotliwoœciowych oraz czasowo-czêstotliwoœciowych. W tych metodach zastosowano zaawansowane przekszta³cenia matematyczne, takie jak szybka transformata Fouriera czy analiza falkowa. Wyniki powy¿szych analiz dotycz¹cych zmiennoœci rytmu serca prezentowane s¹ w postaci wartoœci liczbowych kluczowych charakterystyk oraz ich zmiennoœci w czasie na czytelnych wykresach.
+
+Praca porównuje skutecznoœæ klasycznego algorytmu do detekcji za³amków R z algorytmem opartym na metodach uczenia maszynowego. Zastosowane sieci neuronowe osi¹gnê³y wysok¹ dok³adnoœæ w wykrywaniu charakterystycznych szczytów w sygnale EKG oraz w przewidywaniu na ich podstawie ró¿norodnych miar zmiennoœci rytmu serca. Opracowano innowacyjne podejœcie polegaj¹ce na predykcji parametrów HRV i RSA bezpoœrednio z ca³ego sygna³u EKG, co stanowi istotne rozszerzenie tradycyjnego podejœcia opartego na za³amkach RR.
+
+Eksperymentalnie zbadano wp³yw rytmu oddechowego na RSA oraz przeanalizowano dobow¹ zmiennoœæ pracy serca, porównuj¹c ró¿nice miêdzy dniem a noc¹. W ramach pracy przeprowadzono tak¿e jakoœciow¹ analizê opracowanych modeli neuronowych, wskazuj¹c ich mocne strony, potencjalne kierunki rozwoju oraz mo¿liwe zastosowania w analizie danych biomedycznych.
+
+System oraz metody zaprezentowane w pracy stanowi¹ wszechstronn¹ platformê do analizy EKG, z potencja³em zastosowania w badaniach naukowych i diagnostyce medycznej.
 \vspace{0.5cm}\newline
-\textbf{S³owa kluczowe:} lorem ipsum, dolor sit amet, consectetur adipiscing\vspace{0.5cm}
+\textbf{S³owa kluczowe:} Uczenie maszynowe, EKG, HRV, RSA, Polar H10, analiza end-to-end  \vspace{0.5cm}
 
 \noindent \textbf{Dziedzina nauki i techniki, zgodnie z wymogami OECD:} nauki in¿ynieryjne i techniczne, robotyka i automatyka
