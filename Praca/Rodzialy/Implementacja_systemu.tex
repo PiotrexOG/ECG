@@ -144,12 +144,17 @@ przekszta³cenie nierównomiernie próbkowanego sygna³u RR w równomierny. W tym
 celu zastosowano interpolacjê liniow¹ interwa³ów RR z czêstotliwoœci¹
 próbkowania 4 Hz. Dziêki temu spe³niono warunek Nyquista, poniewa¿ najwiêksza
 analizowana czêstotliwoœæ (0,4 Hz) le¿y poni¿ej po³owy czêstotliwoœci
-próbkowania (2 Hz).
+próbkowania (2 Hz). Warunek ten okreœla maksymaln¹ czêstotliwoœæ sygna³u, któr¹ mo¿na poprawnie odwzorowaæ bez wyst¹pienia aliasingu – zjawiska nak³adania siê ró¿nych sk³adowych czêstotliwoœciowych. W efekcie aliasing prowadzi³by do zniekszta³ceñ sygna³u, uniemo¿liwiaj¹c jego prawid³ow¹ rekonstrukcjê. Spe³nienie kryterium Nyquista gwarantuje, ¿e sygna³ jest próbkowany z odpowiedni¹ czêstotliwoœci¹, co umo¿liwia zachowanie jego integralnoœci i poprawnoœæ analizy \cite{Wang-Nyquist-Sampling} .
+
 
 \subsection{Przygotowanie sygna³u do analizy}
-Przed wykonaniem transformacji na sygna³ na³o¿ono okno Hanninga. Okno to
-redukuje amplitudy na pocz¹tku i koñcu sygna³u, co pozwala na wyg³adzenie
-danych i minimalizacjê efektów nieci¹g³oœci. Nastêpnie wykonano dyskretn¹
+Przed wykonaniem transformacji na sygna³ na³o¿ono \textit{okno Hanninga}, które wyg³adza dane na pocz¹tku i koñcu sygna³u, redukuj¹c amplitudy w tych obszarach. Ka¿dy punkt sygna³u $x(n)$ zosta³ pomno¿ony przez odpowiedni¹ wartoœæ funkcji okna $w(n)$, zdefiniowan¹ w nastêpuj¹cy sposób:
+
+\begin{equation}
+    w(n) = 0.5 \left( 1 - \cos\left(\frac{2\pi n}{N-1}\right) \right),
+\end{equation}
+
+gdzie $n$ to indeks próbki, a $N$ to liczba próbek sygna³u. Zastosowanie tego okna pozwala na wyg³adzenie danych poprzez stopniowe t³umienie wartoœci na krañcach sygna³u oraz minimalizacjê efektów nieci¹g³oœci, takich jak nag³e skoki wartoœci na pocz¹tku i koñcu, które mog³yby wprowadzaæ zak³ócenia w analizie czêstotliwoœciowej \cite{Pielawski-Hann-Windows}. Nastêpnie wykonano dyskretn¹
 transformacjê Fouriera, która przekszta³ca sygna³ z dziedziny czasu do
 dziedziny czêstotliwoœci \cite{Boashash1992}.
 
