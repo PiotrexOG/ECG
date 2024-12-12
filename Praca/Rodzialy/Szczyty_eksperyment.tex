@@ -12,15 +12,15 @@ s¹ na podstawie wartoœci TP (True Positive), FP (False Positive), oraz FN
 (False Negative). Sposób obliczania oraz krótki opis wspomnianych metryk
 znajduje siê poni¿ej:
 \begin{itemize}
-    \item \textbf{TP (True Positive)} - liczba przypadków, w których model prawid³owo rozpozna³ za³amki R
-    \item \textbf{FP (False Positive)} - liczba przypadków, w których model b³êdnie zaklasyfikowa³ fragment sygna³u jako sczyt R
-    \item \textbf{FN (False Negative)} - liczba przypadków, w których model nie rozpozna³ rzeczywistego za³amka R.
-    \item \textbf{Czu³oœæ (Recall)} – wskazuje, jaka czêœæ rzeczywistych pozytywnych przypadków zosta³a poprawnie zidentyfikowana:
+    \item \textbf{TP (True Positive)} -- liczba przypadków, w których model prawid³owo rozpozna³ za³amki R
+    \item \textbf{FP (False Positive)} -- liczba przypadków, w których model b³êdnie zaklasyfikowa³ fragment sygna³u jako sczyt R
+    \item \textbf{FN (False Negative)} -- liczba przypadków, w których model nie rozpozna³ rzeczywistego za³amka R.
+    \item \textbf{Czu³oœæ (Recall)} -- wskazuje, jaka czêœæ rzeczywistych pozytywnych przypadków zosta³a poprawnie rozpoznana:
           \begin{equation}
               \text{Recall} = \frac{TP}{TP + FN}
           \end{equation}
 
-    \item \textbf{Precyzja (Precision)} – wskazuje, jaka czêœæ przewidzianych pozytywnych przypadków jest rzeczywiœcie poprawna:
+    \item \textbf{Precyzja (Precision)} – wskazuje, jaka czêœæ rozpoznanych pozytywnych przypadków jest rzeczywiœcie poprawna:
           \begin{equation}
               \text{Precision} = \frac{TP}{TP + FP}
           \end{equation}
@@ -35,7 +35,7 @@ znajduje siê poni¿ej:
 Przeprowadzono trening dwóch wariantów modelu sieci UNet. Pierwszy wariant
 wytrenowano na danych pacjentów ze zbioru MIT-BIH, a drugi na zbiorze MIT-BIH
 Noise Stress, który zawiera dane wybranych pacjentów z pierwotnego zbioru,
-wzbogacone o szum oraz zjawisko dryftu linii izoelektrycznej (baseline wander).
+wzbogacone o szum oraz zjawisko dryfu linii izoelektrycznej (baseline wander).
 Oba zbiory zawieraj¹ adnotacje dotycz¹ce lokalizacji szczytów R. Do treningu i
 oceny wydajnoœci sieci UNet zastosowano okna o d³ugoœci 10 sekund, poniewa¿ w
 trakcie fazy projektowej taki rozmiar wykazywa³ najwy¿sz¹ skutecznoœæ. Modele
@@ -48,7 +48,7 @@ oznaczeniami wykonanymi przez specjalistów. Wstêpne rezultaty przedstawiono w
 tabeli \ref{wyniki1}.
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Wyniki pierwszego testu modeli na zbiorach treningowych}
+    \caption{Wyniki pierwszego testu modeli na zbiorach treningowych (zaokr¹glone do 3 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|}
         \hline
@@ -88,12 +88,12 @@ adekwatn¹ analizê wyników, uwzglêdniaj¹c¹ rzeczywist¹ jakoœæ przewidywañ,
 wprowadzono tolerancjê wynosz¹c¹ 30 ms. Rozpoznanie szczytu w odleg³oœci do 30
 ms od etykiety uznano za prawdziwie pozytywne (TP). Wyniki po zastosowaniu
 tolerancji przedstawiono w tabeli \ref{wyniki2}, a tak¿e graficznie na Rys.
-\ref{fig/poprawioneEtykietyMit}, gdzie bia³y kolor znacznika oznacza punkty
+\ref{fig/poprawioneEtykietyMit}, gdzie ró¿owy kolor znacznika oznacza punkty
 wykryte w granicach przyjêtej tolerancji.
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Wyniki drugiego testu modeli na zbiorach treningowych - po wprowadzeniu tolerancji}
+    \caption{Wyniki drugiego testu modeli na zbiorach treningowych - po wprowadzeniu tolerancji (zaokr¹glone do 3 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|}
         \hline
@@ -148,7 +148,7 @@ radz¹ sobie z sygna³em wysokiej jakoœci.
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Wyniki klasyfikacji wariantów sieci UNet wzglêdem wartoœci wyznaczonych przez algorytm Pan-Tompkins dla 24 godzinnego odcinka danych}
+    \caption{Wyniki klasyfikacji wariantów sieci UNet wzglêdem wartoœci wyznaczonych przez algorytm Pan-Tompkins dla 24 godzinnego odcinka danych (zaokr¹glone do 3 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|}
         \hline
@@ -175,7 +175,7 @@ radz¹ sobie z sygna³em wysokiej jakoœci.
 
 W przypadku danych zaszumionych manualna ocena wykaza³a liczne
 nieprawid³owoœci w dzia³aniu algorytmu Pan-Tompkinsa. Problemy te wynika³y
-g³ównie z obecnoœci zak³óceñ, takich jak szum czy dryft linii izoelektrycznej
+g³ównie z obecnoœci zak³óceñ, takich jak szum czy dryf linii izoelektrycznej
 (baseline wander), które znacz¹co utrudnia³y prawid³owe wykrywanie za³amków R.
 Przyk³ad b³êdnego dzia³ania algorytmu przedstawiono na Rys.
 \ref{fig/zaszumionyTompkins}, gdzie zauwa¿alne jest pomijanie istotnych
@@ -197,7 +197,7 @@ potwierdzon¹ wiedz¹ medyczn¹, a przez autorów niniejszej pracy, co mog³o
 wp³yn¹c na jakoœæ samych etykiet.
 
 Wyniki dzia³ania poszczególnych algorytmów uzyskane na oznaczonym fragmencie
-danych przedstawiono w tabeli \ref{wynikiClearUnet}. Analizuj¹c jej zawartoœæ
+danych przedstawiono w tabeli \ref{wynikiNoiseUnet}. Analizuj¹c jej zawartoœæ
 mo¿na dojœæ do wniosku, ¿e warianty sieci UNet lepiej radz¹ sobie z
 klasyfikacj¹ sygna³ów zaszumionych w porównaniu do algorytmu Pan-Tompkinsa.
 Modele UNet wykaza³y du¿o wiêksz¹ iloœci¹ szczytów poprawnie zaklasyfikowanych
@@ -212,7 +212,7 @@ nale¿a³oby zebraæ oraz rêcznie oznaczyæ znacznie wiêksz¹ próbê danych.
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Wyniki wariantów sieci UNet oraz algorytmu Pan-Tompkins wzglêdem rêcznie wyznaczonych etykiet na fragmencie sygna³u}
+    \caption{Wyniki wariantów sieci UNet oraz algorytmu Pan-Tompkins wzglêdem rêcznie wyznaczonych etykiet na fragmencie sygna³u (zaokr¹glone do 3 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|c|}
         \hline
@@ -231,15 +231,16 @@ nale¿a³oby zebraæ oraz rêcznie oznaczyæ znacznie wiêksz¹ próbê danych.
         F1                     & $0.840$                                      & $0,961$                                 & 0,974                                              \\
         \hline
     \end{tabular}
-    \label{wynikiClearUnet}
+    \label{wynikiNoiseUnet}
 \end{table}
 
+\FloatBarrier
 \subsection{Wnioski}
 Zastosowane warianty sieci UNet oraz algorytm Pan-Tompkinsa uzyska³y œwietn¹
 skutecznoœæ w rozpoznawaniu szczytów R w sygna³ach dobrej jakoœci, wykazuj¹c
 marginalne ró¿nice miedzy dokonywanymi klasyfikacjami. Wiêksze odchy³y w
 wynikach zauwa¿ono podczas analizy sygna³ów mniej idealnych, gdzie lepsze
-rezultaty uzyska³y oba przetronowane modele sieci neuronowych.
+rezultaty uzyska³y oba przetrenowane modele sieci neuronowych.
 
 W praktycznych zastosowaniach niemal niemo¿liwe jest uzyskanie sygna³u
 ca³kowicie pozbawionego szumów. Na podstawie tej obserwacji oraz uzyskanych

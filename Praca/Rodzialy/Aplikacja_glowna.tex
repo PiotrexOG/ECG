@@ -58,8 +58,8 @@ i optymalizacjê przed zastosowaniem w trybie rzeczywistym.
 
 \subsection*{Tryb ³adowania danych z pliku}
 W trybie ³adowania danych z pliku aplikacja wczytuje ca³y zapis sygna³u EKG
-jednorazowo i przetwarza go w ca³oœci. Analiza obejmuje pe³ny zestaw danych,
-bez ich dzielenia na pakiety. Po zakoñczeniu przetwarzania u¿ytkownik otrzymuje
+jednorazowo i przetwarza go w ca³oœci. Analiza obejmuje pe³en zestaw danych,
+bez dzielenia go na pakiety. Po zakoñczeniu przetwarzania u¿ytkownik otrzymuje
 wykres obrazuj¹cy pe³ny przebieg sygna³u oraz zestaw obliczonych miar HRV. W
 tym trybie dostêpne s¹ trzy opcje ³adowania plików: wczytanie pliku CSV
 zawieraj¹cego dane z czujnika Polar H10 w formacie "timestamp-wartoœæ",
@@ -91,7 +91,7 @@ zidentyfikowano ¿adnego szczytu, analiza rozpoczyna siê od pocz¹tku sygna³u.
 Fragment sygna³u przekazywany jest do komponentu odpowiedzialnego za
 identyfikacjê szczytów R. Po ich wykryciu, aplikacja zapisuje jedynie te, które
 s¹ oddalone od koñca przekazanego przedzia³u o co najmniej po³owê œredniej
-ró¿nicy miêdzy trzema wczeœniej wykrytymi szczytami R. Mechanizm ten zapobiega
+arytmetycznej trzech ostatnich interwa³ów RR. Mechanizm ten zapobiega
 b³êdnemu rozpoznaniu szczytów w przypadkach, gdy sygna³ koñczy siê na zboczu
 fali R, uniemo¿liwiaj¹c algorytmowi poprawne okreœlenie jego maksymalnej
 wartoœci. Takie podejœcie pozwala na uzyskanie wiêkszej precyzji w detekcji

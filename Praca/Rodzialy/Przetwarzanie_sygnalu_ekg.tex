@@ -1,6 +1,7 @@
 % \chapter{Implementacja algorytmów do analizy EKG}
 % Lorem ipsum
 \section{Wyznaczanie szczytów R \small{(autor: Jakub Wojtalewicz)}}
+Identyfikacja szczytów R jest kluczowym etapem analizy sygna³u EKG. Na ich podstawie oblicza siê wiêkszoœæ metryk zwi¹zanych z analiz¹ zmiennoœci rytmu serca. W tym podrodziale opisano zastosowane w aplikacji metody ich wyznaczania: algorytm Pan-Tompkins oraz model g³êbokiej sieci neuronowej.
 \subsection{Pan-Tompkins}\label{P-Tomkins}
 Algorytm Pan-Tomkins jest powszechnie uznawanym narzêdziem do wykrywania
 za³amków R w sygna³ach EKG, zapewniaj¹c przy tym wysok¹ precyzjê. Algorytm
@@ -26,7 +27,6 @@ filtracjê w paœmie 5–15 Hz \cite{Fariha-PanTompkins}. Jednak na wczesnym etapie
 realizacji projektu zaobserwowano, ¿e zastosowanie szerszego pasma filtracji
 5-18 Hz, zaproponowanego w pracy \cite{Khan-PanTompkins++}, prowadzi³o do nieco
 lepszych rezultatów.
-
 
 \begin{figure}[ht]
     \centering
@@ -107,8 +107,8 @@ fa³szywych wykryæ. W tym celu ustalany jest próg na bazie którego podejmowana
 jest decyzja. Próg ten mo¿e byæ wartoœci¹ sta³¹ lub byæ dynamicznie
 dostosowywany, aby uwzglêdniæ zmiany amplitudy w ró¿nych odcinkach sygna³u.
 Podczas oznaczania danych pochodz¹cych z czujnika Polar H10 zastosowano próg
-obliczany jako œrednia wartoœæ sygna³u z poprzedniego kroku, powiêkszona o 0,6-krotnoœæ
-odchylenia standardowego tego sygna³u.\\
+obliczany jako œrednia wartoœæ sygna³u z poprzedniego kroku, powiêkszona o
+0,6-krotnoœæ odchylenia standardowego tego sygna³u.\\
 
 Podczas procesu detekcji wartoœci sygna³u porównywane s¹ z ustalonym progiem.
 Gdy sygna³ przekroczy wartoœæ progu, wstêpnie identyfikowany jest jako
@@ -261,6 +261,7 @@ w³asnym interfejsem, który by³ wspomniany w podsekcji \ref{subsec:wykrywacz}
 % który by³ wspomniany w podsekcji \ref{subsec:wykrywacz} 
 \FloatBarrier
 \section{Modele neuronowe do wyznaczania miar HRV \small{(autor: Jakub Wojtalewicz)}}
+
 \subsection{Model oparty o interwa³y RR}\label{rr-based}
 % \subsection{Model do wyznaczania miar HRV na bazie interwa³ów RR}
 W trakcie prac nad modelem end-to-end opracowano model poœredni, który
@@ -278,7 +279,6 @@ wysokopoziomowe API biblioteki \emph{tensorflow} o nazwie \emph{Keras}
     \caption{Schemat modelu wyznaczaj¹cego miary HRV na podstawie interwa³ów RR}
     \label{fig/rr_siec}
 \end{figure}
-
 
 Model oparto o kaskade trzech bloków przetwarzania, z których ka¿dy zawiera
 jednowymiarowa warstwê splotow¹ (Conv1D), normalizacje wsadow¹

@@ -17,30 +17,29 @@ odniesienia dla modelu end-to-end, omawianego w ramach nastêpnego eksperymentu.
 Do analizy uzyskanych wyników zastosowano nastêpuj¹ce miary:
 
 \begin{itemize}
-    \item Œredni b³¹d bezwzglêdny (Mean Absolute Error, MAE): Œrednia arytmetyczna wartoœci bezwzglêdnych ró¿nic miêdzy wartoœciami rzeczywistymi a przewidywanymi.
+    \item \textbf{Œredni b³¹d bezwzglêdny (ang. Mean Absolute Error, MAE)} -- œrednia arytmetyczna wartoœci bezwzglêdnych ró¿nic miêdzy wartoœciami rzeczywistymi a przewidywanymi.
           \begin{equation}
               \text{MAE} = \frac{1}{n} \sum_{i=1}^n |y_i - \hat{y}_i|
           \end{equation}
 
-    \item B³¹d œredniokwadratowy (Mean Squared Error, MSE): Œrednia arytmetyczna
+    \item \textbf{B³¹d œredniokwadratowy (ang. Mean Squared Error, MSE)} -- œrednia arytmetyczna
           kwadratów ró¿nic miêdzy wartoœciami rzeczywistymi a przewidywanymi,
           podkreœlaj¹ca wiêksze b³êdy.
           \begin{equation}
               \text{MSE} = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2
           \end{equation}
 
-    \item Pierwiastek ze œredniego b³êdu kwadratowego (Root Mean Squared Error, RMSE):
-          Pierwiastek kwadratowy z MSE, interpretowany w tych samych jednostkach, co dane
+    \item \textbf{Pierwiastek ze œredniego b³êdu kwadratowego (ang. Root Mean Squared Error, RMSE)} --
+          pierwiastek kwadratowy z MSE, interpretowany w tych samych jednostkach, co dane
           wejœciowe.
           \begin{equation}
               \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2}
           \end{equation}
 
-    \item Wspó³czynnik determinacji ($R^2$): Miara jakoœci dopasowania modelu do danych.
+    \item \textbf{Wspó³czynnik determinacji ($R^2$)} -- miara jakoœci dopasowania modelu do danych.
           Reprezentuje jaka czêœæ zmiennoœæi wartoœci w danych jest wyjaœniana przez
           model. Wartoœæ $R^2$ przyjmuje wartoœci z zakresu od $-\infty$ do 1, gdzie 1
-          oznacza idealne dopasowanie, a wartoœci poni¿ej 0 œwiadcz¹, ¿e lepiej
-          poradzi³aby sobie zwyk³a œrednia.
+          oznacza idealne dopasowanie, a wartoœci poni¿ej 0 sugeruj¹, ¿e lepsze przewidywanie uzyska³oby siê przy u¿yciu zwyk³ej œredniej.
 
           \begin{equation}
               R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
@@ -81,7 +80,7 @@ wiarygodnej ocenie jakoœci przewidywañ
 Œrednie wyniki uzyskane w ramach walidacji krzy¿owej dla wybranych modeli przedstawiono w tabelach \ref{wyniki_hrv_pojedyncze_rr}, \ref{wyniki_hrv_wiele_rr} oraz \ref{wyniki_hrv_wiele_rr2}.
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary.}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary (zaokr¹glone do 2 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
@@ -96,7 +95,7 @@ wiarygodnej ocenie jakoœci przewidywañ
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar.}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar (zaokr¹glone do 2 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
@@ -112,7 +111,7 @@ wiarygodnej ocenie jakoœci przewidywañ
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar.}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar (zaokr¹glone do 2 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
@@ -194,7 +193,7 @@ porównanie wyników miêdzy ró¿nymi konfiguracjami modeli.
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary.}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych pojedyncze miary (zaokr¹glone do 2 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
@@ -209,7 +208,7 @@ porównanie wyników miêdzy ró¿nymi konfiguracjami modeli.
 
 \begin{table}[ht]
     \captionsetup{justification=centering}
-    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar.}
+    \caption{Œrednie wyniki walidacji krzy¿owej dla modeli przewiduj¹cych wiele miar (zaokr¹glone do 2 miejsc dziesiêtnych)}
     \centering
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
