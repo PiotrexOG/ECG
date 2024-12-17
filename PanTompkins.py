@@ -16,17 +16,14 @@ def bandpass_filter(sig, frequency, lowcut: float = 5, highcut: float = 18):
 
 
 def filter_ecg_with_timestamps(ecg_signal, frequency: float):
-    # Extract timestamps and ECG values from the input
     timestamps = ecg_signal[:, 0]
     ecg_values = ecg_signal[:, 1]
 
-    # Apply bandpass filter to the ECG values
     filtered_signal = bandpass_filter(ecg_values, frequency, lowcut=0.5, highcut=40)
-    #filtered_signal = ecg_values
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
 
-    window_size = int(0.150 * frequency)  # 50 ms window
+    window_size = int(0.150 * frequency)  # 150 ms window
     integrated_signal = moving_window_integration(squared_signal, window_size)
 
     # Combine timestamps with filtered signal values
@@ -80,30 +77,6 @@ def find_r_peaks_values_with_timestamps(ecg_signal, frequency: float):
     
     return peaks_with_timestamps
 
-# def find_r_peaks_ind(ecg_signal, frequency: float):
-#     # filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency)
-#     filtered_signal = bandpass_filter(ecg_signal, frequency)
-#     diff_signal = derivative_filter(filtered_signal)
-#     squared_signal = square(diff_signal)
-    
-#     window_size = int(0.05 * frequency)  # 50 ms window
-#     integrated_signal = moving_window_integration(squared_signal, window_size)
-    
-#   #  threshold = 0.4 * np.max(integrated_signal)
-#     threshold = np.mean(integrated_signal) + 0.6 * np.std(integrated_signal)  # Mean + 0.6*std
-
-#     peaks, _ = signal.find_peaks(
-#         integrated_signal, height=threshold, distance=int(size * frequency) # 400 ms
-#     )
-    
-#     refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
-    
-#     peak_values = ecg_signal[refined_peaks, 1]
-#     peak_timestamps = ecg_signal[refined_peaks, 0]
-    
-#     peaks_with_timestamps = np.column_stack((peak_timestamps, peak_values))
-    
-#     return refined_peaks
 
 def find_r_peaks_ind(ecg_signal, frequency: float):
     # filtered_signal = bandpass_filter(ecg_signal[:, 1], frequency)
@@ -114,57 +87,13 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
     window_size = int(0.050 * frequency)  # 50 ms window
     integrated_signal = moving_window_integration(squared_signal, window_size)
     
-    #threshold = 0.4 * np.max(integrated_signal)
-    
-    OLD = True
-    peaks = []
-    if OLD:
-        clipped_signal = np.clip(integrated_signal, 0, np.percentile(integrated_signal, 99))
-        threshold = np.mean(clipped_signal) + 0.6 * np.std(clipped_signal)
-        # threshold = np.mean(integrated_signal) + 0.6 * np.std(integrated_signal)  # Mean + 0.6*std
-        peaks, _ = signal.find_peaks(
-            integrated_signal, height=threshold, distance=int(0.4 * frequency) # 400 ms
-        )
-    else:
-        # peaks = []
-        if len(ecg_signal) < 2*frequency:
-            clipped_signal = np.clip(integrated_signal, 0, np.percentile(integrated_signal, 99))
-            threshold = np.mean(clipped_signal) + 0.6 * np.std(clipped_signal)
-
-            # threshold = np.mean(integrated_signal) + 0.6 * np.std(integrated_signal)  # Mean + 0.6*std
-            
-            peaks, _ = signal.find_peaks(
-                integrated_signal, height=threshold, distance=int(0.4 * frequency) # 400 ms
-            )
-        else:
-            window_step = frequency
-            wind_start = 0
-            wind_end = 5*frequency
-            while wind_end < len(ecg_signal):
-                window = integrated_signal[wind_start:wind_end]
-                threshold = np.mean(window) + 0.6 * np.std(window)
-                local_peaks, _ = signal.find_peaks(window, height=threshold, distance=int(0.4*frequency))
-                local_peaks+=wind_start
-                peaks.extend(local_peaks)
-                
-                wind_start+=window_step
-                wind_end+=window_step
-            peaks = list(dict.fromkeys(peaks))
-            result = [peaks[0]]
-            min_diff = 0.05*frequency
-            for i in range(1, len(peaks)):
-                if peaks[i] - result[-1] >= min_diff:
-                    result.append(peaks[i])
-            peaks = result
+    clipped_signal = np.clip(integrated_signal, 0, np.percentile(integrated_signal, 99))
+    threshold = np.mean(clipped_signal) + 0.6 * np.std(clipped_signal)
+    peaks, _ = signal.find_peaks(
+        integrated_signal, height=threshold, distance=int(0.4 * frequency) # 400 ms
+    )
 
     
-    
-    
-    
-    
-    
-    
-    # refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
     refined_peaks = refine_peak_positions(ecg_signal, peaks, round(10/130*frequency))
     # refined_peaks = processing.correct_peaks(
     #     sig=ecg_signal,

@@ -11,80 +11,6 @@ import matplotlib.pyplot as plt
 
 #PLIK ZAWIERAJCY FUNKCJE POMOCNICZE DO FUNKCJONOWANIA SIECI UNET
 
-def calculate_stats(r_ref, r_ans, thr_, fs):
-    # Threshold region to consider correct detection. in samples
-    # thr_ = 0.15 #(150/4 ms)
-
-    print("______________________________________________")
-    print("_________Calculating Stats____________________")
-    print("______________________________________________")
-    FP_index_array = []
-    FN_index_array = []
-
-    FP = 0
-    TP = 0
-    FN = 0
-    for j in range(len(r_ref)):
-        loc = np.where(np.abs(r_ans - r_ref[j]) <= thr_ * fs)[0]
-        if j == 0:
-            err = np.where(
-                (r_ans >= 0.5 * fs + thr_ * fs) & (r_ans <= r_ref[j] - thr_ * fs)
-            )[0]
-        elif j == len(r_ref) - 1:
-            err = np.where(
-                (r_ans >= r_ref[j] + thr_ * fs) & (r_ans <= 9.5 * fs - thr_ * fs)
-            )[0]
-        else:
-            err = np.where(
-                (r_ans >= r_ref[j] + thr_ * fs) & (r_ans <= r_ref[j + 1] - thr_ * fs)
-            )[0]
-
-        FP = FP + len(err)
-
-        if err.any():
-            # print(err)
-            # print(len(err))
-            for er in err:
-                # print(r_ans[er])
-                FP_index_array.append(r_ans[er])
-
-        if len(loc) >= 1:
-            TP += 1
-            FP = FP + len(loc) - 1
-        elif len(loc) == 0:
-            FN += 1
-            FN_index_array.append(r_ref[j])
-
-    all_FP = FP
-    all_FN = FN
-    all_TP = TP
-
-    Recall = float(str(round((all_TP / (all_FN + all_TP)) * 100, 2)))
-    Precision = float(str(round((all_TP / (all_FP + all_TP)) * 100, 2)))
-
-    if Recall + Precision == 0:
-        F1_score = 0
-    else:
-        F1_score = float(str(round((2 * Recall * Precision / (Recall + Precision)), 2)))
-    print("TP's:{} FN's:{} FP's:{}".format(all_TP, all_FN, all_FP))
-    print(
-        "Recall:{}, Precision(FNR):{}, F1-Score:{}".format(Recall, Precision, F1_score)
-    )
-    print("Total {}".format(len(r_ref)))
-
-    return [
-        len(r_ref),
-        TP,
-        FN,
-        FP,
-        Recall,
-        Precision,
-        F1_score,
-        FN_index_array,
-        FP_index_array,
-    ]
-
-
 def verifier(ecg, R_peaks, R_probs, ver_wind=60):
 
     del_indx = []
@@ -372,35 +298,6 @@ def train(X_train, y_train, R_p_w, epochs, model_file_name, model, loss_plot_fil
     print(time.process_time() - start)
     plot_losses(history, loss_plot_filename)
     pass
-
-
-def test(model_name, epochs, input_size, ecg_data: EcgData, threshold=0.4):
-    stats_R = []
-    win_size = input_size
-    stride = int(6 / 8 * win_size)
-    model_path = "models/proszePieknie.keras"
-    ecg = ecg_data.raw_data[:, 1]
-    # R_ind = ecg_data.__r_peaks_ind
-
-    model = sig2sig_unet(input_size)
-    model.load_weights(model_path)
-    padded_indices, data_windows = ecg_data.extract_test_windows(win_size, stride)
-    predictions = model.predict(data_windows, verbose=0)
-    predictions = mean_preds(
-        win_idx=padded_indices,
-        preds=predictions,
-        orig_len=ecg.shape[0],
-        win_size=win_size,
-        stride=stride,
-    )
-    filtered_peaks, filtered_proba = filter_predictions(
-        signal=ecg, preds=predictions, threshold=threshold
-    )
-
-    R_peaks_ver, _ = verifier(ecg, filtered_peaks, filtered_proba, ver_wind=7)
-    stats_R = calculate_stats(r_ref=R_ann, r_ans=R_peaks_ver, thr_=0.15, fs=400)
-    pass
-
 
 def plot_losses(history, path: str = None):
     fig = plt.figure(figsize=(8, 6))

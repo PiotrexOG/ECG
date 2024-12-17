@@ -648,13 +648,6 @@ class EcgData:
         except:
             pass
         output = str()
-        # print("ECG peaks---------------")
-        # print (self.r_peaks)
-        # print("ECG intervals---------------")
-        # print (self.rr_intervals)
-        # print("ECG hr---------------")
-        # print (self.hr)
-        # print("\n*********************\n")
         print(len(self.__rr_intervals))
 
         if mean_rr is not None:
@@ -669,24 +662,6 @@ class EcgData:
             output = output[:-1]
         return output
 
-        # if mean_rr is not None:
-        #     print(f"Mean RR: {mean_rr} ms")
-        # if sdnn is not None:
-        #     output += f"SDNN: {sdnn}\n"
-        # if rmssd is not None:
-        #     output += f"RMSSD: {rmssd}\n"
-        # if pnn50 is not None:
-        # print(f"PNN50: {pnn50}%")
-        return
-
-    # def push_raw_data(self, x, y):
-    #     if isinstance(x, list) and isinstance(y, list):
-    #         self.raw_data = np.concatenate((self.raw_data, np.column_stack((x, y))))
-    #     else:
-    #         self.raw_data = np.append(self.raw_data, [[x, y]], axis=0)
-    #
-    #     self.__set_dirty()
-    #     return
 
     def push_raw_data(self, x, y):
         self.__lock.acquire()
@@ -1290,7 +1265,7 @@ class EcgData:
 
         return X_train, y_train, R_per_w
 
-    def extract_piotr(self, window_size, metrics: list = ["SDNN"], stride: int = None):
+    def extract_signal_wind_hrv(self, window_size, metrics: list = ["SDNN"], stride: int = None):
         metrics = [s.lower() for s in metrics]
         X, _, y = self.extract_windows(window_size, stride)
         intervals = [np.diff(row) / 130 for row in y]

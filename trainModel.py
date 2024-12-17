@@ -68,23 +68,7 @@ if __name__ == "__main__":
     # ["100"]
     # ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109"],
     )
-
-    # data = EcgData(SAMPLING_RATE, PanTompkinsFinder())
-    # data.load_csv_data(CSV_PATH)
-    # # data.load_data_from_mitbih("data\\mit-bih\\100")
-    # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
-    # csvs = ["sen_merged.csv", "poranek_merged.csv", "popoludnie.csv"]
-    # csvs = ["ecg_data1.csv"]
-    # X_train, y_train, R_p_w = get_patients_data("data", csvs, get_patient_data_csv)
-
-    # X_train, y_train = shuffle(X_train, y_train)
-    # X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15)
-
     epochs = EPOCHS
-    # epochs = 50
-    # finder = PanTompkinsFinder()
-    # data = EcgData(SAMPLING_RATE, finder)
-    # model_suffix = "_CSV"
     model_suffix = ""
     train_unet(
         X_train,
@@ -96,7 +80,3 @@ if __name__ == "__main__":
         loss_plot_filename=f"loss\\unet\\{WINDOW_SIZE}_{epochs}{MODEL_SUFFIX}",
     )
     # train_cnn(X_train, y_train, R_p_w, WINDOW_SIZE, epochs, model_file_name=f"model_{WINDOW_SIZE}_{epochs}")
-
-    # # data.load_csv_data("data/arkusz_rsa7.csv")
-    # data.load_data_from_mitbih("data\\mit-bih\\100")
-    # X_train, y_train, R_p_w = data.extract_windows(WINDOW_SIZE)
