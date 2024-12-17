@@ -114,17 +114,17 @@ def new_model(input_length, output_len):
     # x = BatchNormalization()(x)
     # x = MaxPooling1D(pool_size=10)(x)  # 15000 → 3750
 
-   x = Conv1D(filters=32, kernel_size=7, activation='relu', padding='same')(input_signal)
-   x = BatchNormalization()(x)
-   x = MaxPooling1D(pool_size=6)(x)
+    x = Conv1D(filters=32, kernel_size=7, activation='relu', padding='same')(input_signal)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=6)(x)
 
-   x = Conv1D(filters=64, kernel_size=5, activation='relu', padding='same')(x)
-   x = BatchNormalization()(x)
-   x = MaxPooling1D(pool_size=6)(x)
+    x = Conv1D(filters=64, kernel_size=5, activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=6)(x)
 
-   x = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(x)
-   x = BatchNormalization()(x)
-   x = MaxPooling1D(pool_size=6)(x)
+    x = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling1D(pool_size=6)(x)
 
     # Attention Layer
     x_attention = Dense(128, activation='sigmoid')(x)

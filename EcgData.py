@@ -5,10 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import FFT
-import Wave
 import PanTompkins
-import NAME_THIS_MODULE_YOURSELF_PIOTER
-import nocOKNO
 from PanTompkins import derivative_filter
 from config import *
 from dataSenderEmulator import read_csv
@@ -120,11 +117,6 @@ class EcgData:
         return self.__r_peaks_filtered
 
     @property
-    def r_peaks_piotr(self):
-        # self.__refresh_if_dirty()
-        return self.__r_peaks_piotr
-
-    @property
     def rr_intervals(self):
         # self.__refresh_if_dirty()
         return self.__rr_intervals
@@ -165,7 +157,6 @@ class EcgData:
         self.__hr_ups = np.empty(0)
         self.__hr_downs = np.empty(0)
         self.__r_peaks_filtered = np.empty(0)
-        self.__r_peaks_piotr = np.empty(0)
         self.__rr_intervals = np.empty((0, 2))
         self.__hr = np.empty((0, 2))
         self.hr_filtered = np.empty((0, 2))
@@ -292,14 +283,6 @@ class EcgData:
             self.data_bufferHR = np.roll(self.data_bufferHR, -1)
             self.data_bufferHR[-1] = new_data
 
-    # def filter_hr(self):
-    #     # Przefiltrowanie sygnału
-    #     # filtered_signal, self.ziHR = signal.lfilter(self.bHR, self.aHR, self.data_bufferHR, zi=self.ziHR)
-    #     filtered_signal = signal.filtfilt(self.bHR, self.aHR, self.__hr[:, 1])
-    #     # return filtered_signal[-len(new_data):]  # Zwróć tylko najnowsze przefiltrowane wartości
-    #     peaks_with_timestamps = np.column_stack((self.__hr[:, 0], filtered_signal))
-    #     return peaks_with_timestamps  # Zwróć tylko najnowsze przefiltrowane wartości
-
     def derivative_filter(self, sig):
         return np.diff(sig, prepend=0)
 
@@ -318,16 +301,16 @@ class EcgData:
         csv_data[:, 0] /= TIMESTAMP_SCALE_FACTOR
 
         path_without_ext = os.path.splitext(path)[0]
-        if not save_peaks:
-            try:
-                if self.__r_peaks_finder.__class__.__name__ == PanTompkinsFinder.__name__:
-                    self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
-                else:
-                    self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
-                self.__loaded_r_peaks_ind = self.__loaded_r_peaks_ind.astype(int)
-                self.__loaded_r_peaks_ind.sort()
-            except:
-                pass
+        # if not save_peaks:
+        #     try:
+        #         if self.__r_peaks_finder.__class__.__name__ == PanTompkinsFinder.__name__:
+        #             self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
+        #         else:
+        #             self.__loaded_r_peaks_ind = np.loadtxt(f"{path_without_ext}_r.txt")
+        #         self.__loaded_r_peaks_ind = self.__loaded_r_peaks_ind.astype(int)
+        #         self.__loaded_r_peaks_ind.sort()
+        #     except:
+        #         pass
 
         # indexes = np.arange(0, csv_data.shape[0])
         # csv_data = np.column_stack((indexes, csv_data[:, 1]))
@@ -342,6 +325,10 @@ class EcgData:
         # filtered_signal = PanTompkins.bandpass_filter(
         #     csv_data[:, 1], self.frequency, 5, 18
         # )
+        # filtered_signal = PanTompkins.derivative_filter(filtered_signal)
+        # filtered_signal = PanTompkins.square(filtered_signal)
+        # window_size = int(0.175 * self.frequency)
+        # filtered_signal = PanTompkins.moving_window_integration(filtered_signal, window_size)
         # csv_data = np.column_stack((csv_data[:, 0], filtered_signal))
 
         if self.target_frequency is not None:
@@ -370,8 +357,6 @@ class EcgData:
             self.frequency = SAMPLING_RATE
 
         self.frequency = SAMPLING_RATE
-        # self.__raw_data = csv_data
-        # self.__is_dirty = True
 
         self.__refresh_data()
 
@@ -526,9 +511,6 @@ class EcgData:
         sample_rate = record.fs
         self.frequency = sample_rate
         ecg_signal = record.p_signal[:, record_num]
-        # header = wfdb.rdann(path, "hea")
-        # ann = wfdb.rdann(path, 'atr')
-        # self.__loaded_r_peaks_ind = ann.sample
         annotation_q1c = wfdb.rdann(path, "q1c")
         annotation_qt1 = wfdb.rdann(path, "qt1")
         annotation_pu = wfdb.rdann(path, "pu")
@@ -541,8 +523,6 @@ class EcgData:
         q_indexes = np.where(np.array(annotation_pu.symbol) == "N")[0]
         self.q = annotation_pu.sample[q_indexes]
         self.__loaded_r_peaks_ind = self.q
-        # self.__loaded_r_peaks_ind = EcgData.remove_duplicates_and_adjacent(self.q, self.frequency)
-        # self.__loaded_r_peaks_ind = EcgData.filter_similar_elements(self.q, self.frequency)
 
         timestamps = np.array([i / sample_rate for i in range(len(ecg_signal))])
 
@@ -558,12 +538,7 @@ class EcgData:
         array = np.unique(array)
         result = []
 
-        # for num in array:
-        #     if not result or num != result[-1] + 1:
-        #         result.append(num)
-
         for i in range(len(array) - 1, -1, -1):
-            # Add to result if it doesn't differ by 1 from the last added number
             if not result or array[i] < result[-1] - int(0.05 * frequency):
                 result.append(array[i])
         result.sort()
@@ -628,7 +603,6 @@ class EcgData:
 
         # Obliczenie i wyświetlenie średnich czasów trwania wdechu i wydechu
         try:
-            raise Exception()
             if self.wdechy:
                 srednia_wdechu = sum(czas for _, _, czas, _, _ in self.wdechy) / len(
                     self.wdechy
@@ -896,7 +870,6 @@ class EcgData:
             self.__find_new_r_peaks_filtered()
         except:
             pass
-        self.__find_r_peaks_piotr()
 
         #self.clean_r_peaks()
 
@@ -942,7 +915,7 @@ class EcgData:
         self.__calc_rmssd()
         self.__calc_pnn50()
         self.__calc_hr()
-		 try:
+        try:
             if len(self.__hr) > 28:
                 self.hr_filtered = self.filter_hr()
                 ups = self.__find_hr_ups()
@@ -952,78 +925,11 @@ class EcgData:
                         - self.__hr[0][0],  # Znormalizowane czasy (pierwsza kolumna)
                         ups[:, 1],  # Oryginalne wartości (druga kolumna)
                     )
-		
-        self.sdann, self.sdnn_index = doba_analysis.analyze(self.raw_data, self.rr_intervals)
-
-        # #nocOKNO.analyze_sliding_window_by_timestamps(self.rr_intervals)
-        #
-        # time_points, rmssd_values, sdnn_values, mean_nn_values = nocOKNO.analyze_sliding_window(self.raw_data, self.rr_intervals)
-        #
-        # time_points = time_points - time_points[0]
-        # # Przykład rysowania wykresu RMSSD
-        # plt.figure(figsize=(10, 6))
-        #
-        #
-        #
-        # GAUSS_WINDOW_SIZE = 60  # Liczba punktów w oknie
-        # x = np.arange(GAUSS_WINDOW_SIZE)
-        # gaussian_weights = np.exp(-((x - GAUSS_WINDOW_SIZE / 2) ** 2) / (2 * (GAUSS_WINDOW_SIZE / 4) ** 2))
-        # gaussian_weights /= np.sum(gaussian_weights)  # Normalizacja
-        #
-        # # Oblicz Gaussowskie uśrednienie dla danych
-        # smoothed_rmssd = self.gaussian_smooth(rmssd_values, gaussian_weights)
-        # smoothed_mean_nn = self.gaussian_smooth(mean_nn_values, gaussian_weights)
-        # smoothed_sd_values = self.gaussian_smooth(sdnn_values, gaussian_weights)
-        #
-        # #plt.plot(time_points, rmssd_values, marker='o', alpha=0.5, label='RMSSD', color='blue')
-        # plt.plot(time_points, smoothed_rmssd, label='RMSSD (Średnia Gaussowska)', color='blue')
-        #
-        # # Mean NN
-        # #plt.plot(time_windows, mean_nn_values, marker='o', alpha=0.5, label='Mean NN (raw)', color='orange')
-        # #plt.plot(time_windows, smoothed_mean_nn, linewidth=2, label='Mean NN (Gaussian Avg)', color='orange')
-        #
-        # # SD Values
-        # #plt.plot(time_points, sdnn_values, marker='o', alpha=0.5, label='SDNN', color='green')
-        # plt.plot(time_points, smoothed_sd_values, label='SDNN (Średnia Gaussowska)', color='green')
-        #
-        # ax = plt.gca()
-        # base_hour = 19  # Godzina początkowa
-        # ax.xaxis.set_major_locator(ticker.MultipleLocator(3600))  # Znaczniki co 600 sekund (10 minut)
-        # ax.xaxis.set_major_formatter(ticker.FuncFormatter(
-        #     lambda x, _: f'{int(x // 3600 + base_hour) % 24:02d}:{int((x % 3600) // 60):02d}'
-        # ))
-        #
-        # self.create_colored_background(ax)
-        #
-        # plt.xlabel("Czas (ns)")
-        # plt.ylabel("RMSSD (ms)")
-        # plt.title("RMSSD dla przesuwającego się okna 5 minutowego")
-        # plt.legend(loc="upper left")
-        # plt.grid()
-        # plt.show()
-
-        if len(self.__hr) > 28:
-            self.hr_filtered = self.filter_hr()
-
-            ups = self.__find_hr_ups()
-            self.__exhalation_starts_moments = np.column_stack(
-                (
-                    ups[:, 0],
-                   # - self.__hr[0][0],  # Znormalizowane czasy (pierwsza kolumna)
-                    ups[:, 1],  # Oryginalne wartości (druga kolumna)
                 )
-
-            downs = self.__find_hr_downs()
-            self.__inhalation_starts_moments = np.column_stack(
-                (
-                    downs[:, 0],
-                    #- self.__hr[0][0],  # Znormalizowane czasy (pierwsza kolumna)
-                    downs[:, 1],  # Oryginalne wartości (druga kolumna)
-                )
-
-                # Zakładając posortowane listy minima (wdechy) i maksima (wydechy)
         except:
             pass
+    
+        self.sdann, self.sdnn_index = doba_analysis.analyze(self.raw_data, self.rr_intervals)
 
         return
 
@@ -1240,11 +1146,6 @@ class EcgData:
             (self.__r_peaks_filtered, new_peaks[start_index:end_index])
         )
 
-    def __find_r_peaks_piotr(self):
-        self.__r_peaks_piotr = NAME_THIS_MODULE_YOURSELF_PIOTER.find_r_peaks_piotr(
-            self.__raw_data
-        )
-        return self.__r_peaks_piotr
 
     def __calc_rr_intervals(self):
         self.__rr_intervals = self.calc_rr_intervals(self.__r_peaks)
@@ -1388,41 +1289,6 @@ class EcgData:
         y_train = np.expand_dims(y_train, axis=2)
 
         return X_train, y_train, R_per_w
-        """
-        win_count = int(len(self.__raw_data) / window_size)
-
-        X_train = np.zeros((win_count, window_size), dtype=np.float64)
-        y_train = np.zeros((win_count, window_size))
-        R_per_w = []
-
-        normalize = partial(processing.normalize_bound, lb=-1, ub=1)
-
-        for i in range(win_count):
-            # for i in tqdm(range(win_count)):
-            win_start = i * window_size
-            end = win_start + window_size
-            r_peaks_ind = np.where(
-                (self.__r_peaks_ind >= win_start) & (self.__r_peaks_ind < end)
-            )
-            R_per_w.append(self.__r_peaks_ind[r_peaks_ind] - win_start)
-
-            for j in self.__r_peaks_ind[r_peaks_ind]:
-                r = int(j) - win_start
-                y_train[i, r - 2 : r + 3] = 1
-
-            if self.__raw_data[win_start:end][1].any():
-                X_train[i:] = np.squeeze(
-                    np.apply_along_axis(normalize, 0, self.__raw_data[win_start:end, 1])
-                )
-            else:
-                X_train[i, :] = self.__raw_data[win_start:end, 1].T
-
-        X_train = np.expand_dims(X_train, axis=2)
-
-        y_train = np.expand_dims(y_train, axis=2)
-
-        return X_train, y_train, R_per_w
-        """
 
     def extract_piotr(self, window_size, metrics: list = ["SDNN"], stride: int = None):
         metrics = [s.lower() for s in metrics]
@@ -1725,29 +1591,6 @@ class EcgData:
             # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), lf, hf)
 
         return X_train, y_train
-
-        """
-        # win_count = int(len(self.__rr_intervals) / window_size)
-        # r_peaks = self.raw_data[self.__loaded_r_peaks_ind]
-        # rr_intervals = np.diff([peak[0] for peak in r_peaks])
-        
-        
-
-        # X_train = np.zeros((win_count, window_size), dtype=np.float64)
-        # # y_train = np.zeros((win_count, 3))
-        # y_train = np.zeros((win_count, 1))
-
-        # for i in range(win_count):
-        #     win_start = i * window_size
-        #     win_end = win_start + window_size
-        #     # X_train[i] = self.rr_intervals[win_start:win_end]
-        #     X_train[i] = rr_intervals[win_start:win_end]
-        #     # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]), 0)
-        #     # y_train[i] = (EcgData.calc_sdnn(X_train[i]), EcgData.calc_rmssd(X_train[i]))
-        #     y_train[i] = EcgData.calc_sdnn(X_train[i])
-
-        # return X_train, y_train
-        """
 
     # eksportuje okna traningowe z obliczonymi wartoscami parametrow takich sdnn czy rmssd
     def extract_hrv_windows_with_detected_peaks(

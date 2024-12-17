@@ -8,7 +8,8 @@ from EcgData import *
 from matplotlib.font_manager import FontProperties
 from config import *
 
-#KLASA DO WYSIETLANIA WYKRESU EKG
+# KLASA DO WYSIETLANIA WYKRESU EKG
+
 
 class EcgPlotter:
     @property
@@ -28,60 +29,58 @@ class EcgPlotter:
         plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.1)
 
         # ECG plot
-        (self.line_ecg,) = self.ax_ecg.plot([], [], color="green")
-        self.ax_ecg.set_title(title + " - ECG Signal")
-        self.ax_ecg.set_ylabel("uV")
+        (self.line_ecg,) = self.ax_ecg.plot([], [], color=ECG_SIGNAL_COLOR)
+        self.ax_ecg.set_title(f"ECG signal")
+        self.ax_ecg.set_ylabel("Amplitude (μV)")
 
-        self.ax_ecg.set_facecolor("black")
-        self.ax_ecg.spines["bottom"].set_color("green")
-        self.ax_ecg.spines["top"].set_color("green")
-        self.ax_ecg.spines["right"].set_color("green")
-        self.ax_ecg.spines["left"].set_color("green")
+        self.ax_ecg.set_facecolor(ECG_PLOT_BACKGROUND_COLOR)
+        self.ax_ecg.spines["bottom"].set_color(ECG_BORDER_COLOR)
+        self.ax_ecg.spines["top"].set_color(ECG_BORDER_COLOR)
+        self.ax_ecg.spines["right"].set_color(ECG_BORDER_COLOR)
+        self.ax_ecg.spines["left"].set_color(ECG_BORDER_COLOR)
         self.ax_ecg.tick_params(
             axis="x",
         )
         self.ax_ecg.tick_params(
             axis="y",
         )
+        
         self.ax_ecg.set_xlabel("Time (s)")
-        self.fig.gca().xaxis.set_major_locator(ticker.MultipleLocator(3600))  # co 3600 sekund (1 godzina)
-        self.fig.gca().xaxis.set_major_formatter(
-            ticker.FuncFormatter(
-                ticker.FuncFormatter(lambda x, _: f'{int(x // 3600 + 19)%24:02d}:{int((x % 3600) // 60):02d}')))
-        #self.ax_ecg.set_ylim([-100, 100])
+        # self.fig.gca().xaxis.set_major_locator(ticker.MultipleLocator(3600))  # co 3600 sekund (1 godzina)
+        # self.fig.gca().xaxis.set_major_formatter(
+        #     ticker.FuncFormatter(
+        #         ticker.FuncFormatter(lambda x, _: f'{int(x // 3600 + 19)%24:02d}:{int((x % 3600) // 60):02d}')))
+        # self.ax_ecg.set_ylim([-100, 100])
 
         self.ax_r_peaks = self.ax_ecg.scatter(
             [], [], color="red", label="R-peaks", marker="x", s=100
         )
 
         self.ax_loaded_r_peaks = self.ax_ecg.scatter(
-            [], [], color="yellow", label="Loaded R-peaks", marker="x", s=100
+            [], [], color="#ffb700", label="Loaded R-peaks", marker="x", s=100
         )
 
         self.ax_detected_r_peaks = self.ax_ecg.scatter(
-            [], [], color="cyan", label="Detected R-peaks", marker="x", s=100
+            [], [], color="#0022ff", label="Detected R-peaks", marker="x", s=100
         )
 
         self.ax_within_spec_r_peaks = self.ax_ecg.scatter(
-            [], [], color="white", label="Within spec R-peaks", marker="x", s=100
+            [], [], color="#ff00ff", label="Within spec R-peaks", marker="x", s=100
         )
-        
+        self.fig.tight_layout()
         handles, labels = self.ax_ecg.get_legend_handles_labels()
-        
-        # Add the legend
+
         if self.ecg_data.loaded_r_peak_ind.size != np.empty(0).size:
             legend = self.ax_ecg.legend(
                 loc="lower right",
                 fontsize=12,
                 facecolor="black",
-                edgecolor="green"
+                edgecolor="#333333"
             )
             # Change text color for the legend
             for text in legend.get_texts():
                 text.set_color("white")
 
-        
-        
         self.stats_text = self.ax_ecg.text(
             0.01,
             0.01,
@@ -90,21 +89,22 @@ class EcgPlotter:
             color="white",
             fontsize=12,
             verticalalignment="bottom",
-            bbox=dict(facecolor="black", alpha=0.5),
+            bbox=dict(facecolor="black", alpha=0.8),
         )
 
-        # self.timer = self.fig.canvas.new_timer(interval=500)
-        # self.timer.add_callback(self.update_plot)
-
-        # self.timer.start()
-        self.ecg_data.add_listener(self.update_plot)
-        self.update_plot()
+        if USE_TIMER:
+            self.timer = self.fig.canvas.new_timer(interval=TIMER_INTERVAL)
+            self.timer.add_callback(self.update_plot)
+            self.timer.start()
+        else:
+            self.ecg_data.add_listener(self.update_plot)
+            self.update_plot()
 
     # def send_single_sample(self, timestamp, voltage):
     #     self._plot_data.append((timestamp, voltage))
 
     def _update_plot_data(self) -> None:
-        #self._plot_data = self.ecg_data.filtered_data
+        # self._plot_data = self.ecg_data.filtered_data
         if 0 == len(self.ecg_data.raw_data) or self._is_plot_up_to_date:
             return
         else:
@@ -126,7 +126,9 @@ class EcgPlotter:
 
                 # Szukanie indeksu z tym samym timestampem w ecg_data.filtered_data
                 last_index = np.where(
-                    np.array([row[0] == target_timestamp for row in self.ecg_data.raw_data])
+                    np.array(
+                        [row[0] == target_timestamp for row in self.ecg_data.raw_data]
+                    )
                 )[0][0]
 
                 for row in self.ecg_data.raw_data[last_index + 1 :]:
@@ -144,7 +146,7 @@ class EcgPlotter:
             timestamps, ecg_values = zip(*self._plot_data)
             x = np.array(timestamps)
             x_normalized = x - x[0]  # Normalize time to start from 0
-            
+
             if DISPLAY_X_INDEXES:
                 x_ind = np.arange(0, len(x_normalized))
                 self.line_ecg.set_data(x_ind, ecg_values)
@@ -159,11 +161,13 @@ class EcgPlotter:
 
             if loaded_r_peaks_ind.size != np.empty(0).size:
                 r_peaks_ind = np.intersect1d(loaded_r_peaks_ind, detected_r_peaks_ind)
-                within_spec_ind = np.intersect1d(self.ecg_data.refined_loaded_peaks_ind, detected_r_peaks_ind)
+                within_spec_ind = np.intersect1d(
+                    self.ecg_data.refined_loaded_peaks_ind, detected_r_peaks_ind
+                )
                 # new_arr = np.empty(0)
                 # for i in range(within_spec_ind.size):
                 #     if within_spec_ind[i] != loaded_r_peaks_ind[i]
-                    
+
                 within_spec_ind = np.setdiff1d(within_spec_ind, r_peaks_ind)
                 # r_peaks_ind = np.union1d(within_spec_ind, r_peaks_ind)
                 loaded_r_peaks_ind = np.setdiff1d(loaded_r_peaks_ind, r_peaks_ind)
@@ -182,12 +186,12 @@ class EcgPlotter:
                     if detected_r_peaks[i, 0] < self._plot_data[0][0]:
                         detected_r_peaks = detected_r_peaks[i + 1 :, :]
                         break
-                    
+
                 for i in range(len(within_spec_r_peaks) - 1, -1, -1):
                     if within_spec_r_peaks[i, 0] < self._plot_data[0][0]:
                         within_spec_r_peaks = within_spec_r_peaks[i + 1 :, :]
                         break
-                    
+
                 if loaded_r_peaks.any():  # Check if any R-peaks were found
                     r_peak_times, r_peak_values = zip(*loaded_r_peaks)
                     # Normalize the R-peak timestamps
@@ -209,7 +213,7 @@ class EcgPlotter:
                     )
                 else:
                     self.ax_detected_r_peaks.set_offsets(np.empty((0, 2)))
-                    
+
                 if within_spec_r_peaks.any():  # Check if any R-peaks were found
                     r_peak_times, r_peak_values = zip(*within_spec_r_peaks)
                     # Normalize the R-peak timestamps
@@ -233,7 +237,9 @@ class EcgPlotter:
                 # Normalize the R-peak timestamps
                 r_peak_times_normalized = np.array(r_peak_times) - x[0]
                 if DISPLAY_X_INDEXES:
-                    r_peak_ind = np.squeeze(np.where(np.isin(x_normalized, r_peak_times_normalized)))
+                    r_peak_ind = np.squeeze(
+                        np.where(np.isin(x_normalized, r_peak_times_normalized))
+                    )
                     r_peak_times_normalized = r_peak_ind
                 # Update scatter plot with R-peaks
                 self.ax_r_peaks.set_offsets(
@@ -246,16 +252,15 @@ class EcgPlotter:
             current_voltage = ecg_values[-1]  # Get latest voltage value
             current_time = timestamps[-1]  # Get latest timestamp
             if self.ecg_data.rr_intervals.any():
-                current_interval = self.ecg_data.rr_intervals[:,1][-1]
+                current_interval = self.ecg_data.rr_intervals[:, 1][-1]
                 current_hr = 60 / current_interval
                 current_r_peak = self.ecg_data.r_peaks[-1][1]
                 # self.text_box.set_text(
                 #     f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV\nHR: {current_hr:.2f}")
             # self.text_box.set_text(f"Time: {current_time:.2f}s\nVoltage: {current_voltage:.2f}uV\nInterval: {current_interval:.2f}s\nR peak volt: {current_r_peak:.2f}uV")
 
-
         if PRINT_ECG_DATA:
             self.stats_text.set_text(self.ecg_data.print_data_string())
-            # self.ecg_data.print_data()
+            self.ecg_data.print_data()
 
         self.fig.canvas.draw_idle()

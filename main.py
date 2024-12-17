@@ -2,28 +2,17 @@ import socket
 import struct
 import matplotlib.pyplot as plt
 import threading
-import queue
 from EcgData import *
 from EcgPlotter import *
-from EcgPlotterFILTERED import *
+from FFTPlotter import FFTPlotter
 from HRPlotter import HRPlotter
+from WaveletPlotter import WaveletPlotter
 from config import *
 from dataSenderEmulator import run_emulator_thread
 # from nnHelpers import *
 from Finders.PanTompkinsFinder import PanTompkinsFinder
 from Finders.UNetFinder import UNetFinder
 from Finders.CnnFinder import CnnFinder
-from FFTPlotter import FFTPlotter
-from HRPlotter import HRPlotter
-from WaveletPlotter import WaveletPlotter
-
-
-import tensorflow as tf
-import time
-import os
-
-VERBOSE = False
-PRINT_PACKETS = False
 
 #GLOWNY PUNKT WEJSCIA APLIKACJI
 
@@ -77,7 +66,6 @@ def process_packet(raw_data):
         ]
 
     data.push_raw_data(timestamps, values)
-    # data1.raw_data = data.raw_data
 
 
 def start_server():
@@ -86,10 +74,6 @@ def start_server():
 
         server_socket.listen(1)  # accept only one client
         print("Server listening on port", HOST, PORT)
-
-        # plot_thread = threading.Thread(target=plot_data)
-        # plot_thread.daemon = True
-        # plot_thread.start()
 
         while True:
             client_socket, client_address = server_socket.accept()
@@ -119,11 +103,6 @@ def run_simulation():
 
 def run_load_CSV(data):
     data.load_csv_data(CSV_PATH, False)
-    data.compare_with_Pan_Tompkins()
-    try:
-        data.check_detected_peaks()
-    except:
-        pass
     
 def run_load_mitbih(data):
     data.load_data_from_mitbih(f"{MITBIH_PATH}\\{MITBIH_PATIENT}")
@@ -154,40 +133,21 @@ def test_qt_patients(finder):
 
 
 if __name__ == "__main__":
-    print(WINDOW_SIZE)
-    finder = PanTompkinsFinder()
-    finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}{MODEL_SUFFIX}_unet.keras", WINDOW_SIZE)
-    #finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
-    
-    # TP, FP, FN = test_mitbih_patients(finder)
-    # recall = TP / (TP + FN)
-    # prec = TP / (TP + FP)
-    # f1 = 2 * prec * recall / (prec + recall)
-    # print("Real values comparison")
-    # print(f"TP: {TP}")
-    # print(f"FP: {FP}")
-    # print(f"FN: {FN}")
-    # print(f"Recall: {recall}")
-    # print(f"Precision: {prec}")
-    # print(f"F1-score: {f1}")
-    
-    # test_qt_patients(finder)
-    # exit()
-    
-    
-    # data = EcgData(SAMPLING_RATE, finder, 360)
+    finder = None
+    if R_PEAK_DETECTION_METHOD == RPeakDetectionAlgorithm.PAN_TOMPKINS:
+        finder=PanTompkinsFinder()
+    elif R_PEAK_DETECTION_METHOD ==RPeakDetectionAlgorithm.UNET:
+        finder = UNetFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}{MODEL_SUFFIX}_unet.keras", WINDOW_SIZE)
+    elif RPeakDetectionAlgorithm == RPeakDetectionAlgorithm.CNN:
+        finder = CnnFinder(f"models/model_{WINDOW_SIZE}_{EPOCHS}_cnn.keras", WINDOW_SIZE)
+        
     if isinstance(finder, PanTompkinsFinder):
         target_freq = -1
     else:
         target_freq = 360
         
-    print(f"target_freq {target_freq}")
-        
     data = EcgData(SAMPLING_RATE, finder, target_freq)
-    #ecg_plotter_filtered = EcgPlotterFILTERED("ECG", data)
-    # hr_plotter = HRPlotter("HR", data)
-    # fft_plotter = FFTPlotter("FFT", data)
-    # wavelet_plotter = WaveletPlotter("FFT", data)
+    
 
     if APP_MODE == AppModeEnum.NORMAL:
         run_normal_mode()
@@ -200,8 +160,10 @@ if __name__ == "__main__":
     elif APP_MODE == AppModeEnum.LOAD_QT:
         run_load_qt(data)
 
-    ecg_plotter = EcgPlotter(f"{finder.__class__.__name__} {WINDOW_SIZE}", data)
+    ecg_plotter = EcgPlotter(f"", data)
+    # hr_plotter = HRPlotter("HR", data)
+    # fft_plotter = FFTPlotter("FFT", data)
+    # wavelet_plotter = WaveletPlotter("FFT", data)
 
     plt.show()    
-    # os.system("pause")
     

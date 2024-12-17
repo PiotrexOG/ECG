@@ -26,7 +26,7 @@ def filter_ecg_with_timestamps(ecg_signal, frequency: float):
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
 
-    window_size = int(0.050 * frequency)  # 50 ms window
+    window_size = int(0.150 * frequency)  # 50 ms window
     integrated_signal = moving_window_integration(squared_signal, window_size)
 
     # Combine timestamps with filtered signal values
@@ -44,7 +44,7 @@ def square(sig):
 
 
 def moving_window_integration(sig, window_size):
-    return np.convolve(sig, np.ones(window_size) / window_size, mode="same")
+    return np.convolve(sig, np.ones(window_size), mode="same")
 
 def refine_peak_positions(ecg_signal, detected_peaks, search_window=10):
     refined_peaks = []
@@ -111,7 +111,7 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
     diff_signal = derivative_filter(filtered_signal)
     squared_signal = square(diff_signal)
     
-    window_size = int(0.150 * frequency)  # 50 ms window
+    window_size = int(0.050 * frequency)  # 50 ms window
     integrated_signal = moving_window_integration(squared_signal, window_size)
     
     #threshold = 0.4 * np.max(integrated_signal)
@@ -166,7 +166,6 @@ def find_r_peaks_ind(ecg_signal, frequency: float):
     
     # refined_peaks = refine_peak_positions(ecg_signal[:, 1], peaks)
     refined_peaks = refine_peak_positions(ecg_signal, peaks, round(10/130*frequency))
-    
     # refined_peaks = processing.correct_peaks(
     #     sig=ecg_signal,
     #     peak_inds=peaks,
