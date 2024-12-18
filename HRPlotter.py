@@ -97,32 +97,7 @@ class HRPlotter:
             verticalalignment="bottom",
             bbox=dict(facecolor="black", alpha=0.5),
         )
-        # t_seconds = np.linspace(0, 21600, 1000)  # Symulowany czas w sekundach (0 - 86400)
-        # # Ustalanie czasu początkowego (t = 0 oznacza 19:36:00)
-        # start_time = datetime.datetime(2024, 12, 6, 19, 36, 0)
-        #
-        # # Tworzenie osi czasu w formacie daty i godziny
-        # time_labels = [start_time + datetime.timedelta(seconds=int(t)) for t in t_seconds]
-        #
-        # # Konfigurowanie osi X - pełne godziny
-        # # Znajdujemy najbliższą pełną godzinę >= start_time
-        # first_full_hour = (start_time + datetime.timedelta(minutes=60 - start_time.minute)).replace(minute=0, second=0,
-        #                                                                                             microsecond=0)
-        #
-        # # Generujemy pełne godziny od 20:00 (lub najbliższej pełnej godziny) do 19:00 następnego dnia
-        # hour_ticks = [first_full_hour + datetime.timedelta(hours=i) for i in range(-1, 24)]
-        # hour_labels = [tick.strftime('%H:%M') for tick in hour_ticks]
-        # # Ustawianie etykiet na osi X tylko dla pełnych godzin
-        # plt.xticks(hour_ticks, hour_labels, rotation=45)
 
-        # plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(3600))  # co 3600 sekund (1 godzina)
-        # plt.gca().xaxis.set_major_formatter(
-        #     ticker.FuncFormatter(lambda x,: f'{int(x // 3600):02d}:{int((x % 3600) // 60):02d}'))
-
-
-        interv = 1500
-        # if(APP_MODE.LOAD_CSV):
-        #     interv = 50000
         self.timer = self.fig.canvas.new_timer(interval=1000)
         self.timer.add_callback(self.check_for_data)
         self.timer.start()
@@ -297,7 +272,6 @@ class HRPlotter:
         if hrs_fil:
             t, r = zip(*hrs_fil)
             r_peak_times, r_peak_values = zip(*hrs_fil)
-        #    x = t[16] - t[0]
             r_peak_times_normalized = np.array(r_peak_times) - t[0]
 
             # Dodanie początkowych pustych danych do czasu 14 sekund
@@ -307,21 +281,6 @@ class HRPlotter:
             self.ax_hr_fil.relim()
             self.ax_hr_fil.autoscale_view()
 
-
-        # hr_values = 60 / np.array(r_intervals)  # Calculate HR from RR intervals
-        # hr_times = np.cumsum(r_intervals)
-        # if r_intervals:
-        #     hr_times_normalized = np.array(hr_times) - hr_times[0]
-        #
-        #     self.line_hr.set_data(hr_times_normalized, hr_values)
-        #     self.ax_hr.relim()
-        #     self.ax_hr.autoscale_view()
-        #
-        #     current_hr = hr_values[-1]
-        #     current_interval = r_intervals[-1]
-        #     self.text_box.set_text(
-        #         f"Interval: {current_interval:.2f}s\nHR: {current_hr:.2f}"
-        #     )
 
         if PRINT_ECG_DATA:
             self.stats_text.set_text(self.ecg_data.print_data_string())

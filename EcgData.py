@@ -376,20 +376,10 @@ class EcgData:
 
         #self.raw_data = self.detect_and_remove_artifacts(self.raw_data)
 
-
-        # print(len(self.raw_data))
-
         # self.filtered_data = np.column_stack((csv_data[:, 0], filtered_signal))
-        # print(len(self.filtered_data))
 
         # self.__set_dirty()
         # self.__refresh_if_dirty()
-
-        # try:
-        #     self.hr_filtered = self.filter_hr()
-        # except:
-        #     pass
-        # FFT.fft(self.__rr_intervals[:, 1])
 
         # Wave.analyze(self.__rr_intervals)
         # self.print_data()

@@ -160,10 +160,12 @@ if __name__ == "__main__":
     elif APP_MODE == AppModeEnum.LOAD_QT:
         run_load_qt(data)
 
-    ecg_plotter = EcgPlotter(f"", data)
-    # hr_plotter = HRPlotter("HR", data)
-    # fft_plotter = FFTPlotter("FFT", data)
-    # wavelet_plotter = WaveletPlotter("FFT", data)
+
+    #NALEZY ZAKOMENTOWAC JAKIS WYKRES JELSI GO NIE CHCEMY
+    ecg_plotter = EcgPlotter("ECG", data)
+    hr_plotter = HRPlotter("HR", data)
+    fft_plotter = FFTPlotter("FFT", data)
+    wavelet_plotter = WaveletPlotter("FFT", data)
 
     plt.show()    
     

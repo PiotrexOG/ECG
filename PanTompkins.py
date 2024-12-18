@@ -58,13 +58,7 @@ def refine_peak_positions(ecg_signal, detected_peaks, search_window=10):
 def find_r_peaks_values(ecg_signal, frequency: float):
     peaks = find_r_peaks_ind(ecg_signal, frequency)
     
-    peak_values = ecg_signal[peaks, 1]
-    # peak_timestamps = ecg_signal[peaks, 0]
-    
-    # peaks_with_timestamps = np.column_stack((peak_timestamps, peak_values))
-    
-    # return peaks_with_timestamps
-    return peak_values
+    return ecg_signal[peaks, 1]
 
 
 def find_r_peaks_values_with_timestamps(ecg_signal, frequency: float):
@@ -142,7 +136,6 @@ def find_hr_peaks(hr_signal, frequency: float, lowcut: float = 5, highcut: float
     else:
         refined_peaks = refine_peak_positions(hr_signal[:, 1], peaks, search_window=size)
 
-    #refined_peaks = peaks
 
     peak_values = hr_signal[refined_peaks, 1]
     peak_timestamps = hr_signal[refined_peaks, 0]
