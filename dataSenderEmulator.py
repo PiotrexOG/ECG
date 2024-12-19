@@ -6,6 +6,7 @@ import socket
 
 from config import *
 
+#PLIK DO SYMULOWANIA POBIERANIA DANYCH
 
 def read_csv(path: str):
     data = []
@@ -48,7 +49,7 @@ def send_loop(data):
 
                     sock.sendall(byte_buffer)
 
-                    sleep_time = (data[index][0] + offset - first_ts_in_iteration) / TIME_SCALE_FACTOR
+                    sleep_time = (data[index][0] + offset - first_ts_in_iteration) / TIMESTAMP_SCALE_FACTOR / SLEEP_MULTIPLIER
                     time.sleep(sleep_time)
         except Exception as ex:
             print(f"Exception was thrown: {ex}")
