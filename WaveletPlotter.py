@@ -233,8 +233,8 @@ class WaveletPlotter:
 
                 else:
                     time_buffer_avg = new_time
-                    hf_power_avg = hf_power
-                    lf_power_avg = lf_power
+                    hf_power_avgG = hf_power
+                    lf_power_avgG = lf_power
                     ratio_avg = np.divide(lf_power, hf_power, out=np.zeros_like(lf_power), where=hf_power > 0)
 
                 # Buforowanie wyników
